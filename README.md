@@ -71,6 +71,8 @@ graph TD
 | **Snapshot Memory Footprint** | Up to 2x RAM (Copy-On-Write) | **Forkless Stream (Zero Doubling)** | **Memory Safe** |
 | **P99 Read/Write Tail Latency** | 4.8 ms | **0.35 ms** | **13.7x Lower** |
 
+![Valence Performance Comparison](assets/valence_performance_comparison.png)
+
 ### 🚀 Peak Throughput Comparison (Operations / Second)
 ```text
 Valence Engine (12 Cores)  [████████████████████████████████████████] 1,250,000+ ops/sec (11.3x)
@@ -96,6 +98,8 @@ Modern high-concurrency systems degrade when binary image BLOBs are stored direc
 * **30% Media Engine (Cloudinary Edge Anycast CDN):** Handles automatic format/codec negotiation (AVIF/WebP), AI gravity cropping (c_fill, g_auto), serverless layered graphics synthesis, and global Anycast delivery.
 
 
+![Valence Cloudinary Dual-Engine Architecture](assets/valence_cloudinary_dual_engine.png)
+
 ```mermaid
 graph LR
     subgraph Traditional Architecture (Redis Bottleneck)
@@ -111,6 +115,8 @@ graph LR
         C2 -->|Auto AVIF/WebP 25.4 KB Payload| C3[Blazing Fast Mobile Client]
     end
 ```
+
+![Database RAM & Bandwidth Preservation Matrix](assets/database_ram_vs_media_savings.png)
 
 ### 💾 In-Memory Database RAM Allocation (10,000 Catalog Assets)
 ```mermaid
