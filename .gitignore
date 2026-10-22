@@ -36,3 +36,15 @@ hackathon_slides/
 
 scratch/
 chrome_temp/
+
+# Documents, presentations, and scratch slide scripts
+*.pdf
+*.pptx
+*.ppt
+winning_samples/
+generate_*.py
+build_master_presentation.py
+create_architecture_diagram.py
+create_ui_showcase.py
+active_tunnel.txt
+demo_swiggy/public/active_tunnel.json
