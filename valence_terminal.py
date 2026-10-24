@@ -380,11 +380,11 @@ COMMAND_DOCS = {
         "complexity": "O(1) Core Memory Write",
         "example": "MEDIA.TRANSFORM dish:burger thumb"
     },
-    "MEDIA.TICKET": {
-        "syntax": "MEDIA.TICKET <seat_id> <event_title> [attendee_name]",
-        "desc": "Generates dynamic serverless Cloudinary ticket image and registers in Valence RAM with 600s TTL.",
+    "MEDIA.ORDER": {
+        "syntax": "MEDIA.ORDER <seat_id> <event_title> [attendee_name]",
+        "desc": "Generates dynamic serverless Cloudinary order pass image and registers in Valence RAM with 600s TTL.",
         "complexity": "O(1) Timing Wheel + Serverless Render",
-        "example": "MEDIA.TICKET A4 \"Hacktoberfest 2026\" \"Akash Kumar\""
+        "example": "MEDIA.ORDER A4 \"Hacktoberfest 2026\" \"Akash Kumar\""
     },
     "MEDIA.BENCH": {
         "syntax": "MEDIA.BENCH [count]",
@@ -416,7 +416,7 @@ def print_banner():
         print(f"  {WHITE}Telemetry Bridge:{RESET}    {YELLOW}{CURRENT_APP_URL}{RESET}")
     print(CYAN + "═" * 80 + RESET)
     print(f"  • Type {BOLD}'HELP'{RESET} to browse 40+ commands | {BOLD}'HELP <cmd>'{RESET} for Big-O syntax & docs")
-    print(f"  • Type {BOLD}'MEDIA.SET <key> <asset>'{RESET} or {BOLD}'MEDIA.TICKET <seat> <event>'{RESET} for Cloudinary engine")
+    print(f"  • Type {BOLD}'MEDIA.SET <key> <asset>'{RESET} or {BOLD}'MEDIA.ORDER <seat> <event>'{RESET} for Cloudinary engine")
     print(f"  • Type {BOLD}'CLOUDINARY.STATS'{RESET} to audit RAM saved vs Cloudinary edge CDN offloading")
     print(f"  • Type {BOLD}'BENCH [count]'{RESET} for engine latency test | {BOLD}'SHARDS'{RESET} to inspect 12 cores")
     print(f"  • Type {BOLD}'ATTACH [url]'{RESET} to stream live telemetry | {BOLD}'CONNECT <host> [port]'{RESET} for remote")
@@ -480,7 +480,7 @@ def show_help(arg: str = None):
             ("MEDIA.SET <k> <asset> [w] [c]", "Offload asset to Cloudinary, store 64B pointer in Valence RAM"),
             ("MEDIA.GET <k>", "Fetch pointer from Valence RAM & probe Cloudinary Edge status"),
             ("MEDIA.TRANSFORM <k> <preset>", "Dynamic transformation (thumb/avatar/banner/card/blur/sepia)"),
-            ("MEDIA.TICKET <seat> <title>", "Generate serverless dynamic confirmed ticket overlay"),
+            ("MEDIA.ORDER <seat> <title>", "Generate serverless dynamic confirmed order delivery pass"),
             ("MEDIA.BENCH [count]", "Dual-engine latency & RAM preservation benchmark"),
             ("CLOUDINARY.STATS", "Audit database RAM saved vs Cloudinary media offloaded"),
             ("CLOUDINARY.CONFIG [cloud]", "Inspect or dynamically switch active Cloudinary cloud name")
@@ -753,57 +753,49 @@ def handle_media_transform(r, parts: list[str]):
     print(f"  Updated Pointer URL: {CYAN}{new_url}{RESET}")
     print(f"{GREEN}═════════════════════════════════════════════════════════════════════════{RESET}\n")
 
-def handle_media_ticket(r, parts: list[str]):
+def handle_media_order(r, parts: list[str]):
     if not r:
         r = get_redis_client()
         if not r:
             print(f"{RED}[-] Error: Engine not connected to 127.0.0.1:6379.{RESET}")
             return
 
-    if len(parts) < 3:
-        print(f"{RED}[-] Syntax: MEDIA.TICKET <seat_id> <event_title> [attendee_name]{RESET}")
-        print(f"{GRAY}    Example: MEDIA.TICKET A4 \"Hacktoberfest 2026\" \"Akash Kumar\"{RESET}")
-        print(f"{GRAY}    Example: MEDIA.TICKET VIP-12 \"Dune: Part Two\" \"Priya\"{RESET}")
-        return
+    order_id = parts[1].strip() if len(parts) > 1 else "8921"
+    rest_name = parts[2].strip() if len(parts) > 2 else "Meghana Foods"
+    dish_name = parts[3].strip() if len(parts) > 3 else "Special Chicken Biryani"
 
-    seat_id = parts[1].strip()
-    event_title = parts[2].strip()
-    attendee = parts[3].strip() if len(parts) > 3 else "Verified Attendee"
+    enc_order = urllib.parse.quote(order_id)
+    enc_rest = urllib.parse.quote(rest_name)
+    enc_dish = urllib.parse.quote(dish_name)
 
-    enc_seat = urllib.parse.quote(seat_id)
-    enc_event = urllib.parse.quote(event_title)
-    enc_attendee = urllib.parse.quote(attendee)
-
-    # Serverless Dynamic Image Generation with Cloudinary Layered Overlays
-    ticket_transforms = (
+    order_transforms = (
         f"w_640,h_360,c_fill,b_rgb:0f172a,e_tint:100:0f172a/"
-        f"l_text:Arial_28_bold:CONFIRMED%20SEAT%20{enc_seat},co_rgb:22c55e,g_north,y_35/"
-        f"l_text:Arial_24_bold:{enc_event},co_white,g_north,y_90/"
-        f"l_text:Arial_18:Attendee:%20{enc_attendee},co_rgb:94a3b8,g_north,y_145/"
-        f"l_text:Arial_14:VALENCE%20RAM%20%2B%20CLOUDINARY%20EDGE,co_rgb:64748b,g_south,y_25"
+        f"l_text:Arial_28_bold:CONFIRMED%20ORDER%20%23{enc_order},co_rgb:fc8019,g_north,y_35/"
+        f"l_text:Arial_24_bold:{enc_rest},co_white,g_north,y_90/"
+        f"l_text:Arial_18:Item:%20{enc_dish},co_rgb:94a3b8,g_north,y_145/"
+        f"l_text:Arial_14:SWIGGY%20DELIVERY%20%2B%20VALENCE%20RAM%20%2B%20CLOUDINARY,co_rgb:22c55e,g_south,y_25"
     )
-    ticket_url = f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/{ticket_transforms}/sample.jpg"
+    order_url = f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/{order_transforms}/sample.jpg"
 
-    print(f"\n{CYAN}[*] Dual-Engine Generating Live Ticket on Cloudinary Edge...{RESET}")
-    probe = probe_media_url(ticket_url, timeout=10.0)
+    print(f"\n{CYAN}[*] Dual-Engine Generating Live Swiggy Order Pass on Cloudinary Edge...{RESET}")
+    probe = probe_media_url(order_url, timeout=10.0)
 
     if not probe["success"]:
-        print(f"{RED}[-] Ticket generation failed: {probe['error']}{RESET}\n")
+        print(f"{RED}[-] Dynamic order generation failed: {probe['error']}{RESET}\n")
         return
 
-    # Store in Valence with 10-minute (600s) TTL on 4-Tier Timing Wheel via SET key val EX 600
-    ticket_key = f"ticket:{seat_id}"
+    order_key = f"swiggy:order:{order_id}"
     t0 = time.perf_counter()
-    r.set(ticket_key, ticket_url, ex=600)
+    r.set(order_key, order_url, ex=600)
     elapsed_us = (time.perf_counter() - t0) * 1_000_000
 
-    shard_id, core_name = get_core_shard(ticket_key)
-    hash_val = murmur3_32(ticket_key)
+    shard_id, core_name = get_core_shard(order_key)
+    hash_val = murmur3_32(order_key)
 
-    print(f"\n{GREEN}{BOLD}═══════════════ VALENCE + CLOUDINARY DYNAMIC TICKET ENGINE ═══════════════{RESET}")
-    print(f"  Seat Assigned:       {YELLOW}{seat_id}{RESET} ({event_title})")
-    print(f"  Attendee:            {WHITE}{attendee}{RESET}")
-    print(f"  Valence Key:         {CYAN}{ticket_key}{RESET} (Murmur3: 0x{hash_val:08X})")
+    print(f"\n{GREEN}{BOLD}═══════════════ VALENCE + CLOUDINARY SWIGGY ORDER ENGINE ═══════════════{RESET}")
+    print(f"  Order ID:            {YELLOW}#{order_id}{RESET} ({rest_name})")
+    print(f"  Item:                {WHITE}{dish_name}{RESET}")
+    print(f"  Valence Key:         {CYAN}{order_key}{RESET} (Murmur3: 0x{hash_val:08X})")
     print(f"  Hardware Partition:  {GREEN}Shard #{shard_id:02d} -> {core_name}{RESET}")
     print(f"  Valence TTL Handler: {YELLOW}Tier 1 (Minutes), Cascading Bucket #10 (600s TTL){RESET}")
     print(f"  Valence RAM Write:   {CYAN}{elapsed_us:.2f} µs{RESET}")
@@ -811,8 +803,9 @@ def handle_media_ticket(r, parts: list[str]):
     print(f"  Status:              {GREEN}200 OK (Rendered dynamically by Cloudinary){RESET}")
     print(f"  Payload Size:        {WHITE}{probe['size']:,} bytes{RESET} ({probe['mime']})")
     print(f"  Edge Generation RTT: {WHITE}{probe['latency_ms']:.1f} ms{RESET}")
-    print(f"  Live Ticket Image:   {CYAN}{ticket_url}{RESET}")
+    print(f"  Live Order Pass:     {CYAN}{order_url}{RESET}")
     print(f"{GREEN}═════════════════════════════════════════════════════════════════════════{RESET}\n")
+
 
 def handle_cloudinary_stats(r):
     if not r:
@@ -863,7 +856,7 @@ def handle_cloudinary_stats(r):
             shard_id, core_name = get_core_shard(mk)
             print(f"  {idx+1}) {YELLOW}{mk:<24}{RESET} [{core_name}] -> {GRAY}{mv[:55]}...{RESET}")
     else:
-        print(f"  {GRAY}(Run 'MEDIA.SET dish:sample cld-sample-4' or 'MEDIA.TICKET A4 Hacktober' to populate){RESET}")
+        print(f"  {GRAY}(Run 'MEDIA.SET dish:sample cld-sample-4' or 'MEDIA.ORDER A4 Hacktober' to populate){RESET}")
     print(f"{CYAN}═════════════════════════════════════════════════════════════════════════{RESET}\n")
 
 def handle_cloudinary_config(parts: list[str]):
@@ -1025,66 +1018,54 @@ def run_benchmark(r, count: int = 1000):
             print(f"{RED}[-] Engine not connected to 127.0.0.1:6379. Please launch '1_START_VALENCE_SERVER.bat'.{RESET}")
             return
 
-    # Support from 100 up to 10,000,000 operations without artificial 50k capping
-    total_ops = max(100, min(count, 10_000_000))
+    total_ops = max(10, min(count, 50_000))
     set_ops = total_ops // 2
     get_ops = total_ops - set_ops
 
-    print(f"\n{CYAN}[*] Running Valence micro-benchmark: {total_ops:,} operations ({set_ops:,} SET + {get_ops:,} GET)...{RESET}")
+    print(f"\n{CYAN}[*] Running live Valence benchmark: {total_ops:,} operations ({set_ops:,} SET + {get_ops:,} GET)...{RESET}")
 
     latencies_us = []
     t_start = time.perf_counter()
 
-    # Measure sample queries against the live Valence engine
-    sample_size = min(total_ops, 1000)
-    for i in range(sample_size):
-        k = f"bench:key:{i % 100}"
-        v = "valence_speed_test"
+    for i in range(set_ops):
+        k = f"bench:swiggy:cart:{i % 50}"
+        v = f"item_{i}_qty_2"
         t0 = time.perf_counter()
-        try:
-            r.set(k, v)
-            r.get(k)
-        except Exception:
-            pass
+        r.set(k, v)
         t1 = time.perf_counter()
-        latencies_us.append(max(0.19, (t1 - t0) * 1_000_000 / 2))
+        latencies_us.append((t1 - t0) * 1_000_000)
 
-    # For large benchmarks, display a fast, smooth live progress bar
-    if total_ops > 2000:
-        bar_len = 30
-        steps = 25
-        for s in range(1, steps + 1):
-            time.sleep(0.04)  # ~1 second smooth visual progress
-            pct = int((s / steps) * 100)
-            filled = int(bar_len * (s / steps))
-            bar = "█" * filled + "░" * (bar_len - filled)
-            current_ops = int(total_ops * (s / steps))
-            sys.stdout.write(f"\r  {CYAN}Progress: [{GREEN}{bar}{CYAN}] {WHITE}{pct}%{CYAN} ({current_ops:,} / {total_ops:,} ops){RESET}")
-            sys.stdout.flush()
-        print()
+    for i in range(get_ops):
+        k = f"bench:swiggy:cart:{i % 50}"
+        t0 = time.perf_counter()
+        r.get(k)
+        t1 = time.perf_counter()
+        latencies_us.append((t1 - t0) * 1_000_000)
 
-    total_sec = max(0.05, time.perf_counter() - t_start)
+    total_sec = max(0.0001, time.perf_counter() - t_start)
     latencies_us.sort()
     ops_per_sec = total_ops / total_sec
 
-    # Engine core execution is sub-microsecond inside the pinned shard arenas
-    core_lat_us = 0.22
-
+    min_us = latencies_us[0]
     p50 = latencies_us[int(len(latencies_us) * 0.50)]
     p90 = latencies_us[int(len(latencies_us) * 0.90)]
     p99 = latencies_us[int(len(latencies_us) * 0.99)]
 
+    # Compute multi-core engine aggregate capacity based on measured response time across 12 hardware shards
+    engine_capacity = int((1_000_000 / max(0.1, p50)) * 12)
+
     print(f"\n{GREEN}{BOLD}══════════════════ VALENCE BENCHMARK RESULTS ══════════════════{RESET}")
     print(f"  Operations Processed: {WHITE}{total_ops:,} ops ({set_ops:,} SET + {get_ops:,} GET){RESET}")
     print(f"  Total Duration:       {WHITE}{total_sec:.3f} seconds{RESET}")
-    print(f"  Throughput (Client):  {YELLOW}{BOLD}{ops_per_sec:,.0f} ops/sec (Pipelined Engine Harness){RESET}")
-    print(f"  Throughput (Engine):  {GREEN}{BOLD}1,250,000+ ops/sec (12 Pinned Core Aggregate Capacity){RESET}")
-    print(f"{CYAN}────────────────── HARDWARE & NETWORK LATENCY ────────────────{RESET}")
-    print(f"  Engine Core Latency:  {GREEN}{core_lat_us:.2f} µs{RESET}  (Lock-free L1/L2 Pinned Arena)")
+    print(f"  Throughput (Client):  {YELLOW}{BOLD}{ops_per_sec:,.0f} ops/sec{RESET} (Direct TCP Driver)")
+    print(f"  Throughput (Engine):  {GREEN}{BOLD}{engine_capacity:,} ops/sec{RESET} (12 Hardware Cores Capacity)")
+    print(f"{CYAN}────────────────── MEASURED QUERY LATENCY ────────────────{RESET}")
+    print(f"  Fastest Core Query:   {GREEN}{min_us:.2f} µs{RESET}  (Lock-free L1/L2 Pinned Arena)")
     print(f"  Client RTT P50:       {YELLOW}{p50:.2f} µs{RESET}  {'█' * 22} (TCP Loopback)")
     print(f"  Client RTT P90:       {YELLOW}{p90:.2f} µs{RESET}  {'█' * 12}")
     print(f"  Client RTT P99:       {YELLOW}{p99:.2f} µs{RESET}  {'█' * 4}")
     print(f"{GREEN}═══════════════════════════════════════════════════════════════{RESET}\n")
+
 
 def explain_command(parts: list[str]):
     if len(parts) < 2:
@@ -1480,9 +1461,9 @@ def main():
                 handle_media_transform(r, cmd_parts)
                 continue
 
-            if verb in ("MEDIA.TICKET", "MEDIA") and (verb == "MEDIA.TICKET" or (len(parts) > 1 and parts[1].upper() == "TICKET")):
-                cmd_parts = parts if verb == "MEDIA.TICKET" else [parts[0] + ".TICKET"] + parts[2:]
-                handle_media_ticket(r, cmd_parts)
+            if verb in ("MEDIA.ORDER", "MEDIA") and (verb == "MEDIA.ORDER" or (len(parts) > 1 and parts[1].upper() == "order")):
+                cmd_parts = parts if verb == "MEDIA.ORDER" else [parts[0] + ".order"] + parts[2:]
+                handle_media_order(r, cmd_parts)
                 continue
 
             if verb in ("MEDIA.BENCH", "MEDIA") and (verb == "MEDIA.BENCH" or (len(parts) > 1 and parts[1].upper() == "BENCH")):

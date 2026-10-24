@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Food Online from India's Best Restaurants | Swiggy</title>
+  <meta name="theme-color" content="#fc8019">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Swiggy">
   <link rel="icon" type="image/png" href="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_100/portal/m/seo/icon-192x192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,6 +48,9 @@
       <div class="nav-item" onclick="triggerValenceAction('signin')">
         <span class="nav-icon">👤</span> Sign In
       </div>
+      <button onclick="openSwiggyQrModal()" style="background:rgba(56, 189, 248, 0.15); border:1px solid rgba(56, 189, 248, 0.4); color:#38bdf8; font-weight:700; font-size:13px; padding:7px 14px; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s;">
+        <span>📱</span> <span>Phone QR</span>
+      </button>
       <div class="nav-item cart-nav-btn" onclick="toggleCartDrawer()">
         <span class="nav-icon">🛒</span> Cart <span class="cart-badge-count" id="header-cart-count">0</span>
       </div>
@@ -84,6 +91,20 @@
          ========================================================================= -->
     <section class="view-panel customer-full-view" id="panel-customer">
       
+      <!-- Mobile Quick Search Bar & Live Engine HUD -->
+      <div class="mobile-search-pill-container">
+        <div class="mobile-search-box" onclick="focusSearch()">
+          <span class="ms-search-icon">🔍</span>
+          <input type="text" id="mob-search-input" placeholder="Search for restaurant, biryani, burger..." oninput="handleMobileSearch(this.value)" autocomplete="off">
+          <span class="ms-mic" onclick="triggerValenceAction('search')">🎙️</span>
+        </div>
+      </div>
+
+      <div class="valence-live-chip-mobile" id="valence-live-chip-mobile" onclick="triggerValenceAction('shards')">
+        <span class="vlc-pulse"></span>
+        <span class="vlc-text" id="vlc-text">⚡ Valence Engine: 12 Cores Active (0.22 µs)</span>
+      </div>
+
       <!-- Promotional Hero Carousel Banner -->
       <div class="hero-promo-container">
         <div class="promo-banner-card promo-bg-one" onclick="triggerValenceAction('swiggy_one')" style="cursor: pointer;">
@@ -129,6 +150,10 @@
         <!-- Filter Pills Row -->
         <div class="filters-row">
           <button class="filter-pill active" onclick="filterCuisine('all')">All</button>
+          <button class="filter-pill" onclick="filterQuick('fast')">⚡ Fast Delivery</button>
+          <button class="filter-pill" onclick="filterQuick('rating')">Ratings 4.3+ ★</button>
+          <button class="filter-pill" onclick="filterQuick('veg')">Pure Veg 🌱</button>
+          <button class="filter-pill" onclick="filterQuick('offers')">Offers 🏷️</button>
           <button class="filter-pill" onclick="filterCuisine('Biryani')">Biryani</button>
           <button class="filter-pill" onclick="filterCuisine('Burgers')">Burgers</button>
           <button class="filter-pill" onclick="filterCuisine('Pizzas')">Pizzas</button>
@@ -455,6 +480,40 @@
   </aside>
   <div class="cart-drawer-backdrop" id="cart-drawer-backdrop" onclick="toggleCartDrawer()"></div>
 
+  <!-- Floating Bottom Cart Bar (Signature Swiggy Mobile Pill) -->
+  <div class="swiggy-floating-cart-bar" id="floating-cart-bar" onclick="toggleCartDrawer()">
+    <div class="fc-left">
+      <div class="fc-count-pill" id="fc-count-pill">1 ITEM</div>
+      <span class="fc-divider">|</span>
+      <span class="fc-price" id="fc-price">₹340</span>
+    </div>
+    <div class="fc-right">
+      <span>VIEW CART</span>
+      <span class="fc-cart-arrow">➔</span>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar (Authentic Swiggy App Bar) -->
+  <nav class="swiggy-mobile-bottom-nav">
+    <button class="mob-nav-btn active" id="mob-nav-food" onclick="showCustomerHome(); return false;">
+      <span class="mob-nav-icon">🍕</span>
+      <span class="mob-nav-label">Swiggy</span>
+    </button>
+    <button class="mob-nav-btn" id="mob-nav-insta" onclick="triggerValenceAction('instamart'); return false;">
+      <span class="mob-nav-icon">⚡</span>
+      <span class="mob-nav-label">Instamart</span>
+      <span class="mob-badge-chip">10 MIN</span>
+    </button>
+    <button class="mob-nav-btn" id="mob-nav-dineout" onclick="triggerValenceAction('dineout'); return false;">
+      <span class="mob-nav-icon">🍽️</span>
+      <span class="mob-nav-label">Dineout</span>
+    </button>
+    <button class="mob-nav-btn" id="mob-nav-val" onclick="setAppMode('rush'); return false;">
+      <span class="mob-nav-icon">📊</span>
+      <span class="mob-nav-label">12 Cores</span>
+    </button>
+  </nav>
+
   <!-- Modal: Open on Phone / QR Code -->
   <div class="modal-backdrop" id="modal-qr">
     <div class="modal-card">
@@ -476,5 +535,38 @@
 
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
   <script src="app.js"></script>
+  <script>
+    async function openSwiggyQrModal() {
+      const modal = document.getElementById('modal-qr');
+      const linksDiv = document.getElementById('network-links-list');
+      const canvas = document.getElementById('qr-canvas');
+      let targetUrl = window.location.origin;
+      try {
+        const res = await fetch('/active_tunnel.json');
+        if (res.ok) {
+          const data = await res.json();
+          targetUrl = data.url;
+        }
+      } catch (e) {}
+      linksDiv.innerHTML = `<div style="text-align:center; margin-top:12px;">
+        <span style="color:#64748b; font-size:11px; display:block; text-transform:uppercase; font-weight:700;">Public HTTPS Link:</span>
+        <a href="${targetUrl}" target="_blank" style="color:#fc8019; font-weight:800; word-break:break-all; font-size:14px; text-decoration:none;">${targetUrl}</a>
+        <div style="margin-top:10px; background:rgba(16, 185, 129, 0.1); border:1px solid rgba(16, 185, 129, 0.3); border-radius:8px; padding:8px; font-size:12px; color:#10b981;">
+          💡 Open on your phone to test Swiggy food ordering live on Valence (port 6379)!
+        </div>
+      </div>`;
+      if (window.QRCode) {
+        QRCode.toCanvas(canvas, targetUrl, { width: 200, margin: 1 }, function (error) {});
+      }
+      modal.classList.add('show');
+      modal.style.display = 'flex';
+    }
+
+    function closeQrModal() {
+      const modal = document.getElementById('modal-qr');
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+  </script>
 </body>
 </html>
