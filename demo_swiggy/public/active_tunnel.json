@@ -1,7 +1,7 @@
 {
-  "url": "https://description-exp-showtimes-option.trycloudflare.com",
-  "provider": "Cloudflare Edge",
+  "url": "http://127.0.0.1:3000",
+  "provider": "Localhost Engine Direct",
   "port": 3000,
   "valence_port": 6379,
-  "timestamp": 1792183500
+  "cloud_url": "https://akash20065ray-sys.github.io/VALENCE_2.0/"
 }
