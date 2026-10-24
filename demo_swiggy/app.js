@@ -1,3 +1,16 @@
+
+// Force removal of any legacy TTL badges
+function purgeLegacyTtlBadges() {
+  const badge = document.getElementById('fc-ttl-badge');
+  if (badge) badge.remove();
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', purgeLegacyTtlBadges);
+} else {
+  purgeLegacyTtlBadges();
+}
+setInterval(purgeLegacyTtlBadges, 250);
+
 // ==============================================================================
 // DEFAULT SWIGGY CATALOG DATA (Fallbacks for Static Cloud Deployment)
 // ==============================================================================

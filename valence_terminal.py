@@ -1202,32 +1202,7 @@ def format_telemetry_line(q):
         lat = 0.25
     status = q.get("status") or "OK"
     details = q.get("details") or ""
-
-    # Timing Wheel TTL Resolution
-    ttl_val = q.get("ttl")
-    if not ttl_val:
-        k_low = key.lower()
-        if "cart" in k_low:
-            ttl_val = "60s"
-        elif "order" in k_low:
-            ttl_val = "900s"
-        elif "search" in k_low or "filter" in k_low or "category" in k_low:
-            ttl_val = "300s"
-        elif "restaurant" in k_low or "catalog" in k_low or "menu" in k_low:
-            ttl_val = "3600s"
-        elif "rider" in k_low or "gps" in k_low:
-            ttl_val = "30s"
-        elif "rush" in k_low:
-            ttl_val = "120s"
-        else:
-            ttl_val = "300s"
-    elif isinstance(ttl_val, (int, float)):
-        ttl_val = f"{int(ttl_val)}s"
-    elif isinstance(ttl_val, str) and not ttl_val.endswith("s"):
-        ttl_val = f"{ttl_val}s"
-
-    ttl_tag = f"{MAGENTA}[TTL: {ttl_val:<5}]{RESET}"
-    return f"{CYAN}[{core}]{RESET} {GREEN}[{lat:.2f} us]{RESET} {ttl_tag} {YELLOW}{cmd:<5}{RESET} {WHITE}{key:<28}{RESET} -> {GRAY}{status} {details}{RESET}"
+    return f"{CYAN}[{core}]{RESET} {GREEN}[{lat:.2f} us]{RESET} {YELLOW}{cmd:<5}{RESET} {WHITE}{key:<30}{RESET} -> {GRAY}{status} {details}{RESET}"
 
 def print_live_telemetry_query(q):
     line = format_telemetry_line(q)
