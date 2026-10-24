@@ -628,7 +628,7 @@ def handle_media_set(r, parts: list[str]):
     print(f"\n{GREEN}{BOLD}═════════════════ VALENCE + CLOUDINARY DUAL-ENGINE PIPELINE ═════════════════{RESET}")
     print(f"  Target Key:          {YELLOW}{key}{RESET}")
     print(f"  Valence Core Pin:    {GREEN}Shard #{shard_id:02d} -> {core_name}{RESET} (Murmur3: 0x{hash_val:08X})")
-    print(f"  Valence RAM Write:   {CYAN}{elapsed_us:.2f} µs{RESET} (Lock-free Arena Pointer Storage)")
+    print(f"  Valence RAM Write:   {CYAN}{elapsed_us:.2f} us{RESET} (Lock-free Arena Pointer Storage)")
     print(f"  Database RAM Footprint: {WHITE}{pointer_bytes} bytes{RESET} pointer in RAM vs {WHITE}{orig_size:,} bytes{RESET} raw image ({GREEN}{ram_saved_pct:.2f}% RAM Preserved{RESET})")
     print(f"{CYAN}───────────────── CLOUDINARY DYNAMIC EDGE TRANSFORMATION ─────────────────{RESET}")
     print(f"  Origin Asset:        {WHITE}{orig_size:,} bytes{RESET} ({p_orig.get('mime', 'image/jpeg')})")
@@ -666,7 +666,7 @@ def handle_media_get(r, parts: list[str]):
     print(CYAN + "─" * 70 + RESET)
     print(f"  Key:             {YELLOW}{key}{RESET}")
     print(f"  Shard / Core:    {GREEN}Shard #{shard_id:02d} ({core_name}){RESET} | Murmur3: 0x{hash_val:08X}")
-    print(f"  Valence RAM RTT: {GREEN}{elapsed_us:.2f} µs{RESET}")
+    print(f"  Valence RAM RTT: {GREEN}{elapsed_us:.2f} us{RESET}")
     print(f"  Pointer Size:    {WHITE}{len(val)} bytes{RESET}")
     print(f"  Stored Value:    {WHITE}{val_str}{RESET}")
 
@@ -737,7 +737,7 @@ def handle_media_transform(r, parts: list[str]):
     print(f"\n{GREEN}{BOLD}═══════════════ CLOUDINARY DYNAMIC MEDIA TRANSFORMATION ═══════════════{RESET}")
     print(f"  Target Key:          {YELLOW}{key}{RESET}")
     print(f"  Applied Preset:      {WHITE}{raw_transform}{RESET} -> [{tx_params}]")
-    print(f"  Valence RAM Update:  {GREEN}{elapsed_us:.2f} µs{RESET}")
+    print(f"  Valence RAM Update:  {GREEN}{elapsed_us:.2f} us{RESET}")
     print(f"  Previous Edge Size:  {WHITE}{sz_before:,} bytes{RESET} ({p_before.get('mime', 'unknown')})")
     print(f"  New Transformed Size:{GREEN}{sz_after:,} bytes{RESET} ({p_after['mime']}) [Delta: {delta_str} bytes]")
     print(f"  Edge Response Time:  {WHITE}{p_after['latency_ms']:.1f} ms{RESET}")
@@ -789,7 +789,7 @@ def handle_media_order(r, parts: list[str]):
     print(f"  Valence Key:         {CYAN}{order_key}{RESET} (Murmur3: 0x{hash_val:08X})")
     print(f"  Hardware Partition:  {GREEN}Shard #{shard_id:02d} -> {core_name}{RESET}")
     print(f"  Valence TTL Handler: {YELLOW}Tier 1 (Minutes), Cascading Bucket #10 (600s TTL){RESET}")
-    print(f"  Valence RAM Write:   {CYAN}{elapsed_us:.2f} µs{RESET}")
+    print(f"  Valence RAM Write:   {CYAN}{elapsed_us:.2f} us{RESET}")
     print(f"{CYAN}───────────────── SERVERLESS EDGE RENDER VERIFICATION ─────────────────{RESET}")
     print(f"  Status:              {GREEN}200 OK (Rendered dynamically by Cloudinary){RESET}")
     print(f"  Payload Size:        {WHITE}{probe['size']:,} bytes{RESET} ({probe['mime']})")
@@ -909,9 +909,9 @@ def handle_media_bench(r, parts: list[str]):
 
     print(f"\n{GREEN}{BOLD}═══════════════ DUAL-ENGINE SYSTEM BENCHMARK RESULTS ═══════════════{RESET}")
     print(f"  Media Pointers Managed:  {WHITE}{count:,} keys{RESET} distributed across 12 CPU shards")
-    print(f"  Valence RAM Read P50:    {GREEN}{p50:.2f} µs{RESET}")
-    print(f"  Valence RAM Read P90:    {GREEN}{p90:.2f} µs{RESET}")
-    print(f"  Valence RAM Read P99:    {YELLOW}{p99:.2f} µs{RESET}")
+    print(f"  Valence RAM Read P50:    {GREEN}{p50:.2f} us{RESET}")
+    print(f"  Valence RAM Read P90:    {GREEN}{p90:.2f} us{RESET}")
+    print(f"  Valence RAM Read P99:    {YELLOW}{p99:.2f} us{RESET}")
     print(f"{CYAN}───────────────── DATABASE RAM PRESERVATION ───────────────────────{RESET}")
     print(f"  Valence Pointer RAM:     {CYAN}{pointer_ram_kb:.1f} KB{RESET} (Sub-microsecond L1/L2 access)")
     print(f"  Traditional BLOB RAM:    {RED}{blob_ram_mb:.1f} MB{RESET} (Raw image data in database heap)")
@@ -1202,7 +1202,32 @@ def format_telemetry_line(q):
         lat = 0.25
     status = q.get("status") or "OK"
     details = q.get("details") or ""
-    return f"{CYAN}[{core}]{RESET} {GREEN}[{lat:.2f} us]{RESET} {YELLOW}{cmd:<5}{RESET} {WHITE}{key:<30}{RESET} -> {GRAY}{status} {details}{RESET}"
+
+    # Timing Wheel TTL Resolution
+    ttl_val = q.get("ttl")
+    if not ttl_val:
+        k_low = key.lower()
+        if "cart" in k_low:
+            ttl_val = "60s"
+        elif "order" in k_low:
+            ttl_val = "900s"
+        elif "search" in k_low or "filter" in k_low or "category" in k_low:
+            ttl_val = "300s"
+        elif "restaurant" in k_low or "catalog" in k_low or "menu" in k_low:
+            ttl_val = "3600s"
+        elif "rider" in k_low or "gps" in k_low:
+            ttl_val = "30s"
+        elif "rush" in k_low:
+            ttl_val = "120s"
+        else:
+            ttl_val = "300s"
+    elif isinstance(ttl_val, (int, float)):
+        ttl_val = f"{int(ttl_val)}s"
+    elif isinstance(ttl_val, str) and not ttl_val.endswith("s"):
+        ttl_val = f"{ttl_val}s"
+
+    ttl_tag = f"{MAGENTA}[TTL: {ttl_val:<5}]{RESET}"
+    return f"{CYAN}[{core}]{RESET} {GREEN}[{lat:.2f} us]{RESET} {ttl_tag} {YELLOW}{cmd:<5}{RESET} {WHITE}{key:<28}{RESET} -> {GRAY}{status} {details}{RESET}"
 
 def print_live_telemetry_query(q):
     line = format_telemetry_line(q)
@@ -1631,7 +1656,7 @@ def main():
                 res = r.execute_command(*parts)
                 elapsed_us = (time.perf_counter() - t0) * 1_000_000
                 output = format_resp_result(res)
-                print(f"{output} {GRAY}({elapsed_us:.2f} µs){RESET}")
+                print(f"{output} {GRAY}({elapsed_us:.2f} us){RESET}")
 
                 # Optional automatic explain plan if '--explain' is appended
                 if "--explain" in cmd_line and len(parts) >= 2:

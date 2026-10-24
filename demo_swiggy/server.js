@@ -160,9 +160,22 @@ function broadcastQuery(command, key, latencyUs, status = 'OK', details = '') {
   liveQueryStream.unshift(item);
   if (liveQueryStream.length > 80) liveQueryStream.pop();
 
-  // Print directly to terminal in real-time
+  // Print directly to terminal in real-time with Timing Wheel TTL tag
   const coreTag = isWheel ? `\x1b[35m[WHEEL]\x1b[0m` : `\x1b[36m[${item.core}]\x1b[0m`;
-  console.log(`${coreTag} \x1b[32m[${item.latencyUs.toFixed(2)} us]\x1b[0m \x1b[33m${item.command.padEnd(5)}\x1b[0m \x1b[97m${item.key.padEnd(28)}\x1b[0m \x1b[90m-> ${item.status} ${item.details || ''}\x1b[0m`);
+  let ttlVal = item.ttl;
+  if (!ttlVal) {
+    const kLow = (item.key || '').toLowerCase();
+    if (kLow.includes('cart')) ttlVal = '60s';
+    else if (kLow.includes('order')) ttlVal = '900s';
+    else if (kLow.includes('search') || kLow.includes('filter')) ttlVal = '300s';
+    else if (kLow.includes('restaurant') || kLow.includes('catalog')) ttlVal = '3600s';
+    else if (kLow.includes('rider') || kLow.includes('gps')) ttlVal = '30s';
+    else ttlVal = '300s';
+  } else if (!String(ttlVal).endsWith('s')) {
+    ttlVal = ttlVal + 's';
+  }
+  const ttlTag = `\x1b[35m[TTL: ${String(ttlVal).padEnd(5)}]\x1b[0m`;
+  console.log(`${coreTag} \x1b[32m[${item.latencyUs.toFixed(2)} us]\x1b[0m ${ttlTag} \x1b[33m${item.command.padEnd(5)}\x1b[0m \x1b[97m${item.key.padEnd(28)}\x1b[0m \x1b[90m-> ${item.status} ${item.details || ''}\x1b[0m`);
 
   const msg = `data: ${JSON.stringify(item)}\n\n`;
   for (let i = sseClients.length - 1; i >= 0; i--) {
