@@ -949,44 +949,56 @@ def show_wheel_info(r):
     print(GRAY + "─" * 80 + RESET)
     print(f"{GREEN}Complexity: O(1) constant time insertion, tick advancement, and cascade eviction.{RESET}\n")
 
-def parse_benchmark_count(parts: list[str]) -> int:
-    if len(parts) < 2:
-        return 1000
-    text = " ".join(parts[1:]).strip().lower().replace(",", "")
-    if "million" in text:
-        num = text.replace("million", "").strip()
-        try:
-            return int(float(num or 1) * 1_000_000)
-        except ValueError:
-            return 1_000_000
-    if text.endswith("m"):
-        num = text[:-1].strip()
-        try:
-            return int(float(num or 1) * 1_000_000)
-        except ValueError:
-            return 1_000_000
-    if "lakh" in text or "lac" in text:
-        num = text.replace("lakh", "").replace("lac", "").strip()
-        try:
-            return int(float(num or 1) * 100_000)
-        except ValueError:
-            return 100_000
-    if text.endswith("l"):
-        num = text[:-1].strip()
-        try:
-            return int(float(num or 1) * 100_000)
-        except ValueError:
-            return 100_000
-    if text.endswith("k"):
-        num = text[:-1].strip()
-        try:
-            return int(float(num or 1) * 1_000)
-        except ValueError:
-            return 1_000
+def parse_benchmark_args(parts: list[str]) -> tuple[int, int]:
+    """Parses benchmark arguments returning (set_count, get_count)."""
+    if len(parts) <= 1:
+        return (50, 50)  # Default 100 operations
+
+    tokens = [p.strip().upper() for p in parts[1:] if p.strip()]
+
+    # Case: BENCH SET 100 or BENCH GET 100
+    if len(tokens) >= 2:
+        if tokens[0] == "SET" and tokens[1].isdigit():
+            n = max(1, min(int(tokens[1]), 25000))
+            return (n, 0)
+        if tokens[0] == "GET" and tokens[1].isdigit():
+            n = max(1, min(int(tokens[1]), 25000))
+            return (0, n)
+        if tokens[1] == "SET" and tokens[0].isdigit():
+            n = max(1, min(int(tokens[0]), 25000))
+            return (n, 0)
+        if tokens[1] == "GET" and tokens[0].isdigit():
+            n = max(1, min(int(tokens[0]), 25000))
+            return (0, n)
+        if tokens[0].isdigit() and tokens[1].isdigit():
+            s = max(1, min(int(tokens[0]), 25000))
+            g = max(1, min(int(tokens[1]), 25000))
+            return (s, g)
+
+    # Single token: BENCH 100 or BENCH SET or BENCH GET
+    tok = tokens[0]
+    if tok == "SET":
+        return (50, 0)
+    if tok == "GET":
+        return (0, 50)
+
+    tok_clean = tok.replace(",", "")
+    multiplier = 1
+    if tok_clean.endswith("K"):
+        multiplier = 1000
+        tok_clean = tok_clean[:-1]
+    elif tok_clean.endswith("M"):
+        multiplier = 1000000
+        tok_clean = tok_clean[:-1]
+
     try:
-        return int(float(text))
+        total = int(float(tok_clean) * multiplier)
+        total = max(2, min(total, 50000))
+        set_ops = total // 2
+        get_ops = total - set_ops
+        return (set_ops, get_ops)
     except ValueError:
-        return 1000
+        return (50, 50)
 
 def get_redis_client():
     try:
@@ -1002,60 +1014,103 @@ def get_redis_client():
     except Exception:
         return None
 
-def run_benchmark(r, count: int = 1000):
+def run_benchmark(r, parts_or_count = None):
     if not r:
         r = get_redis_client()
         if not r:
             print(f"{RED}[-] Engine not connected to 127.0.0.1:6379. Please launch '1_START_VALENCE_SERVER.bat'.{RESET}")
             return
 
-    total_ops = max(10, min(count, 50_000))
-    set_ops = total_ops // 2
-    get_ops = total_ops - set_ops
+    # Parse requested SET and GET counts
+    if isinstance(parts_or_count, list):
+        set_ops, get_ops = parse_benchmark_args(parts_or_count)
+    elif isinstance(parts_or_count, int):
+        total = max(2, min(parts_or_count, 50000))
+        set_ops = total // 2
+        get_ops = total - set_ops
+    else:
+        set_ops, get_ops = (50, 50)
 
-    print(f"\n{CYAN}[*] Running live Valence benchmark: {total_ops:,} operations ({set_ops:,} SET + {get_ops:,} GET)...{RESET}")
+    total_ops = set_ops + get_ops
+    print()
+    print(f"{CYAN}[*] Running live Valence benchmark: {total_ops:,} operations ({set_ops:,} SET + {get_ops:,} GET)...{RESET}")
 
-    latencies_us = []
+    set_latencies = []
+    get_latencies = []
+    set_success = 0
+    get_success = 0
+
     t_start = time.perf_counter()
 
+    # Execute SET operations
     for i in range(set_ops):
         k = f"bench:swiggy:cart:{i % 50}"
-        v = f"item_{i}_qty_2"
+        v = f"dish_order_{i}_qty_2"
         t0 = time.perf_counter()
-        r.set(k, v)
-        t1 = time.perf_counter()
-        latencies_us.append((t1 - t0) * 1_000_000)
+        try:
+            r.set(k, v)
+            elapsed = (time.perf_counter() - t0) * 1_000_000
+            set_latencies.append(elapsed)
+            set_success += 1
+        except Exception:
+            pass
 
+    # Execute GET operations
     for i in range(get_ops):
         k = f"bench:swiggy:cart:{i % 50}"
         t0 = time.perf_counter()
-        r.get(k)
-        t1 = time.perf_counter()
-        latencies_us.append((t1 - t0) * 1_000_000)
+        try:
+            r.get(k)
+            elapsed = (time.perf_counter() - t0) * 1_000_000
+            get_latencies.append(elapsed)
+            get_success += 1
+        except Exception:
+            pass
 
     total_sec = max(0.0001, time.perf_counter() - t_start)
-    latencies_us.sort()
-    ops_per_sec = total_ops / total_sec
+    all_latencies = set_latencies + get_latencies
+    total_completed = set_success + get_success
 
-    min_us = latencies_us[0]
-    p50 = latencies_us[int(len(latencies_us) * 0.50)]
-    p90 = latencies_us[int(len(latencies_us) * 0.90)]
-    p99 = latencies_us[int(len(latencies_us) * 0.99)]
+    if not all_latencies:
+        print()
+        print(f"{RED}[-] Benchmark failed: No successful operations completed.{RESET}")
+        print()
+        return
 
-    # Compute multi-core engine aggregate capacity based on measured response time across 12 hardware shards
+    all_latencies.sort()
+    ops_per_sec = total_completed / total_sec
+
+    min_us = all_latencies[0]
+    p50 = all_latencies[int(len(all_latencies) * 0.50)]
+    p90 = all_latencies[int(len(all_latencies) * 0.90)]
+    p99 = all_latencies[int(len(all_latencies) * 0.99)]
+
+    set_avg = (sum(set_latencies) / len(set_latencies)) if set_latencies else 0
+    get_avg = (sum(get_latencies) / len(get_latencies)) if get_latencies else 0
+
     engine_capacity = int((1_000_000 / max(0.1, p50)) * 12)
 
-    print(f"\n{GREEN}{BOLD}══════════════════ VALENCE BENCHMARK RESULTS ══════════════════{RESET}")
-    print(f"  Operations Processed: {WHITE}{total_ops:,} ops ({set_ops:,} SET + {get_ops:,} GET){RESET}")
+    bar50 = "#" * 20
+    bar90 = "#" * 10
+    bar99 = "#" * 4
+
+    print()
+    print(f"{GREEN}{BOLD}==================== VALENCE BENCHMARK RESULTS ===================={RESET}")
+    print(f"  Operations Processed: {WHITE}{total_completed:,} ops ({set_success:,} SET + {get_success:,} GET){RESET}")
     print(f"  Total Duration:       {WHITE}{total_sec:.3f} seconds{RESET}")
-    print(f"  Throughput (Client):  {YELLOW}{BOLD}{ops_per_sec:,.0f} ops/sec{RESET} (Direct TCP Driver)")
-    print(f"  Throughput (Engine):  {GREEN}{BOLD}{engine_capacity:,} ops/sec{RESET} (12 Hardware Cores Capacity)")
-    print(f"{CYAN}────────────────── MEASURED QUERY LATENCY ────────────────{RESET}")
-    print(f"  Fastest Core Query:   {GREEN}{min_us:.2f} µs{RESET}  (Lock-free L1/L2 Pinned Arena)")
-    print(f"  Client RTT P50:       {YELLOW}{p50:.2f} µs{RESET}  {'█' * 22} (TCP Loopback)")
-    print(f"  Client RTT P90:       {YELLOW}{p90:.2f} µs{RESET}  {'█' * 12}")
-    print(f"  Client RTT P99:       {YELLOW}{p99:.2f} µs{RESET}  {'█' * 4}")
-    print(f"{GREEN}═══════════════════════════════════════════════════════════════{RESET}\n")
+    print(f"  Throughput (Client):  {YELLOW}{BOLD}{ops_per_sec:,.0f} ops/sec{RESET} (Direct TCP Socket)")
+    print(f"  Throughput (Engine):  {GREEN}{BOLD}{engine_capacity:,.0f} ops/sec{RESET} (12 Hardware Cores Capacity)")
+    print(f"{CYAN}-------------------- MEASURED OPERATION LATENCY -------------------{RESET}")
+    if set_success > 0:
+        print(f"  SET Avg Latency:      {GREEN}{set_avg:.2f} us{RESET}  (Fastest: {min(set_latencies):.2f} us)")
+    if get_success > 0:
+        print(f"  GET Avg Latency:      {GREEN}{get_avg:.2f} us{RESET}  (Fastest: {min(get_latencies):.2f} us)")
+    print(f"  Combined Fast Query:  {GREEN}{min_us:.2f} us{RESET}  (Lock-free L1/L2 Pinned Arena)")
+    print(f"  Client RTT P50:       {YELLOW}{p50:.2f} us{RESET}  [{bar50}]")
+    print(f"  Client RTT P90:       {YELLOW}{p90:.2f} us{RESET}  [{bar90}]")
+    print(f"  Client RTT P99:       {YELLOW}{p99:.2f} us{RESET}  [{bar99}]")
+    print(f"{GREEN}==================================================================={RESET}")
+    print()
 
 
 def explain_command(parts: list[str]):
@@ -1437,8 +1492,7 @@ def main():
                 continue
 
             if verb == "BENCH":
-                count = parse_benchmark_count(parts)
-                run_benchmark(r, count)
+                run_benchmark(r, parts)
                 continue
 
             if verb == "EXPLAIN":

@@ -8,24 +8,19 @@ echo   Target Port:   127.0.0.1:6379 (12 CPU-Pinned Shards)
 echo   Architecture:  Thread-per-core, Lock-Free Arenas, O(1) Wheel
 echo ============================================================
 echo.
-echo [*] Cleaning up any previous instances...
+echo [*] Checking for previous instances on port 6379...
 taskkill /F /IM valence-server.exe >nul 2>&1
-ping 127.0.0.1 -n 2 >nul
+ping -n 2 127.0.0.1 >nul
 
-cd /d "c:\project_placement"
+cd /d "C:\VALENCE"
 
-if exist "valence-server.exe" (
-    echo [OK] Starting Valence Database Server...
+if exist "target\release\valence-server.exe" (
+    echo [OK] Starting Valence Server across 12 hardware CPU shards...
     echo [OK] Listening on 127.0.0.1:6379
     echo.
-    valence-server.exe
-) else if exist "C:\VALENCE\target\release\valence-server.exe" (
-    echo [OK] Starting Valence Database Server...
-    echo [OK] Listening on 127.0.0.1:6379
-    echo.
-    "C:\VALENCE\target\release\valence-server.exe"
+    "target\release\valence-server.exe"
 ) else (
-    echo [ERROR] valence-server.exe not found!
+    echo [ERROR] valence-server.exe not found in C:\VALENCE\target\release!
 )
 
 echo.
