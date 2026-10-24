@@ -2246,14 +2246,9 @@ input:checked + .slider-small:before { transform: translateX(16px); }
     max-width: 90px;
   }
 
-  .nav-right .nav-item:not(.cart-nav-btn):not(.btn-cinema-nav) {
-    display: none;
-  }
+  .nav-right .nav-item:not(.cart-nav-btn):not(
 
-  .btn-cinema-nav {
-    padding: 6px 10px !important;
-    font-size: 11px !important;
-  }
+  
 
   .cart-nav-btn {
     display: none; /* Mobile uses floating bottom cart bar instead */
