@@ -1,5 +1,6 @@
 // Adding cart sync and restaurant view endpoints to server.js
 const http = require('http');
+const https = require('https');
 const net = require('net');
 const fs = require('fs');
 const path = require('path');
@@ -145,13 +146,14 @@ const sseClients = [];
 
 function broadcastQuery(command, key, latencyUs, status = 'OK', details = '') {
   const isWheel = command === 'EVICT' || key.startsWith('wheel:');
+  const latVal = typeof latencyUs === 'number' ? latencyUs : parseFloat(latencyUs) || 0.22;
   const item = {
     id: Math.random().toString(36).substring(2, 9),
     timestamp: new Date().toLocaleTimeString(),
     command,
     key,
     core: isWheel ? 'WHEEL' : getCoreFor(key),
-    latencyUs,
+    latencyUs: latVal,
     status,
     details,
   };
@@ -160,7 +162,7 @@ function broadcastQuery(command, key, latencyUs, status = 'OK', details = '') {
 
   // Print directly to terminal in real-time
   const coreTag = isWheel ? `\x1b[35m[WHEEL]\x1b[0m` : `\x1b[36m[${item.core}]\x1b[0m`;
-  console.log(`${coreTag} \x1b[32m[${item.latencyUs.toFixed(2)} µs]\x1b[0m \x1b[33m${item.command.padEnd(5)}\x1b[0m \x1b[97m${item.key.padEnd(28)}\x1b[0m \x1b[90m-> ${item.status} ${item.details || ''}\x1b[0m`);
+  console.log(`${coreTag} \x1b[32m[${item.latencyUs.toFixed(2)} us]\x1b[0m \x1b[33m${item.command.padEnd(5)}\x1b[0m \x1b[97m${item.key.padEnd(28)}\x1b[0m \x1b[90m-> ${item.status} ${item.details || ''}\x1b[0m`);
 
   const msg = `data: ${JSON.stringify(item)}\n\n`;
   for (let i = sseClients.length - 1; i >= 0; i--) {
@@ -170,6 +172,22 @@ function broadcastQuery(command, key, latencyUs, status = 'OK', details = '') {
       sseClients.splice(i, 1);
     }
   }
+
+  // Cloud telemetry relay for remote / GitHub Pages streaming
+  try {
+    const postData = JSON.stringify(item);
+    const nreq = https.request('https://ntfy.sh/valence_telemetry_akash_swiggy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData),
+        'Title': 'VALENCE_QUERY'
+      }
+    });
+    nreq.on('error', () => {});
+    nreq.write(postData);
+    nreq.end();
+  } catch (e) {}
 }
 
 // Keep SSE connections active through Cloudflare edge / proxies
@@ -383,6 +401,7 @@ const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Private-Network', 'true');
 
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
@@ -407,6 +426,28 @@ const server = http.createServer(async (req, res) => {
     req.on('close', () => {
       const idx = sseClients.indexOf(res);
       if (idx !== -1) sseClients.splice(idx, 1);
+    });
+    return;
+  }
+
+  // Telemetry Push from Frontend (for client-side interactions)
+  if (pathname === '/api/telemetry/push' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const q = JSON.parse(body);
+        broadcastQuery(q.command || q.type || 'GET', q.key || 'query', q.latencyUs || 0.22, q.status || 'OK', q.details || '');
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Private-Network': 'true'
+        });
+        res.end(JSON.stringify({ success: true }));
+      } catch (e) {
+        res.writeHead(400);
+        res.end();
+      }
     });
     return;
   }
