@@ -2477,3 +2477,155 @@ input:checked + .slider-small:before { transform: translateX(16px); }
   }
 }
 
+
+
+/* ==============================================================================
+   BOOTSTRAP 5 & AUTHENTIC MOBILE APP HARMONY RULES
+   ============================================================================== */
+a {
+  text-decoration: none !important;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+body {
+  overflow-x: hidden !important;
+  width: 100vw;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  /* Mobile App Viewport Optimizations */
+  html, body {
+    overflow-x: hidden !important;
+    position: relative;
+    width: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .main-content-wrap {
+    padding: 8px 12px 100px 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Responsive Swiggy App Top Nav */
+  .swiggy-nav {
+    height: 56px !important;
+    padding: 0 12px !important;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background: #FFF;
+  }
+
+  /* Mobile Search Pill */
+  .mobile-search-pill-container {
+    padding: 4px 0 8px 0;
+    width: 100%;
+  }
+
+  .mobile-search-box {
+    border-radius: 12px;
+    height: 46px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Categories Slider - Native Mobile Inertia */
+  .category-scroll-row {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+  }
+
+  .category-scroll-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-item {
+    scroll-snap-align: start;
+    flex: 0 0 76px;
+    text-align: center;
+  }
+
+  .cat-img-box {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto;
+  }
+
+  /* Mobile Restaurant Cards - Bootstrap Card Look */
+  .restaurant-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .rest-card {
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: #FFF;
+    width: 100% !important;
+  }
+
+  .rest-card-img-wrap {
+    height: 180px !important;
+  }
+
+  .rest-card:hover {
+    transform: none !important;
+  }
+
+  /* Dish Row Cards in Mobile Menu View */
+  .dish-row-card {
+    padding: 14px 0 !important;
+    gap: 12px !important;
+  }
+
+  .dish-img-col {
+    width: 110px !important;
+    height: 105px !important;
+  }
+
+  /* Mobile Floating Cart Bar - Guaranteed Finger Target */
+  .swiggy-floating-cart-bar {
+    position: fixed !important;
+    bottom: 68px !important;
+    left: 12px !important;
+    right: 12px !important;
+    height: 52px !important;
+    border-radius: 14px !important;
+    z-index: 1030 !important;
+    box-shadow: 0 8px 24px rgba(96, 178, 70, 0.5) !important;
+  }
+
+  /* Mobile Bottom Navigation Bar - Authentic Fixed Footer */
+  .swiggy-mobile-bottom-nav {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 58px !important;
+    background: #FFF !important;
+    z-index: 1025 !important;
+    border-top: 1px solid #E2E8F0 !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* Cart Drawer 100% Width on Mobile Phone */
+  .cart-drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
