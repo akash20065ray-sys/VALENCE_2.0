@@ -266,7 +266,7 @@ let chipTimer = null;
 // ==============================================================================
 // VALENCE DUAL-CHANNEL TELEMETRY BROADCASTER (Local Node + Cloud SSE Stream)
 // ==============================================================================
-window.broadcastLiveTelemetry = function(cmd, key, latencyUs, status = 'OK', details = '', core = null) {
+window.broadcastLiveTelemetry = function(cmd, key, latencyUs, status = 'OK', details = '', core = null, ttl = null) {
   if (!core) {
     const shardNum = Math.floor(Math.random() * 12);
     core = 'Core C' + String(shardNum).padStart(2, '0');
@@ -280,7 +280,8 @@ window.broadcastLiveTelemetry = function(cmd, key, latencyUs, status = 'OK', det
     core: core,
     latencyUs: latFloat,
     status: status,
-    details: details
+    details: details,
+    ttl: ttl || (key.includes('cart') ? '60s' : (key.includes('order') ? '900s' : (key.includes('search') || key.includes('filter') ? '300s' : '3600s')))
   };
 
   // 1. Post to local Node server on port 3000 if available
