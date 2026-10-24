@@ -304,33 +304,18 @@ window.broadcastLiveTelemetry = function(cmd, key, latencyUs, status = 'OK', det
   } catch(e) {}
 };
 
-window.flashValenceLiveChip = function(core = 'Core C02', latencyUs = '0.22', label = '', customTtl = '') {
+window.flashValenceLiveChip = function(core = 'Core C02', latencyUs = '0.22', label = '') {
   const chip = document.getElementById('valence-live-chip-mobile');
   const vlcText = document.getElementById('vlc-text');
   if (!chip || !vlcText) return;
 
-  // Timing Wheel TTL resolution for mobile app HUD
-  let ttl = customTtl;
-  if (!ttl) {
-    const l = (label || '').toLowerCase();
-    if (l.includes('cart') || l.includes('qty')) ttl = '60s Hold';
-    else if (l.includes('order')) ttl = '900s Order';
-    else if (l.includes('filter') || l.includes('search') || l.includes('biryani') || l.includes('pizza') || l.includes('burger')) ttl = '300s Cache';
-    else if (l.includes('veg')) ttl = '300s Filter';
-    else if (l.includes('meghana') || l.includes('rest')) ttl = '3600s Arena';
-    else if (l.includes('rider') || l.includes('gps')) ttl = '30s Pulse';
-    else ttl = '300s Wheel';
-  }
-
-  const tag = label ? ` • <span style="color:#fdba74;">${label}</span>` : '';
-  const ttlBadge = `<span style="background:rgba(217,70,239,0.22); color:#f5d0fe; border:1px solid rgba(217,70,239,0.6); padding:2px 7px; border-radius:6px; font-weight:800; font-size:10px; margin:0 5px; box-shadow:0 0 8px rgba(217,70,239,0.3);">TTL: ${ttl}</span>`;
-
-  vlcText.innerHTML = `⚡ <strong>${core}</strong>: ${latencyUs} µs • ${ttlBadge}${tag}`;
+  const tag = label ? ` • <span>${label}</span>` : '';
+  vlcText.innerHTML = `⚡ <strong>${core}</strong>: ${latencyUs} µs${tag}`;
   chip.classList.add('pulse-active');
   clearTimeout(chipTimer);
   chipTimer = setTimeout(() => {
     chip.classList.remove('pulse-active');
-  }, 2200);
+  }, 1800);
 };
 
 window.filterCuisine = async function(cuisine) {
