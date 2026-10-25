@@ -766,7 +766,7 @@ def handle_media_order(r, parts: list[str]):
         f"l_text:Arial_18:Item:%20{enc_dish},co_rgb:94a3b8,g_north,y_145/"
         f"l_text:Arial_14:SWIGGY%20DELIVERY%20%2B%20VALENCE%20RAM%20%2B%20CLOUDINARY,co_rgb:22c55e,g_south,y_25"
     )
-    order_url = f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/{order_transforms}/sample.jpg"
+    order_url = f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/{order_transforms}/cld-sample-4.jpg"
 
     print(f"\n{CYAN}[*] Dual-Engine Generating Live Swiggy Order Pass on Cloudinary Edge...{RESET}")
     probe = probe_media_url(order_url, timeout=10.0)
@@ -820,7 +820,7 @@ def handle_cloudinary_stats(r):
             pass
 
     # Probe Cloudinary health
-    probe = probe_media_url(f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/sample.jpg")
+    probe = probe_media_url(f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/cld-sample-4.jpg")
 
     # Calculate real memory savings
     raw_media_saved_bytes = len(media_keys) * 818_600  # Based on real average asset size
@@ -855,14 +855,14 @@ def handle_cloudinary_config(parts: list[str]):
     if len(parts) > 1 and parts[1].strip():
         new_cloud = parts[1].strip()
         print(f"\n{CYAN}[*] Testing connection to Cloudinary cloud '{new_cloud}'...{RESET}")
-        probe = probe_media_url(f"https://res.cloudinary.com/{new_cloud}/image/upload/sample.jpg")
+        probe = probe_media_url(f"https://res.cloudinary.com/{new_cloud}/image/upload/cld-sample-4.jpg")
         CLOUDINARY_CLOUD_NAME = new_cloud
         if probe["success"]:
             print(f"{GREEN}[✓] Active Cloud Name updated to '{new_cloud}' (Edge RTT: {probe['latency_ms']:.1f} ms){RESET}\n")
         else:
             print(f"{YELLOW}[!] Cloud Name set to '{new_cloud}'. Notice: {probe['error']}{RESET}\n")
     else:
-        probe = probe_media_url(f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/sample.jpg")
+        probe = probe_media_url(f"https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/image/upload/cld-sample-4.jpg")
         status_str = f"{GREEN}ONLINE ({probe['latency_ms']:.1f} ms){RESET}" if probe["success"] else f"{RED}ERR: {probe['error']}{RESET}"
         print(f"\n{CYAN}{BOLD}CLOUDINARY CONFIGURATION{RESET}")
         print(CYAN + "─" * 60 + RESET)
@@ -1339,6 +1339,21 @@ def attach_to_app(app_url: str = None):
     CURRENT_APP_URL = app_url
     is_cloud_app = "github.io" in app_url.lower()
 
+    monitor_start_time = time.time()
+    seen_query_ids = set()
+    stop_stream_evt = threading.Event()
+
+    # Pre-populate existing queries so historical operations are NOT printed
+    try:
+        init_req = urllib.request.Request("http://127.0.0.1:3000/api/telemetry", headers={"User-Agent": "Valence-Terminal-Init"})
+        with urllib.request.urlopen(init_req, timeout=0.6) as i_resp:
+            i_data = json.loads(i_resp.read().decode())
+            for it in i_data.get("queries", []):
+                if it.get("id"):
+                    seen_query_ids.add(it["id"])
+    except Exception:
+        pass
+
     print()
     print(f"{GREEN}[+] MONITOR ATTACHED:{RESET} {CYAN}{app_url}{RESET}")
     if is_cloud_app:
@@ -1347,15 +1362,12 @@ def attach_to_app(app_url: str = None):
     print(f"{GREEN}[+] LOCAL APP RUNTIME:{RESET}   {WHITE}http://127.0.0.1:3000 (Pure Swiggy Web App){RESET}")
     print(f"{YELLOW}[+] STREAMING LIVE CLICKS & MUTATIONS... (Press Ctrl+C to exit monitor){RESET}\n", flush=True)
 
-    seen_query_ids = set()
-    stop_stream_evt = threading.Event()
-
-    # Instant cloud streaming thread
+    # Cloud streaming thread (only processes messages sent AFTER monitor opened)
     def _cloud_stream_daemon():
         while not stop_stream_evt.is_set():
             try:
                 s_req = urllib.request.Request("https://ntfy.sh/valence_telemetry_akash_swiggy/json", headers={"User-Agent": "Valence-Terminal-Stream"})
-                with urllib.request.urlopen(s_req, timeout=12) as s_resp:
+                with urllib.request.urlopen(s_req, timeout=15) as s_resp:
                     for line in s_resp:
                         if stop_stream_evt.is_set():
                             return
@@ -1365,7 +1377,14 @@ def attach_to_app(app_url: str = None):
                         try:
                             entry = json.loads(txt)
                             if entry.get("event") == "message":
+                                entry_time = entry.get("time") or 0
+                                # Ignore old messages from before monitor opened
+                                if entry_time and entry_time < (monitor_start_time - 1):
+                                    continue
                                 msg = json.loads(entry.get("message", "{}"))
+                                msg_ts = msg.get("timestamp") or 0
+                                if msg_ts and msg_ts < ((monitor_start_time - 1.5) * 1000):
+                                    continue
                                 qid = msg.get("id") or str(entry.get("id"))
                                 if qid and qid not in seen_query_ids:
                                     seen_query_ids.add(qid)
@@ -1373,7 +1392,7 @@ def attach_to_app(app_url: str = None):
                         except Exception:
                             pass
             except Exception:
-                time.sleep(0.5)
+                time.sleep(1.0)
 
     stream_th = threading.Thread(target=_cloud_stream_daemon, daemon=True)
     stream_th.start()
@@ -1539,10 +1558,36 @@ def main():
 
             if verb in ("ATTACH", "STREAM"):
                 if len(parts) > 1 and parts[1].upper() in ("OFF", "STOP", "DETACH", "CLOSE", "FALSE"):
-                    stop_background_attach()
+                    stop_background_attach(silent=False)
                     continue
-                raw_url = parts[1].strip() if len(parts) > 1 else None
-                start_background_attach(raw_url)
+                if verb == "STREAM":
+                    raw_url = parts[1].strip() if len(parts) > 1 else None
+                    start_background_attach(raw_url)
+                    continue
+
+                raw_url = parts[1].strip() if len(parts) > 1 else (CURRENT_APP_URL or get_discovered_app_url())
+                if not raw_url:
+                    raw_url = "https://akash20065ray-sys.github.io/VALENCE_2.0/"
+                raw_url = raw_url.strip()
+                if not raw_url.startswith("http://") and not raw_url.startswith("https://"):
+                    if "github.io" in raw_url or "trycloudflare.com" in raw_url or "pinggy.link" in raw_url or "loca.lt" in raw_url:
+                        raw_url = "https://" + raw_url
+                    else:
+                        raw_url = "http://" + raw_url
+                if "localhost:3000" in raw_url:
+                    raw_url = raw_url.replace("localhost:3000", "127.0.0.1:3000")
+
+                CURRENT_APP_URL = raw_url
+                try:
+                    with open(os.path.join(os.path.dirname(__file__), "active_tunnel.txt"), "w", encoding="utf-8") as f:
+                        f.write(CURRENT_APP_URL)
+                except Exception:
+                    pass
+
+                stop_background_attach(silent=True)
+                print(f"\n{GREEN}{BOLD}[✓] TARGET APP ATTACHED:{RESET} {YELLOW}{CURRENT_APP_URL}{RESET}")
+                print(f"{GREEN}[✓] VALENCE ENGINE:{RESET} 127.0.0.1:{VALENCE_PORT} (12 CPU-Pinned Shards)")
+                print(f"{CYAN}[*] Target registered. Type {BOLD}'MONITOR'{RESET}{CYAN} to stream live operations when ready.{RESET}\n", flush=True)
                 continue
 
             if verb in ("DETACH", "DEATTACH", "UNATTACH"):
