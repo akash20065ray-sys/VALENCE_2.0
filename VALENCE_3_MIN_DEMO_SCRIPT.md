@@ -1,9 +1,9 @@
 # 🎙️ VALENCE 2.0: OFFICIAL 3–4 MINUTE DEMO VIDEO SCRIPT
 ## (Dashboard First ➔ Attach Swiggy in Access & Security ➔ Query Workbench Live Execution)
 
-> **Setup Before Recording:**
-> - Have **Valence Studio** open at: [http://localhost:8080](http://localhost:8080)
-> - Have **Swiggy App** open in another tab: [https://openings-tennessee-conf-gate.trycloudflare.com](https://openings-tennessee-conf-gate.trycloudflare.com) (or `http://localhost:3000`)
+> **Setup Before Recording / Presenting:**
+> - Have **Valence Studio** open at: [https://valence-b8tm.onrender.com](https://valence-b8tm.onrender.com) (or `http://localhost:8080`)
+> - Have **Swiggy App** open in another tab: [https://integration-browsing-coalition-chris.trycloudflare.com](https://integration-browsing-coalition-chris.trycloudflare.com) (or `http://localhost:3000`)
 > - The left sidebar is pinned open by default.
 
 ---
@@ -16,7 +16,7 @@ Full screen on **Overview & Cockpit** (`#view-overview`).
 🗣️ **What to speak:**
 > *"Hello everyone. Today I'm presenting **Valence 2.0**—a next-generation, lock-free in-memory state engine engineered from scratch in pure Rust, designed as a modern, multi-core replacement for Redis.
 >
-> On my screen is the Valence Studio control plane running locally on port 8080. 
+> On my screen is the Valence Studio control plane deployed live on Render at `valence-b8tm.onrender.com`. 
 >
 > Look at our live telemetry: the database engine on port 6379 currently starts at **0 keys in RAM**. There are no hardcoded mocks or static tables—every counter, shard status bar, and microsecond telemetry readout is bound live to hardware counters.
 >
@@ -70,7 +70,7 @@ Full screen on **Overview & Cockpit** (`#view-overview`).
 👉 **What to show on screen:**  
 1. In the left sidebar under `ADMINISTRATION`, click **Access & Security**.
 2. Point your cursor to the top panel: **Application Peering & Ingress Control**.
-3. In `Target Service URL / Port`, show `http://localhost:3000` (or `https://openings-tennessee-conf-gate.trycloudflare.com`).
+3. In `Target Service URL / Port`, show `https://integration-browsing-coalition-chris.trycloudflare.com` (or `http://localhost:3000`).
 4. Click the green button: **`[⚡ ATTACH APPLICATION]`**.
 5. Alert pops up: `Attached successfully to http://localhost:3000 (Swiggy Food Delivery)!`. Click **OK**.
 6. Point your mouse to the top header status pill: it turns green: **`● Attached: Swiggy Food Delivery (Port 3000)`**.
@@ -98,7 +98,7 @@ Full screen on **Overview & Cockpit** (`#view-overview`).
    - Core tag: `C11`
    - Latency readout: **`0.18 µs`** (sub-microsecond execution!)
    - Output: `{"dish":"hyderabadi_biryani","qty":2,"price":499}`
-5. Switch to the tab showing the **Swiggy App** (`https://openings-tennessee-conf-gate.trycloudflare.com`).
+5. Switch to the tab showing the **Swiggy App** (`https://integration-browsing-coalition-chris.trycloudflare.com`).
    - Click **`Add to Cart`** on Hyderabadi Biryani.
    - Point out that the consumer frontend communicates in real-time with this exact in-memory state.
 

@@ -6118,7 +6118,7 @@
               </svg>
               <span id="tm-bench-btn-lbl">Start Stress Test</span>
             </button>
-            <button class="tm-bench-btn" id="tm-bench-pause-btn" onclick="togglePauseBenchmark()" style="display:none; background:#1e293b; color:#cbd5e1; border:1px solid #334155; margin-left:8px;">
+            <button class="tm-bench-btn" id="tm-bench-pause-btn" onclick="togglePauseBenchmark()" style="display:inline-flex; opacity:0.6; cursor:pointer; background:#1e293b; color:#cbd5e1; border:1px solid #334155; margin-left:8px;">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="6" y="4" width="4" height="16"></rect>
                 <rect x="14" y="4" width="4" height="16"></rect>
@@ -7690,6 +7690,10 @@
         <div class="modal-field">
           <label class="modal-label">TARGET APPLICATION URL</label>
           <input type="text" class="modal-input" id="inp-attach-url" value="http://localhost:3000">
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button type="button" class="btn-secondary" style="font-size:10.5px; padding:3px 8px;" onclick="setAttachPreset('https://integration-browsing-coalition-chris.trycloudflare.com')">⚡ Cloudflare Tunnel (Live Public)</button>
+            <button type="button" class="btn-secondary" style="font-size:10.5px; padding:3px 8px;" onclick="setAttachPreset('http://localhost:3000')">💻 Localhost (:3000)</button>
+          </div>
         </div>
         <div class="modal-field">
           <label class="modal-label">BEARER AUTH SECRET</label>
@@ -10864,10 +10868,82 @@
       if (hubTick) {
         const curTick = (Date.now() % 256);
         hubTick.innerText = curTick + ' ms';
+        renderTimingWheelSvg();
       }
     }
 
+    function renderTimingWheelSvg() {
+      const svg = document.getElementById('tw-concentric-svg');
+      if (!svg) return;
+      const cx = 160, cy = 160;
+      const now = Date.now();
+
+      const a0 = ((now % 1000) / 1000) * 360;
+      const a1 = ((now % 60000) / 60000) * 360;
+      const a2 = ((now % 3600000) / 3600000) * 360;
+      const a3 = ((now % 86400000) / 86400000) * 360;
+
+      const p0 = getAnglePoint(cx, cy, 54, a0);
+      const p1 = getAnglePoint(cx, cy, 84, a1);
+      const p2 = getAnglePoint(cx, cy, 114, a2);
+      const p3 = getAnglePoint(cx, cy, 144, a3);
+
+      svg.innerHTML = `
+        <defs>
+          <filter id="tw-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Concentric Circular Slotted Tracks -->
+        <!-- Wheel 3: 4.6h - 49.7d (Purple) -->
+        <circle cx="${cx}" cy="${cy}" r="144" fill="none" stroke="rgba(168, 85, 247, 0.2)" stroke-width="4" stroke-dasharray="4 8" />
+        <circle cx="${cx}" cy="${cy}" r="144" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="2 12" />
+        <circle cx="${p3.x}" cy="${p3.y}" r="4.5" fill="#a855f7" filter="url(#tw-glow)" />
+
+        <!-- Wheel 2: 65s - 4.6h (Amber) -->
+        <circle cx="${cx}" cy="${cy}" r="114" fill="none" stroke="rgba(251, 191, 36, 0.2)" stroke-width="4" stroke-dasharray="4 6" />
+        <circle cx="${cx}" cy="${cy}" r="114" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-dasharray="2 10" />
+        <circle cx="${p2.x}" cy="${p2.y}" r="4.5" fill="#fbbf24" filter="url(#tw-glow)" />
+
+        <!-- Wheel 1: 256ms - 65s (Cyan) -->
+        <circle cx="${cx}" cy="${cy}" r="84" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="4.5" stroke-dasharray="3 5" />
+        <circle cx="${cx}" cy="${cy}" r="84" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="2 8" />
+        <circle cx="${p1.x}" cy="${p1.y}" r="5" fill="#38bdf8" filter="url(#tw-glow)" />
+
+        <!-- Wheel 0: 1ms - 256ms (Emerald - Active Primary) -->
+        <circle cx="${cx}" cy="${cy}" r="54" fill="none" stroke="rgba(62, 207, 142, 0.35)" stroke-width="5" stroke-dasharray="3 4" />
+        <circle cx="${cx}" cy="${cy}" r="54" fill="none" stroke="#3ecf8e" stroke-width="3" stroke-dasharray="2 6" />
+        <circle cx="${p0.x}" cy="${p0.y}" r="5.5" fill="#3ecf8e" filter="url(#tw-glow)" />
+
+        <!-- Rotating Hands -->
+        <line x1="${cx}" y1="${cy}" x2="${p0.x}" y2="${p0.y}" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" />
+        <line x1="${cx}" y1="${cy}" x2="${p1.x}" y2="${p1.y}" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2 2" />
+
+        <!-- Center Hub Outer Ring -->
+        <circle cx="${cx}" cy="${cy}" r="34" fill="#0b0f17" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
+      `;
+    }
+
+    function getAnglePoint(cx, cy, r, angleDeg) {
+      const rad = (angleDeg - 90) * (Math.PI / 180);
+      return {
+        x: cx + r * Math.cos(rad),
+        y: cy + r * Math.sin(rad)
+      };
+    }
+
+    function setAttachPreset(url) {
+      const inp = document.getElementById('inp-attach-url');
+      if (inp) inp.value = url;
+    }
+
     function renderTimingWheelView() {
+      renderTimingWheelSvg();
       // 1. Active TTL Timers from live keyspace
       const expiringKeys = (STATE.keys || []).filter(k => k.ttl && k.ttl > 0);
       const activeKpi = document.getElementById('tw-kpi-active');
