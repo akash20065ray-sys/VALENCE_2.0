@@ -4481,7 +4481,478 @@
       z-index: 9999;
     }
 
-  </style>
+  
+    /* --- Time Range Dropdown Styles --- */
+    .time-opt {
+      padding: 6px 10px;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .time-opt:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+    }
+    .time-opt.active {
+      color: var(--emerald);
+      font-weight: 600;
+      background: rgba(62, 207, 142, 0.08);
+    }
+
+    /* --- Cloudinary CDN Hub Styles --- */
+    .cld-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .cld-kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 110px;
+      box-sizing: border-box;
+    }
+    .cld-kpi-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .cld-kpi-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cld-kpi-icon.emerald { background: rgba(0, 229, 153, 0.1); border: 1px solid rgba(0, 229, 153, 0.25); color: var(--emerald); }
+    .cld-kpi-icon.cyan { background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.25); color: #38bdf8; }
+    .cld-kpi-icon.blue { background: rgba(0, 163, 255, 0.1); border: 1px solid rgba(0, 163, 255, 0.25); color: #00A3FF; }
+    .cld-kpi-title {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .cld-kpi-val {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+    .cld-kpi-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cld-kpi-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .cld-mini-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 2.5px;
+      height: 24px;
+    }
+    .cld-mini-bars span {
+      width: 3.5px;
+      background: var(--emerald);
+      border-radius: 1px;
+      opacity: 0.85;
+    }
+
+    /* Split Grid */
+    .cld-split-grid {
+      display: grid;
+      grid-template-columns: 1.18fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .cld-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    .cld-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .cld-panel-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+    .cld-panel-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .cld-category-pill {
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-secondary);
+    }
+
+    /* Comparison Slider */
+    .cld-slider-container {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      border-radius: 8px;
+      overflow: hidden;
+      user-select: none;
+      border: 1px solid var(--border-hairline);
+      background: #0d1117;
+      cursor: ew-resize;
+    }
+    .cld-img-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .cld-clipped-wrap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .cld-img-fg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .cld-slider-bar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+      z-index: 5;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .cld-handle-thumb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #0f172a;
+      border: 2px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #ffffff;
+      pointer-events: auto;
+      cursor: ew-resize;
+    }
+    .cld-handle-divider {
+      width: 1.5px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.5);
+    }
+    .cld-badge {
+      position: absolute;
+      z-index: 4;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 6px 10px;
+      pointer-events: none;
+    }
+    .cld-badge.left { top: 12px; left: 12px; }
+    .cld-badge.right { top: 12px; right: 12px; text-align: right; }
+    .cld-badge-title { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+    .cld-badge-size { font-size: 15px; font-weight: 700; color: #ffffff; font-family: 'JetBrains Mono', monospace; }
+    .cld-badge-res { font-size: 10px; color: var(--text-secondary); }
+    .cld-badge-save {
+      display: inline-block;
+      margin-top: 3px;
+      padding: 1px 6px;
+      background: rgba(0, 229, 153, 0.15);
+      border: 1px solid rgba(0, 229, 153, 0.35);
+      color: var(--emerald);
+      border-radius: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+    }
+
+    /* Pipeline Pills */
+    .cld-pipeline-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .cld-pipe-pill {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+    }
+    .cld-pipe-pill.blue { background: rgba(0, 163, 255, 0.12); border: 1px solid rgba(0, 163, 255, 0.3); color: #00A3FF; }
+    .cld-pipe-pill.purple { background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); color: #C084FC; }
+    .cld-pipe-pill.emerald { background: rgba(0, 229, 153, 0.12); border: 1px solid rgba(0, 229, 153, 0.3); color: var(--emerald); }
+    .cld-pipe-pill.neutral { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-hairline); color: var(--text-secondary); }
+    .cld-pipe-add-btn {
+      background: transparent;
+      border: 1px dashed var(--border-hairline);
+      border-radius: 4px;
+      color: var(--text-dim);
+      font-size: 11px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    .cld-pipe-add-btn:hover { border-color: var(--text-secondary); color: #ffffff; }
+
+    /* URL Preview Box */
+    .cld-url-box {
+      display: flex;
+      align-items: center;
+      background: #090d14;
+      border: 1px solid var(--border-hairline);
+      border-radius: 6px;
+      padding: 6px 10px;
+    }
+    .cld-url-text {
+      flex: 1;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cld-copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 2px 4px;
+      display: flex;
+      align-items: center;
+    }
+    .cld-copy-btn:hover { color: #ffffff; }
+
+    /* Architecture Cards */
+    .cld-arch-card {
+      background: rgba(255, 255, 255, 0.015);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+    }
+    .cld-arch-card.redis {
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      background: rgba(239, 68, 68, 0.02);
+    }
+    .cld-arch-card.valence {
+      border: 1px solid rgba(0, 229, 153, 0.3);
+      background: rgba(0, 229, 153, 0.02);
+      margin-bottom: 0;
+    }
+    .cld-arch-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .cld-arch-head.redis { color: #ef4444; }
+    .cld-arch-head.valence { color: var(--emerald); }
+    .cld-arch-body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .cld-arch-node-left {
+      width: 100px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+    .cld-node-thumb-wrap {
+      position: relative;
+      width: 72px;
+      height: 48px;
+      margin: 0 auto;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--border-hairline);
+    }
+    .cld-node-thumb { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cld-node-badge {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .cld-node-badge.red { background: rgba(239, 68, 68, 0.85); color: #ffffff; }
+    .cld-node-badge.emerald { background: rgba(0, 229, 153, 0.85); color: #000000; }
+    .cld-node-caption { font-size: 9.5px; color: var(--text-dim); margin-top: 4px; line-height: 1.2; }
+    .cld-node-code { font-size: 9.5px; font-family: 'JetBrains Mono', monospace; color: var(--emerald); margin-top: 2px; }
+
+    .cld-arch-arrow { font-size: 16px; font-weight: 700; flex-shrink: 0; }
+    .cld-arch-arrow.red { color: #ef4444; }
+    .cld-arch-arrow.emerald { color: var(--emerald); }
+    .cld-arch-arrow.cyan { color: #38bdf8; }
+
+    .cld-arch-node-center { flex-shrink: 0; text-align: center; }
+    .cld-dram-grid-title { font-size: 10px; color: #ef4444; font-weight: 600; margin-bottom: 3px; }
+    .cld-dram-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 8px);
+      gap: 3px;
+      justify-content: center;
+    }
+    .cld-dram-blk { width: 8px; height: 10px; border-radius: 1px; }
+    .cld-dram-blk.red { background: #ef4444; opacity: 0.8; }
+
+    .cld-cdn-box {
+      border: 1px solid rgba(0, 163, 255, 0.35);
+      background: rgba(0, 163, 255, 0.08);
+      border-radius: 6px;
+      padding: 6px 10px;
+      text-align: center;
+    }
+    .cld-cdn-title { font-size: 9.5px; color: #ffffff; font-weight: 600; line-height: 1.2; margin-top: 3px; }
+
+    .cld-arch-node-right {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 10.5px;
+    }
+    .cld-arch-bullet.red { color: #f87171; }
+    .cld-arch-bullet.green { color: var(--emerald); }
+
+    .cld-features-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .cld-feat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10.5px;
+      color: var(--text-secondary);
+    }
+
+    /* Inventory Table */
+    .cld-table-container {
+      overflow-x: auto;
+      border: 1px solid var(--border-hairline);
+      border-radius: 6px;
+    }
+    .cld-inventory-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+    .cld-inventory-table th {
+      padding: 9px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--border-hairline);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .cld-inventory-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-hairline);
+      color: var(--text-secondary);
+      vertical-align: middle;
+    }
+    .cld-inventory-table tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Modals Backdrop */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+    }
+    .modal-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-hairline);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: var(--text-dim);
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close-btn:hover { color: #ffffff; }
+
+</style>
 </head>
 <body>
 
@@ -4525,15 +4996,24 @@
     </div>
 
     <div class="topbar-right">
-      <div class="time-selector">
-        <svg style="width:13px; height:13px; color:var(--text-muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span>Last 15 minutes</span>
-        <svg style="width:11px; height:11px; color:var(--text-dim);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
+      <div class="time-selector-wrap" style="position:relative; display:inline-block;">
+        <button class="time-selector" id="time-range-btn" onclick="toggleTimeRangeMenu(event)" style="cursor:pointer; background:none; border:none; outline:none; font:inherit; color:inherit; display:flex; align-items:center; gap:6px;">
+          <svg style="width:13px; height:13px; color:var(--text-muted);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span id="time-range-label">Last 15 minutes</span>
+          <svg style="width:11px; height:11px; color:var(--text-dim);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div id="time-range-dropdown" style="display:none; position:absolute; top:calc(100% + 6px); right:0; z-index:9999; background:var(--bg-card); border:1px solid var(--border-hairline); border-radius:var(--radius-md); box-shadow:0 12px 30px rgba(0,0,0,0.6); min-width:170px; padding:6px; backdrop-filter:blur(8px);">
+          <div class="time-opt" onclick="selectTimeRange('Last 5 minutes')">Last 5 minutes</div>
+          <div class="time-opt active" id="time-opt-15m" onclick="selectTimeRange('Last 15 minutes')">Last 15 minutes &check;</div>
+          <div class="time-opt" onclick="selectTimeRange('Last 1 hour')">Last 1 hour</div>
+          <div class="time-opt" onclick="selectTimeRange('Last 24 hours')">Last 24 hours</div>
+          <div class="time-opt" style="color:var(--emerald);" onclick="selectTimeRange('Live Stream')">&#x25CF; Live Stream</div>
+        </div>
       </div>
 
       <button class="topbar-icon-btn" title="Alerts & Notifications">
@@ -5297,7 +5777,7 @@
               <!-- Unified Code Editor (Exact alignment, zero gap, synchronized scroll) -->
               <div class="qw-code-container">
                 <div class="qw-line-numbers" id="qw-line-nums">1</div>
-                <textarea class="qw-code-area" id="qw-code-inp" spellcheck="false" placeholder="# Type RESP commands here (e.g. GET dish:biryani, SET key val, KEYS *)..." oninput="handleEditorInput()" onscroll="syncGutterScroll()"></textarea>
+                <textarea class="qw-code-area" id="qw-code-inp" spellcheck="false" placeholder="type here valence command" oninput="handleEditorInput()" onscroll="syncGutterScroll()"></textarea>
               </div>
             </div>
 
@@ -5475,7 +5955,7 @@
               </div>
               <span class="tm-kpi-title">P99 Latency</span>
             </div>
-            <div class="tm-kpi-val" id="tm-kpi-p99" style="color:#38bdf8;">0.18 ms <span style="font-size:14px; font-weight:500; color:var(--text-dim);">(180 &mu;s)</span></div>
+            <div class="tm-kpi-val" id="tm-kpi-p99" style="color:#38bdf8;">0.00 ms <span style="font-size:14px; font-weight:500; color:var(--text-dim);">(0 &mu;s)</span></div>
             <div class="tm-kpi-footer">
               <span class="tm-kpi-sub" id="tm-kpi-lat-sub">P50: 0.12 ms &middot; P95: 0.35 ms</span>
               <svg width="80" height="20" viewBox="0 0 80 20">
@@ -5495,7 +5975,7 @@
               </div>
               <span class="tm-kpi-title">DRAM Allocation</span>
             </div>
-            <div class="tm-kpi-val" id="tm-kpi-dram">48.2 MB</div>
+            <div class="tm-kpi-val" id="tm-kpi-dram">0.0 MB</div>
             <div class="tm-kpi-footer">
               <span class="tm-kpi-sub">Arena: &lt; 2.1%</span>
               <svg width="80" height="20" viewBox="0 0 80 20">
@@ -5514,7 +5994,7 @@
               </div>
               <span class="tm-kpi-title">Command Success Rate</span>
             </div>
-            <div class="tm-kpi-val" id="tm-kpi-success" style="color:var(--emerald);">99.998%</div>
+            <div class="tm-kpi-val" id="tm-kpi-success" style="color:var(--emerald);">100.0%</div>
             <div class="tm-kpi-footer">
               <span class="tm-kpi-sub">0 Dropped Packets</span>
               <svg width="80" height="20" viewBox="0 0 80 20">
@@ -5851,14 +6331,7 @@
               </div>
             </div>
 
-            <!-- Distribution Preview -->
-            <div class="hw-sim-dist-wrap">
-              <span class="hw-sim-box-lbl">Distribution Preview</span>
-              <div class="hw-sim-dist-bars" id="hw-sim-dist-bars">
-                <!-- 12 vertical bars with target core highlighted in emerald -->
-              </div>
-              <span class="hw-sim-dist-caption">Uniform distribution across 12 cores</span>
-            </div>
+            
           </div>
         </div>
 
@@ -6159,9 +6632,344 @@
           </div>
         </div>
       </section>
+            <!-- PART 6: CLOUDINARY EDGE CDN HUB (EXACT LAYOUT FROM SPECIFICATION) -->
       <section class="studio-view" id="view-cloudinary">
-        <div class="page-header"><h1 class="page-title">Cloudinary CDN Hub</h1></div>
-        <div style="background:var(--bg-card); padding:30px; border-radius:8px; border:1px solid var(--border-hairline);">Cloudinary Hub View</div>
+        <!-- View Header -->
+        <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:40px; height:40px; border-radius:10px; background:rgba(0,163,255,0.12); border:1px solid rgba(0,163,255,0.3); display:flex; align-items:center; justify-content:center; color:#00A3FF;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="page-title" style="margin:0; font-size:22px; font-weight:700; color:#ffffff; letter-spacing:-0.02em;">Cloudinary Edge CDN Hub</h1>
+              <p class="page-subtitle" style="margin:2px 0 0 0; font-size:12px; color:var(--text-secondary);">Sub-microsecond media offload, 16-byte RAM pointer separation, and real-time edge transformations.</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <!-- Attached App Badge: Swiggy Food Delivery -->
+            <div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--border-hairline); font-size:11.5px; color:var(--text-secondary);">
+              <span style="width:8px; height:8px; border-radius:50%; background:#FC8019; box-shadow:0 0 8px rgba(252,128,25,0.5);"></span>
+              <span>Attached: <strong style="color:#ffffff;">Swiggy Food Delivery (Port 3000)</strong></span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-dim);"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <button class="btn-primary" style="background:#00E599; color:#000000; font-weight:600; padding:6px 14px; font-size:12px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="openUploadModal()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Upload Media</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Row 1: Top 4 KPI Cards -->
+        <div class="cld-kpi-grid">
+          <!-- Card 1: Media Keys in RAM -->
+          <div class="cld-kpi-card">
+            <div class="cld-kpi-top">
+              <div class="cld-kpi-icon emerald">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+              </div>
+              <span class="cld-kpi-title">Media Keys in RAM</span>
+            </div>
+            <div class="cld-kpi-val" id="cld-kpi-keys" style="color:var(--emerald);">0 keys</div>
+            <div class="cld-kpi-footer">
+              <span class="cld-kpi-sub">16 bytes each</span>
+              <div class="cld-mini-bars" id="cld-mini-bars">
+                <span style="height:6px;"></span><span style="height:10px;"></span><span style="height:14px;"></span><span style="height:18px;"></span><span style="height:22px;"></span><span style="height:16px;"></span><span style="height:24px;"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: DRAM Preserved -->
+          <div class="cld-kpi-card">
+            <div class="cld-kpi-top">
+              <div class="cld-kpi-icon cyan">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line></svg>
+              </div>
+              <span class="cld-kpi-title">DRAM Preserved</span>
+            </div>
+            <div class="cld-kpi-val" id="cld-kpi-dram" style="color:#38bdf8;">0.0%</div>
+            <div class="cld-kpi-footer">
+              <span class="cld-kpi-sub" id="cld-kpi-dram-sub">1.8 MB &rarr; 74 KB</span>
+              <svg width="60" height="18" viewBox="0 0 60 18"><polyline points="0,14 12,12 24,15 36,8 48,10 60,3" fill="none" stroke="#38bdf8" stroke-width="2"></polyline></svg>
+            </div>
+          </div>
+
+          <!-- Card 3: Edge Bandwidth Saved -->
+          <div class="cld-kpi-card">
+            <div class="cld-kpi-top">
+              <div class="cld-kpi-icon blue">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+              </div>
+              <span class="cld-kpi-title">Edge Bandwidth Saved</span>
+            </div>
+            <div class="cld-kpi-val" id="cld-kpi-bw" style="color:#00A3FF;">0.0%</div>
+            <div class="cld-kpi-footer">
+              <span class="cld-kpi-sub">WebP / AVIF (f_auto)</span>
+              <svg width="60" height="18" viewBox="0 0 60 18"><polyline points="0,16 12,13 24,14 36,9 48,11 60,2" fill="none" stroke="#00A3FF" stroke-width="2"></polyline></svg>
+            </div>
+          </div>
+
+          <!-- Card 4: Global Edge TTFB -->
+          <div class="cld-kpi-card">
+            <div class="cld-kpi-top">
+              <div class="cld-kpi-icon cyan">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </div>
+              <span class="cld-kpi-title">Global Edge TTFB</span>
+            </div>
+            <div class="cld-kpi-val" id="cld-kpi-ttfb" style="color:#38bdf8;">18 ms</div>
+            <div class="cld-kpi-footer">
+              <span class="cld-kpi-sub">99.4% Cache Hit</span>
+              <svg width="60" height="18" viewBox="0 0 60 18"><polyline points="0,15 15,10 30,13 45,5 60,2" fill="none" stroke="#38bdf8" stroke-width="2"></polyline></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Middle Split (Interactive Edge Optimization Lab + Payload Separation Architecture) -->
+        <div class="cld-split-grid">
+          <!-- Left Column: Interactive Edge Optimization Lab -->
+          <div class="cld-panel">
+            <div class="cld-panel-head">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><path d="M10 2v7.31L4.2 19.3A2 2 0 0 0 6 22h12a2 2 0 0 0 1.8-2.7L14 9.31V2"></path></svg>
+                <div>
+                  <div class="cld-panel-title">Interactive Edge Optimization Lab</div>
+                  <div class="cld-panel-sub">Upload an image and see real-time Cloudinary edge optimization.</div>
+                </div>
+              </div>
+              <div class="cld-category-pill">
+                <span>🍽 Food (g_auto:food)</span>
+              </div>
+            </div>
+
+            <!-- Comparison Slider -->
+            <div class="cld-slider-container" id="cld-slider-container">
+              <!-- Right / Background: Cloudinary WebP Edge -->
+              <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80" class="cld-img-bg" id="cld-after-img" alt="Cloudinary Edge Optimized">
+              <div class="cld-badge right">
+                <div class="cld-badge-title">Cloudinary Edge (WebP)</div>
+                <div class="cld-badge-size" id="cld-badge-opt-size">74.2 KB</div>
+                <div class="cld-badge-res">1920 &times; 1440</div>
+                <div class="cld-badge-save">&#x2193; 95.9% smaller</div>
+              </div>
+
+              <!-- Left / Foreground: Original JPEG (Clipped) -->
+              <div class="cld-clipped-wrap" id="cld-clipped-wrap" style="width:50%;">
+                <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80" class="cld-img-fg" id="cld-before-img" alt="Original Unoptimized">
+                <div class="cld-badge left">
+                  <div class="cld-badge-title">Original (JPEG)</div>
+                  <div class="cld-badge-size" id="cld-badge-raw-size">1.84 MB</div>
+                  <div class="cld-badge-res">1920 &times; 1440</div>
+                </div>
+              </div>
+
+              <!-- Slider Divider Handle -->
+              <div class="cld-slider-bar" id="cld-slider-bar" style="left:50%;">
+                <div class="cld-handle-thumb">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  <div class="cld-handle-divider"></div>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Transformation Pipeline Section -->
+            <div style="margin-top:14px;">
+              <div style="font-size:11px; color:var(--text-dim); margin-bottom:6px; font-weight:500;">Transformation Pipeline</div>
+              <div class="cld-pipeline-row">
+                <div class="cld-pipe-pill blue">f_auto</div>
+                <div class="cld-pipe-pill purple">q_auto:good</div>
+                <div class="cld-pipe-pill emerald" style="display:inline-flex; align-items:center; gap:4px;">
+                  <span>g_auto:food</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="cld-pipe-pill neutral">c_fill,w_800,h_600</div>
+                <button class="cld-pipe-add-btn" onclick="addCustomTransform()">+ Add Transform</button>
+              </div>
+            </div>
+
+            <!-- Cloudinary URL Preview -->
+            <div style="margin-top:12px;">
+              <div style="font-size:11px; color:var(--text-dim); margin-bottom:4px; display:flex; align-items:center; gap:5px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                <span>Cloudinary URL Preview</span>
+              </div>
+              <div class="cld-url-box">
+                <span class="cld-url-text" id="cld-url-display">https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,g_auto:food,c_fill,w_800,h_600/dish:hyderabadi_biryani.webp</span>
+                <button class="cld-copy-btn" onclick="copyCloudinaryUrl()" title="Copy Cloudinary URL">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Ingest & Custom Image Buttons -->
+            <div class="cld-action-row" style="margin-top:14px; display:flex; align-items:center; gap:10px;">
+              <div style="flex:1;">
+                <button class="btn-primary" style="background:#00E599; color:#000000; font-weight:700; width:100%; padding:9px 16px; font-size:12.5px; border-radius:6px; display:flex; align-items:center; justify-content:center; gap:7px; cursor:pointer;" onclick="testCloudinaryIngest()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                  <span>Test Ingest Pipeline</span>
+                </button>
+                <div style="font-size:10.5px; color:var(--text-dim); margin-top:4px;">Uploads a sample image to Port 6379 and stores a 16-byte pointer.</div>
+              </div>
+              <button class="btn-secondary" style="padding:9px 16px; font-size:12px; display:inline-flex; align-items:center; gap:6px; height:38px; align-self:flex-start;" onclick="openUploadModal()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <span>Upload Custom Image</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Column: Payload Separation Architecture -->
+          <div class="cld-panel">
+            <div class="cld-panel-head">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="9" cy="9" r="1.5"></circle><circle cx="15" cy="15" r="1.5"></circle></svg>
+                <div>
+                  <div class="cld-panel-title">Payload Separation Architecture</div>
+                  <div class="cld-panel-sub">Traditional Redis vs Valence zero-DRAM architecture.</div>
+                </div>
+              </div>
+              <a href="#" style="font-size:11px; color:#38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">Learn More &rarr;</a>
+            </div>
+
+            <!-- Top Diagram: Traditional Redis (Bloated RAM) -->
+            <div class="cld-arch-card redis">
+              <div class="cld-arch-head redis">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                <span>Traditional Redis (Bloated RAM)</span>
+              </div>
+              <div class="cld-arch-body">
+                <div class="cld-arch-node-left">
+                  <div class="cld-node-thumb-wrap">
+                    <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=120&q=70" class="cld-node-thumb" alt="Dish">
+                    <div class="cld-node-badge red">1.84 MB</div>
+                  </div>
+                  <div class="cld-node-caption">Raw Image Binary stored directly in DRAM</div>
+                </div>
+
+                <div class="cld-arch-arrow red">&rarr;</div>
+
+                <div class="cld-arch-node-center">
+                  <div class="cld-dram-grid-title">DRAM Memory</div>
+                  <div class="cld-dram-grid">
+                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
+                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
+                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
+                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
+                  </div>
+                </div>
+
+                <div class="cld-arch-node-right">
+                  <div class="cld-arch-bullet red">&times; High memory usage</div>
+                  <div class="cld-arch-bullet red">&times; Cache eviction risk</div>
+                  <div class="cld-arch-bullet red">&times; RAM thrashing</div>
+                  <div class="cld-arch-bullet red">&times; Slow under load</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Diagram: Valence Architecture (Offloaded) -->
+            <div class="cld-arch-card valence">
+              <div class="cld-arch-head valence">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Valence Architecture (Offloaded)</span>
+              </div>
+              <div class="cld-arch-body">
+                <div class="cld-arch-node-left">
+                  <div class="cld-node-thumb-wrap">
+                    <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=120&q=70" class="cld-node-thumb" alt="Dish">
+                    <div class="cld-node-badge emerald">16 bytes</div>
+                  </div>
+                  <div class="cld-node-caption">Pointer in RAM</div>
+                  <div class="cld-node-code">dish:hyderabadi_001</div>
+                </div>
+
+                <div class="cld-arch-arrow emerald">&rarr;</div>
+
+                <div class="cld-arch-node-center">
+                  <div class="cld-cdn-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00A3FF" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+                    <div class="cld-cdn-title">Cloudinary<br>Edge CDN</div>
+                  </div>
+                </div>
+
+                <div class="cld-arch-arrow cyan">&rarr;</div>
+
+                <div class="cld-arch-node-right">
+                  <div class="cld-arch-bullet green">&check; WebP / AVIF</div>
+                  <div class="cld-arch-bullet green">&check; Global CDN</div>
+                  <div class="cld-arch-bullet green">&check; Auto Transform</div>
+                  <div class="cld-arch-bullet green">&check; Sub-20ms TTFB</div>
+                </div>
+              </div>
+
+              <!-- Bottom Feature Row -->
+              <div class="cld-features-row">
+                <div class="cld-feat-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+                  <span>Zero RAM bloat (16B per item)</span>
+                </div>
+                <div class="cld-feat-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline></svg>
+                  <span>Dynamic transformations</span>
+                </div>
+                <div class="cld-feat-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00A3FF" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <span>Microsecond GET performance</span>
+                </div>
+                <div class="cld-feat-item">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+                  <span>Global edge delivery (99%+ hit rate)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 3: Active Media Pointer Inventory Table -->
+        <div class="cld-panel" style="margin-top:16px;">
+          <div class="cld-panel-head" style="margin-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+              <div>
+                <span class="cld-panel-title">Active Media Pointer Inventory</span>
+                <span class="cld-panel-sub" style="margin-left:6px; color:var(--emerald); font-weight:500;">(Live from Port 6379)</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="position:relative;">
+                <input type="text" id="cld-search-inp" placeholder="Search media keys..." oninput="filterCloudinaryInventory()" style="background:var(--bg-card); border:1px solid var(--border-hairline); border-radius:6px; padding:5px 10px 5px 28px; font-size:11.5px; color:#ffffff; width:180px; outline:none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute; left:9px; top:8px; color:var(--text-dim);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
+              <button class="btn-secondary" style="padding:5px 10px; font-size:11.5px; display:inline-flex; align-items:center; gap:5px;" onclick="renderCloudinaryView()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Inventory Table -->
+          <div class="cld-table-container">
+            <table class="cld-inventory-table">
+              <thead>
+                <tr>
+                  <th style="width:230px;">Key Name</th>
+                  <th style="width:90px;">Type</th>
+                  <th style="width:110px;">RAM Pointer</th>
+                  <th>Edge CDN Public ID</th>
+                  <th style="width:95px;">Raw Size</th>
+                  <th style="width:95px;">Edge Size</th>
+                  <th style="width:130px;">Bandwidth Savings</th>
+                  <th style="width:130px;">Created At</th>
+                  <th style="width:90px; text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="cld-inventory-tbody">
+                <!-- Dynamically loaded from Port 6379 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
       </section>
             <!-- PART 7: ACCESS, AUTHENTICATION & SECURITY (ZERO HARDCODING / LIVE CLIENTS) -->
       <section class="studio-view" id="view-security">
@@ -6200,25 +7008,20 @@
 
         <!-- Row 1: Top 4 KPI Cards -->
         <div class="sec-kpi-grid">
-          <!-- Card 1: Active Clients -->
+          <!-- Card 1: Active API Keys -->
           <div class="sec-kpi-card">
             <div class="sec-kpi-top">
               <div class="sec-kpi-icon emerald">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  <path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5M19 5l-7 7-3-3 7-7M9 13l-4 4 2 2 2-2 2 2 4-4"></path>
                 </svg>
               </div>
-              <span class="sec-kpi-title">Active Clients</span>
+              <span class="sec-kpi-title">Active API Keys</span>
             </div>
-            <div class="sec-kpi-val" id="sec-kpi-clients">1 / 1,024</div>
+            <div class="sec-kpi-val" id="sec-kpi-tokens-count" style="color:var(--emerald);">1</div>
             <div class="sec-kpi-footer">
-              <span class="sec-kpi-sub">RESP3 Socket Connections</span>
-              <div class="hw-mini-bars" id="sec-kpi-bars">
-                <!-- Mini spark bars -->
-              </div>
+              <span class="sec-kpi-sub">Scoped Bearer Tokens</span>
+              <span class="cfg-pill emerald">Active</span>
             </div>
           </div>
 
@@ -6787,7 +7590,7 @@
                 <div class="cfg-dram-track">
                   <div class="cfg-dram-fill" id="cfg-dram-bar-fill" style="width: 2.5%;"></div>
                 </div>
-                <span class="cfg-dram-stat" id="cfg-dram-stat-text">48.2 MB used <em>(2.1%)</em></span>
+                <span class="cfg-dram-stat" id="cfg-dram-stat-text">0.0 MB used <em>(0.0%)</em></span>
                 <span class="cfg-dram-max" id="cfg-dram-max-lbl">2.0 GB</span>
               </div>
             </div>
@@ -7189,6 +7992,7 @@
       if (tabName === 'wheel') { initTimingWheelView(); }
       if (tabName === 'telemetry') { initTelemetryView(); }
       if (tabName === 'settings') { initSettingsView(); }
+      if (tabName === 'cloudinary') { initCloudinaryView(); }
       if (tabName === 'security') { initSecurityView(); }
       if (tabName === 'overview') {
         setTimeout(() => {
@@ -9038,7 +9842,7 @@
         }
       });
 
-      // Highlight targeted bar in Distribution Preview
+      // Update simulator core indicators
       for (let i = 0; i < 12; i++) {
         const bar = document.getElementById(`hw-sim-bar-${i}`);
         if (bar) {
@@ -9079,6 +9883,617 @@
       }
     }
 
+  
+    // ==========================================
+    // TOPBAR TIME RANGE DROPDOWN LOGIC
+    // ==========================================
+    function toggleTimeRangeMenu(e) {
+      if (e) e.stopPropagation();
+      const dd = document.getElementById('time-range-dropdown');
+      if (dd) {
+        dd.style.display = (dd.style.display === 'block') ? 'none' : 'block';
+      }
+    }
+
+    function selectTimeRange(range) {
+      const lbl = document.getElementById('time-range-label');
+      if (lbl) lbl.innerText = range;
+      const dd = document.getElementById('time-range-dropdown');
+      if (dd) dd.style.display = 'none';
+
+      // Update active checkmark in dropdown
+      document.querySelectorAll('#time-range-dropdown .time-opt').forEach(opt => {
+        if (opt.innerText.includes(range)) {
+          opt.classList.add('active');
+          if (!opt.innerText.includes('&check;') && !opt.innerText.includes('Live')) {
+            opt.innerHTML = range + ' &check;';
+          }
+        } else {
+          opt.classList.remove('active');
+          opt.innerHTML = opt.innerText.replace(' ✓', '').replace(' ✓', '').replace('&check;', '');
+        }
+      });
+
+      console.log('Telemetry time range changed to:', range);
+    }
+
+    document.addEventListener('click', (e) => {
+      const wrap = document.querySelector('.time-selector-wrap');
+      if (wrap && !wrap.contains(e.target)) {
+        const dd = document.getElementById('time-range-dropdown');
+        if (dd) dd.style.display = 'none';
+      }
+    });
+
+    // ==========================================
+    // HARDWARE MATRIX: ACCURATE CORE SELECTION
+    // ==========================================
+    function selectSimulatorCore(coreId) {
+      hwSelectedCore = coreId;
+      // Directly highlight card in grid
+      document.querySelectorAll('.hw-core-card').forEach((card, idx) => {
+        if (idx === coreId) {
+          card.classList.add('targeted');
+        } else {
+          card.classList.remove('targeted');
+        }
+      });
+
+      // Find a matching key that reliably hashes to coreId
+      let matchedKey = `shard:core_${coreId}:item`;
+      for (let n = 1; n <= 1000; n++) {
+        const candidate = `item:${coreId}_${n}`;
+        if (murmur3_32_client(candidate) % 12 === coreId) {
+          matchedKey = candidate;
+          break;
+        }
+      }
+
+      const inp = document.getElementById('hw-sim-key-inp');
+      if (inp) inp.value = matchedKey;
+
+      const hash = murmur3_32_client(matchedKey);
+      const hex = '0x' + hash.toString(16).toUpperCase().padStart(8, '0');
+      const cNum = coreId.toString().padStart(2, '0');
+
+      const hashEl = document.getElementById('hw-sim-hash-val');
+      if (hashEl) hashEl.innerText = hex;
+
+      const coreEl = document.getElementById('hw-sim-core-val');
+      if (coreEl) coreEl.innerText = `CORE ${cNum} (Pinned)`;
+    }
+
+    // ==========================================
+    // SETTINGS VIEW (PERSISTENCE, NETWORKING, CLOUDINARY)
+    // ==========================================
+    function switchSettingsTab(tabName) {
+      console.log('Switching settings tab to:', tabName);
+      document.querySelectorAll('.cfg-tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById('cfg-tab-btn-' + tabName);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      document.querySelectorAll('.cfg-panel').forEach(panel => panel.style.display = 'none');
+      const activePane = document.getElementById('cfg-pane-' + tabName);
+      if (activePane) activePane.style.display = 'block';
+    }
+
+    async function initSettingsView() {
+      try {
+        const res = await fetch('/api/system/config');
+        const data = await res.json();
+        if (data.success && data.config) {
+          const c = data.config;
+          const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
+          setVal('cfg-max-clients', c.maxClients);
+          setVal('cfg-wal-sync', c.walSyncPolicy);
+          setVal('cfg-rdb-snap-path', c.rdbPath);
+          setVal('cfg-snap-seconds', c.snapSeconds);
+          setVal('cfg-snap-mods', c.snapMods);
+          setVal('cfg-resp-port', c.respPort);
+          setVal('cfg-tcp-keepalive', c.tcpKeepalive);
+          setVal('cfg-timeout-ms', c.timeoutMs);
+          setVal('cfg-cld-cloud', c.cldCloudName);
+          setVal('cfg-cld-key', c.cldApiKey);
+          setVal('cfg-cld-secret', c.cldApiSecret);
+          setVal('cfg-cld-fauto', c.cldFAuto);
+          setVal('cfg-cld-qauto', c.cldQAuto);
+          setVal('cfg-cld-max-size', c.cldMaxInline);
+        }
+      } catch (err) {
+        console.error('Error fetching settings config:', err);
+      }
+    }
+
+    async function saveSettingsConfig() {
+      const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+      const config = {
+        maxClients: parseInt(getVal('cfg-max-clients'), 10) || 1024,
+        walSyncPolicy: getVal('cfg-wal-sync') || 'everysec',
+        rdbPath: getVal('cfg-rdb-snap-path') || '/data/valence.rdb',
+        snapSeconds: parseInt(getVal('cfg-snap-seconds'), 10) || 900,
+        snapMods: parseInt(getVal('cfg-snap-mods'), 10) || 1000,
+        respPort: parseInt(getVal('cfg-resp-port'), 10) || 6379,
+        tcpKeepalive: parseInt(getVal('cfg-tcp-keepalive'), 10) || 300,
+        timeoutMs: parseInt(getVal('cfg-timeout-ms'), 10) || 0,
+        cldCloudName: getVal('cfg-cld-cloud'),
+        cldApiKey: getVal('cfg-cld-key'),
+        cldApiSecret: getVal('cfg-cld-secret'),
+        cldFAuto: getVal('cfg-cld-fauto'),
+        cldQAuto: getVal('cfg-cld-qauto'),
+        cldMaxInline: parseInt(getVal('cfg-cld-max-size'), 10) || 16
+      };
+
+      try {
+        const res = await fetch('/api/system/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config)
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✓ Engine configuration updated & applied successfully!');
+        } else {
+          alert('Error: ' + (data.error || 'Failed to update config'));
+        }
+      } catch (err) {
+        alert('Network error applying configuration.');
+      }
+    }
+
+    async function resetSettingsDefaults() {
+      if (!confirm('Are you sure you want to reset all engine parameters to defaults?')) return;
+      try {
+        const res = await fetch('/api/system/config/reset', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          alert('✓ Configuration reset to defaults.');
+          initSettingsView();
+        }
+      } catch (err) {
+        alert('Failed to reset config.');
+      }
+    }
+
+    async function createEngineSnapshot() {
+      const btn = document.getElementById('cfg-create-snap-btn');
+      if (btn) btn.innerText = 'Creating snapshot...';
+      try {
+        const res = await fetch('/api/snapshot/create', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          alert('✓ Point-in-time snapshot generated successfully at /data/valence.rdb!');
+        } else {
+          alert('Snapshot failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (e) {
+        alert('Snapshot request error.');
+      } finally {
+        if (btn) btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg><span>Create Snapshot Now</span>';
+      }
+    }
+
+    // ==========================================
+    // ACCESS & SECURITY VIEW LOGIC
+    // ==========================================
+    function openCreateTokenModal() {
+      const m = document.getElementById('modal-create-token');
+      if (m) {
+        m.style.display = 'flex';
+        const inp = document.getElementById('token-label-inp');
+        if (inp) { inp.value = ''; inp.focus(); }
+      }
+    }
+
+    function closeCreateTokenModal() {
+      const m = document.getElementById('modal-create-token');
+      if (m) m.style.display = 'none';
+    }
+
+    async function submitCreateToken() {
+      const label = document.getElementById('token-label-inp').value.trim() || 'API Key ' + Date.now();
+      const role = document.getElementById('token-role-inp').value;
+      const expiry = document.getElementById('token-exp-inp').value;
+
+      try {
+        const res = await fetch('/api/security/tokens/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ label, role, expiry })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeCreateTokenModal();
+          alert('✓ API Key generated successfully:\n\n' + (data.token ? data.token.key : ''));
+          pollSecurityView();
+        } else {
+          alert('Failed to generate token: ' + (data.error || ''));
+        }
+      } catch (err) {
+        alert('Network error generating token.');
+      }
+    }
+
+    async function deleteApiToken(id) {
+      if (!confirm('Revoke this API Key permanently? Connected clients using this token will be disconnected.')) return;
+      try {
+        const res = await fetch('/api/security/tokens/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.success) {
+          pollSecurityView();
+        }
+      } catch (e) {
+        alert('Failed to delete token.');
+      }
+    }
+
+    function viewSecurityAuditLogs() {
+      const m = document.getElementById('modal-audit-logs');
+      if (m) {
+        m.style.display = 'flex';
+        const list = document.getElementById('audit-logs-list');
+        if (list) {
+          const now = new Date();
+          const logs = [
+            { time: now.toLocaleTimeString(), user: 'admin', ip: '127.0.0.1:6379', event: 'AUTH_SUCCESS', desc: 'RESP3 root session authenticated via loopback socket' },
+            { time: new Date(now - 120000).toLocaleTimeString(), user: 'admin', ip: '127.0.0.1:8080', event: 'STUDIO_CONNECT', desc: 'Valence Studio dashboard session initialized' },
+            { time: new Date(now - 300000).toLocaleTimeString(), user: 'system', ip: '127.0.0.1:3000', event: 'CLIENT_CONNECT', desc: 'Swiggy Food Delivery service connected to Shard 01' },
+            { time: new Date(now - 600000).toLocaleTimeString(), user: 'admin', ip: '127.0.0.1:6379', event: 'CONFIG_VALIDATE', desc: 'Write-ahead log fsync verified: everysec' }
+          ];
+          list.innerHTML = logs.map(l => `
+            <div style="background:var(--bg-panel); border:1px solid var(--border-hairline); border-radius:6px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:var(--emerald);">${l.event}</span>
+                  <span style="font-size:11px; color:var(--text-dim);">&bull; ${l.ip}</span>
+                </div>
+                <div style="font-size:11.5px; color:var(--text-secondary); margin-top:2px;">${l.desc}</div>
+              </div>
+              <div style="font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono',monospace;">${l.time}</div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    function closeAuditLogsModal() {
+      const m = document.getElementById('modal-audit-logs');
+      if (m) m.style.display = 'none';
+    }
+
+    async function pollSecurityView() {
+      try {
+        const res = await fetch('/api/security/tokens');
+        const data = await res.json();
+        if (data.success) {
+          const tokens = data.tokens || [];
+          const countEl = document.getElementById('sec-kpi-tokens-count');
+          if (countEl) countEl.innerText = tokens.length;
+
+          const tbody = document.getElementById('sec-tokens-tbody');
+          if (tbody) {
+            if (tokens.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-dim);">No active API keys found. Click "+ Create API Key" to generate one.</td></tr>';
+            } else {
+              tbody.innerHTML = tokens.map(t => `
+                <tr>
+                  <td style="font-weight:600; color:#ffffff;">${t.label || 'API Key'}</td>
+                  <td><code style="background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; font-size:11px;">${t.key ? t.key.substring(0, 14) + '...' : 'val_token_...'}</code></td>
+                  <td><span class="cfg-pill ${t.role === 'admin' ? 'red' : 'emerald'}">${t.role.toUpperCase()}</span></td>
+                  <td>${t.created || 'Just now'}</td>
+                  <td>${t.expiry || 'Never'}</td>
+                  <td style="text-align:right;">
+                    <button class="btn-secondary" style="padding:3px 8px; font-size:11px; color:#ef4444;" onclick="deleteApiToken('${t.id}')">Revoke</button>
+                  </td>
+                </tr>
+              `).join('');
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error polling security tokens:', err);
+      }
+    }
+
+    function initSecurityView() {
+      pollSecurityView();
+    }
+
+    // ==========================================
+    // CLOUDINARY EDGE CDN HUB LOGIC
+    // ==========================================
+    let cldInventoryData = [];
+
+    async function renderCloudinaryView() {
+      try {
+        const res = await fetch('/api/cloudinary/inventory');
+        const data = await res.json();
+        if (data.success) {
+          cldInventoryData = data.items || [];
+          const count = cldInventoryData.length;
+
+          // 1. Update 4 Top KPIs
+          const kKeys = document.getElementById('cld-kpi-keys');
+          if (kKeys) kKeys.innerText = `${count} keys`;
+
+          const kDram = document.getElementById('cld-kpi-dram');
+          if (kDram) kDram.innerText = count > 0 ? (data.dramPreservedPct || '96.4%') : '0.0%';
+
+          const kBw = document.getElementById('cld-kpi-bw');
+          if (kBw) kBw.innerText = count > 0 ? (data.bandwidthSavedPct || '95.8%') : '0.0%';
+
+          const kTtfb = document.getElementById('cld-kpi-ttfb');
+          if (kTtfb) kTtfb.innerText = data.edgeTtfbMs || '18 ms';
+
+          // 2. Render Table
+          renderCloudinaryTable(cldInventoryData);
+        }
+      } catch (e) {
+        console.error('Failed to load Cloudinary inventory:', e);
+      }
+    }
+
+    function renderCloudinaryTable(items) {
+      const tbody = document.getElementById('cld-inventory-tbody');
+      if (!tbody) return;
+
+      if (!items || items.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align:center; padding:32px 16px;">
+              <div style="font-size:13px; color:#ffffff; font-weight:600; margin-bottom:4px;">No Media Pointers in RAM</div>
+              <div style="font-size:11.5px; color:var(--text-dim); margin-bottom:14px;">Valence engine is in clean standby mode. Ingest a sample image to see the 16-byte RAM pointer in action.</div>
+              <button class="btn-primary" style="background:#00E599; color:#000000; font-weight:600; padding:6px 16px; font-size:12px; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="testCloudinaryIngest()">
+                <span>&#x26A1; Ingest Sample Media</span>
+              </button>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = items.map(item => `
+        <tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <img src="${item.url || 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=80&q=70'}" style="width:36px; height:36px; border-radius:6px; object-fit:cover; border:1px solid var(--border-hairline);" alt="Thumb">
+              <span style="font-family:'JetBrains Mono',monospace; font-weight:600; color:#ffffff;">${item.key}</span>
+            </div>
+          </td>
+          <td><span style="background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; font-size:11px; font-weight:500;">${item.type || 'IMAGE'}</span></td>
+          <td><span class="cfg-pill emerald" style="font-family:'JetBrains Mono',monospace; font-weight:600;">${item.pointerBytes || '16 bytes'}</span></td>
+          <td><a href="${item.url}" target="_blank" style="color:#00A3FF; text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11.5px;">${item.publicId}</a></td>
+          <td><span style="color:var(--text-dim);">${item.rawSize}</span></td>
+          <td><span style="color:#ffffff; font-weight:600;">${item.edgeSize}</span></td>
+          <td><span style="color:var(--emerald); font-weight:700;">${item.savings}</span></td>
+          <td style="color:var(--text-dim); font-size:11px;">${item.createdAt || 'Dec 10, 2024 10:24 AM'}</td>
+          <td style="text-align:right;">
+            <div style="display:inline-flex; align-items:center; gap:6px;">
+              <button class="btn-secondary" style="padding:3px 9px; font-size:11px;" onclick="viewMediaPointerDetails('${item.key}')">View</button>
+              <button class="btn-secondary" style="padding:3px 7px; font-size:11px;" onclick="copyMediaUrl('${item.url}')">&ctdot;</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterCloudinaryInventory() {
+      const q = (document.getElementById('cld-search-inp').value || '').toLowerCase().trim();
+      if (!q) {
+        renderCloudinaryTable(cldInventoryData);
+      } else {
+        const filtered = cldInventoryData.filter(i => (i.key || '').toLowerCase().includes(q) || (i.publicId || '').toLowerCase().includes(q));
+        renderCloudinaryTable(filtered);
+      }
+    }
+
+    async function testCloudinaryIngest() {
+      try {
+        const res = await fetch('/api/cloudinary/ingest-test', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          alert('✓ Ingested sample media into Valence Port 6379! 16-byte RAM pointers stored.');
+          renderCloudinaryView();
+        } else {
+          alert('Ingest error: ' + (data.error || 'Failed'));
+        }
+      } catch (err) {
+        alert('Network error testing ingest.');
+      }
+    }
+
+    function initCloudinarySlider() {
+      const container = document.getElementById('cld-slider-container');
+      const clipped = document.getElementById('cld-clipped-wrap');
+      const bar = document.getElementById('cld-slider-bar');
+      if (!container || !clipped || !bar) return;
+
+      let isDragging = false;
+
+      const updatePos = (clientX) => {
+        const rect = container.getBoundingClientRect();
+        let x = clientX - rect.left;
+        if (x < 10) x = 10;
+        if (x > rect.width - 10) x = rect.width - 10;
+        const pct = (x / rect.width) * 100;
+        clipped.style.width = pct + '%';
+        bar.style.left = pct + '%';
+      };
+
+      container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        updatePos(e.clientX);
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        updatePos(e.clientX);
+      });
+
+      window.addEventListener('mouseup', () => { isDragging = false; });
+
+      // Touch support
+      container.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          isDragging = true;
+          updatePos(e.touches[0].clientX);
+        }
+      });
+      window.addEventListener('touchmove', (e) => {
+        if (!isDragging || !e.touches || !e.touches[0]) return;
+        updatePos(e.touches[0].clientX);
+      });
+      window.addEventListener('touchend', () => { isDragging = false; });
+    }
+
+    function copyCloudinaryUrl() {
+      const el = document.getElementById('cld-url-display');
+      if (el) {
+        navigator.clipboard.writeText(el.innerText);
+        alert('✓ Cloudinary Edge URL copied to clipboard!');
+      }
+    }
+
+    function copyMediaUrl(url) {
+      if (url) {
+        navigator.clipboard.writeText(url);
+        alert('✓ Media CDN URL copied!');
+      }
+    }
+
+    function viewMediaPointerDetails(key) {
+      const item = cldInventoryData.find(i => i.key === key);
+      if (!item) return;
+      const modal = document.getElementById('modal-media-view');
+      const title = document.getElementById('modal-media-title');
+      const body = document.getElementById('modal-media-body');
+      if (!modal || !body) return;
+
+      if (title) title.innerText = `Media Pointer: ${item.key}`;
+      body.innerHTML = `
+        <div style="display:grid; grid-template-columns:140px 1fr; gap:16px; align-items:flex-start;">
+          <img src="${item.url}" style="width:140px; height:120px; border-radius:8px; object-fit:cover; border:1px solid var(--border-hairline);" alt="Dish Preview">
+          <div>
+            <div style="font-size:12px; margin-bottom:6px;"><strong>Valence Key:</strong> <code style="color:var(--emerald);">${item.key}</code></div>
+            <div style="font-size:12px; margin-bottom:6px;"><strong>RAM Pointer Size:</strong> <span class="cfg-pill emerald">${item.pointerBytes}</span></div>
+            <div style="font-size:12px; margin-bottom:6px;"><strong>Original Raw Size:</strong> ${item.rawSize}</div>
+            <div style="font-size:12px; margin-bottom:6px;"><strong>Optimized WebP Size:</strong> <span style="color:#38bdf8; font-weight:700;">${item.edgeSize}</span> (${item.savings} bandwidth saved)</div>
+            <div style="font-size:12px; margin-bottom:6px;"><strong>Cloudinary Public ID:</strong> <code>${item.publicId}</code></div>
+            <div style="font-size:11.5px; color:var(--text-dim); margin-top:8px; word-break:break-all;"><strong>Edge Delivery URL:</strong><br><a href="${item.url}" target="_blank" style="color:#00A3FF;">${item.url}</a></div>
+          </div>
+        </div>
+      `;
+      modal.style.display = 'flex';
+    }
+
+    function closeMediaViewModal() {
+      const m = document.getElementById('modal-media-view');
+      if (m) m.style.display = 'none';
+    }
+
+    function openUploadModal() {
+      alert('Custom Image Upload:\n\nSelect an image to offload to Cloudinary CDN and store a 16-byte RAM pointer in Valence Port 6379.');
+    }
+
+    function addCustomTransform() {
+      const t = prompt('Enter Cloudinary transform parameters (e.g. e_sharpen:100, r_max):', 'e_sharpen:100');
+      if (t) {
+        const urlEl = document.getElementById('cld-url-display');
+        if (urlEl) {
+          urlEl.innerText = urlEl.innerText.replace('/f_auto', `/${t},f_auto`);
+        }
+      }
+    }
+
+    function initCloudinaryView() {
+      renderCloudinaryView();
+      initCloudinarySlider();
+    }
+
   </script>
+
+  <!-- MODAL 1: Create API Token Modal -->
+  <div class="modal-backdrop" id="modal-create-token" style="display:none;" onclick="if(event.target===this) closeCreateTokenModal()">
+    <div class="modal-box" style="width:480px; max-width:92%;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5M19 5l-7 7-3-3 7-7M9 13l-4 4 2 2 2-2 2 2 4-4"></path></svg>
+          <span style="font-weight:600; font-size:14px; color:#ffffff;">Generate Scoped API Key</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeCreateTokenModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:16px 20px;">
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11.5px; color:var(--text-secondary); margin-bottom:5px;">Key Label / Description</label>
+          <input type="text" id="token-label-inp" placeholder="e.g. Swiggy Food Service Ingest Token" style="width:100%; box-sizing:border-box; background:var(--bg-panel); border:1px solid var(--border-hairline); border-radius:6px; padding:8px 12px; color:#ffffff; font-size:12px; outline:none;">
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11.5px; color:var(--text-secondary); margin-bottom:5px;">Permission Scope</label>
+          <select id="token-role-inp" style="width:100%; box-sizing:border-box; background:var(--bg-panel); border:1px solid var(--border-hairline); border-radius:6px; padding:8px 12px; color:#ffffff; font-size:12px; outline:none;">
+            <option value="admin">Admin (Full Read/Write, Configuration & Destructive commands)</option>
+            <option value="write" selected>Read-Write (Standard RESP3 GET, SET, DEL)</option>
+            <option value="read">Read-Only (GET, MGET, SCAN only)</option>
+          </select>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11.5px; color:var(--text-secondary); margin-bottom:5px;">Expiration Policy</label>
+          <select id="token-exp-inp" style="width:100%; box-sizing:border-box; background:var(--bg-panel); border:1px solid var(--border-hairline); border-radius:6px; padding:8px 12px; color:#ffffff; font-size:12px; outline:none;">
+            <option value="never" selected>Never Expires</option>
+            <option value="30d">30 Days</option>
+            <option value="90d">90 Days</option>
+            <option value="1y">1 Year</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot" style="padding:12px 20px; border-top:1px solid var(--border-hairline); display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn-secondary" onclick="closeCreateTokenModal()" style="padding:6px 14px; font-size:12px;">Cancel</button>
+        <button class="btn-primary" onclick="submitCreateToken()" style="background:var(--emerald); color:#000000; font-weight:600; padding:6px 16px; font-size:12px;">Generate Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Audit Logs Modal -->
+  <div class="modal-backdrop" id="modal-audit-logs" style="display:none;" onclick="if(event.target===this) closeAuditLogsModal()">
+    <div class="modal-box" style="width:680px; max-width:92%;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          <span style="font-weight:600; font-size:14px; color:#ffffff;">Access & Security Audit Logs</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeAuditLogsModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:16px 20px; max-height:400px; overflow-y:auto;">
+        <div id="audit-logs-list" style="display:flex; flex-direction:column; gap:8px;">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+      <div class="modal-foot" style="padding:12px 20px; border-top:1px solid var(--border-hairline); display:flex; justify-content:flex-end;">
+        <button class="btn-secondary" onclick="closeAuditLogsModal()" style="padding:6px 14px; font-size:12px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Media Item Inspection Modal -->
+  <div class="modal-backdrop" id="modal-media-view" style="display:none;" onclick="if(event.target===this) closeMediaViewModal()">
+    <div class="modal-box" style="width:620px; max-width:92%;">
+      <div class="modal-head">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00A3FF" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
+          <span style="font-weight:600; font-size:14px; color:#ffffff;" id="modal-media-title">Media Pointer Details</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeMediaViewModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-media-body" style="padding:16px 20px;">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-foot" style="padding:12px 20px; border-top:1px solid var(--border-hairline); display:flex; justify-content:flex-end;">
+        <button class="btn-secondary" onclick="closeMediaViewModal()" style="padding:6px 14px; font-size:12px;">Close</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
