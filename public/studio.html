@@ -4954,7 +4954,7 @@
 
 </style>
 </head>
-<body>
+<body class="sidebar-pinned">
 
   <!-- Top Navigation Bar -->
   <header class="topbar">
@@ -5029,7 +5029,7 @@
   </header>
 
   <!-- Supabase-Style Hover-Expand Sidebar -->
-  <aside class="sidebar" id="app-sidebar">
+  <aside class="sidebar pinned" id="app-sidebar">
     <div class="sidebar-top">
       <div class="nav-section-title">DATABASE</div>
       <nav class="nav-group">
@@ -7931,7 +7931,7 @@
     let hoverTimeout = null;
 
     try {
-      if (localStorage.getItem('valence_sidebar_pinned') === 'true') {
+      if (localStorage.getItem('valence_sidebar_pinned') !== 'false') {
         STATE.sidebarPinned = true;
         sidebar.classList.add('pinned');
         document.body.classList.add('sidebar-pinned');
@@ -8520,19 +8520,6 @@
           if (secKpiApp) { secKpiApp.innerText = 'None (Standby)'; secKpiApp.style.color = 'var(--text-dim)'; }
           if (secKpiPill) { secKpiPill.innerText = 'Standby'; secKpiPill.className = 'cfg-pill cyan'; }
           if (secUptime) secUptime.innerText = 'Connected: Standby';
-        }
-      }
-    }
-
-      if (cldText && cldDot) {
-        if (attached) {
-          cldDot.style.background = '#FC8019';
-          cldDot.style.boxShadow = '0 0 8px rgba(252,128,25,0.6)';
-          cldText.innerHTML = `Attached: <strong style="color:#ffffff;">Swiggy Food Delivery (${url || 'Port 3000'})</strong>`;
-        } else {
-          cldDot.style.background = '#64748b';
-          cldDot.style.boxShadow = 'none';
-          cldText.innerHTML = `No App Attached (Click to Connect)`;
         }
       }
     }
