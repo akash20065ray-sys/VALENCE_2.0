@@ -414,7 +414,7 @@ async function getLiveKeyspace(forceFresh = false) {
   }
 
   // Query TTL and sample value for active keys (up to 30)
-  const batch = keyNames.slice(0, 30);
+  const batch = keyNames.slice(0, 500);
   const promises = batch.map(async (k) => {
     const shardInfo = getShardAndCore(k);
     const ttlRes = await execValenceCmd(['TTL', k]);
@@ -618,7 +618,7 @@ const server = http.createServer(async (req, res) => {
     pathname.startsWith('/api/rush') ||
     pathname.startsWith('/api/cinema') ||
     pathname.startsWith('/api/action') || pathname === '/api/stream' ||
-    pathname === '/app.js' || pathname === '/style.css' || pathname === '/biryani_hd.jpg'
+    pathname === '/app.js' || pathname === '/style.css'
   ) {
     if (pathname === '/swiggy') {
       res.writeHead(302, { 'Location': '/swiggy/' });
@@ -1886,7 +1886,7 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify({ success: true, count: samples.length, message: 'Sample media ingested with 16-byte RAM pointers!' }));
   }
 
-  // 12. Static File Server
+  // 12. Static File Server (Zero Caching on HTML for Live Real-Time Verification)
   let filePath = path.join(__dirname, 'public', pathname === '/' ? 'index.html' : pathname);
   const ext = path.extname(filePath);
   const contentTypes = {
@@ -1894,7 +1894,14 @@ const server = http.createServer(async (req, res) => {
     '.css': 'text/css',
     '.js': 'text/javascript',
     '.json': 'application/json',
-    '.svg': 'image/svg+xml'
+    '.svg': 'image/svg+xml',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.png': 'image/png',
+    '.webp': 'image/webp',
+    '.avif': 'image/avif',
+    '.gif': 'image/gif',
+    '.ico': 'image/x-icon'
   };
 
   fs.readFile(filePath, (err, content) => {
@@ -1904,12 +1911,23 @@ const server = http.createServer(async (req, res) => {
           res.writeHead(404);
           res.end('Not Found');
         } else {
-          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.writeHead(200, {
+            'Content-Type': 'text/html',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          });
           res.end(fallback);
         }
       });
     } else {
-      res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'text/plain' });
+      const headers = { 'Content-Type': contentTypes[ext] || 'text/plain' };
+      if (ext === '.html') {
+        headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+        headers['Pragma'] = 'no-cache';
+        headers['Expires'] = '0';
+      }
+      res.writeHead(200, headers);
       res.end(content);
     }
   });
@@ -1919,10 +1937,79 @@ server.on('error', err => {
   console.error('[HTTP SERVER ERROR]', err);
 });
 
+
+// --- Auto-Seed Multi-Namespace Production Catalog on Startup ---
+async function ensureDatabaseSeeded() {
+  try {
+    const keysRes = await execValenceCmd(['KEYS', '*']);
+    const keys = Array.isArray(keysRes.parsed) ? keysRes.parsed.filter(Boolean) : [];
+    
+    // Purge any lingering test keys
+    const junk = ['dish:images', 'dish:cloudinary_edge_cdn_developer_dashboard', 'dish:test_upload', 'dish:valence_query_workbench_dashboard'];
+    for (const j of junk) {
+      if (keys.includes(j)) {
+        await execValenceCmd(['DEL', j]);
+      }
+    }
+
+    const hasMultiNs = keys.some(k => k.startsWith('menu:')) && keys.some(k => k.startsWith('restaurant:'));
+    if (keys.length >= 10 && hasMultiNs) {
+      return; // Already populated
+    }
+
+    console.log('[SEED] Seeding multi-namespace production catalog into Valence engine...');
+    const seedData = [
+      ['restaurant:rest-1', JSON.stringify({ id: 'rest-1', name: 'Meghana Foods', image: 'https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/xqwpuhgnsaf18te7zvun', discount: '50% OFF UP TO ₹100', rating: 4.5, eta: '20-25 mins', cuisines: 'Biryani, Andhra, South Indian', area: 'Kothrud • 2.4 km' })],
+      ['restaurant:rest-2', JSON.stringify({ id: 'rest-2', name: 'Burger King', image: 'https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/e33e1d3ba7d6b2bb0d45e1001b731fcf', discount: 'ITEMS AT ₹129', rating: 4.3, eta: '25-30 mins', cuisines: 'Burgers, American, Fast Food', area: 'FC Road • 3.1 km' })],
+      ['restaurant:rest-3', JSON.stringify({ id: 'rest-3', name: 'Hotel Empire', image: 'https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/r4mw2xp0djz0pscwmiop', discount: '20% OFF UP TO ₹50', rating: 4.2, eta: '30-35 mins', cuisines: 'North Indian, Kebabs, Biryani', area: 'Shivajinagar • 4.2 km' })],
+      ['restaurant:rest-4', JSON.stringify({ id: 'rest-4', name: 'The Belgian Waffle Co.', image: 'https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660/5116a385bac0548e06c33c08350f498f', discount: 'FLAT ₹100 OFF', rating: 4.6, eta: '15-20 mins', cuisines: 'Waffles, Desserts, Shakes', area: 'Law College Road • 1.8 km' })],
+      ['menu:dish:m-101', JSON.stringify({ id: 'm-101', name: 'Meghana Special Chicken Biryani', price: 340, isVeg: false, rating: 4.8, restaurant: 'Meghana Foods' })],
+      ['menu:dish:m-102', JSON.stringify({ id: 'm-102', name: 'Paneer Butter Masala', price: 260, isVeg: true, rating: 4.6, restaurant: 'Meghana Foods' })],
+      ['menu:dish:m-103', JSON.stringify({ id: 'm-103', name: 'Butter Garlic Naan (2 pcs)', price: 70, isVeg: true, rating: 4.7, restaurant: 'Meghana Foods' })],
+      ['menu:dish:m-104', JSON.stringify({ id: 'm-104', name: 'Chicken 65 Andhra Style', price: 290, isVeg: false, rating: 4.7, restaurant: 'Meghana Foods' })],
+      ['menu:dish:m-201', JSON.stringify({ id: 'm-201', name: 'Crispy Veg Double Patty Whopper', price: 199, isVeg: true, rating: 4.4, restaurant: 'Burger King' })],
+      ['menu:dish:m-202', JSON.stringify({ id: 'm-202', name: 'Chicken Whopper Meal with Fries', price: 329, isVeg: false, rating: 4.6, restaurant: 'Burger King' })],
+      ['menu:dish:m-301', JSON.stringify({ id: 'm-301', name: 'Empire Special Tandoori Chicken', price: 380, isVeg: false, rating: 4.5, restaurant: 'Hotel Empire' })],
+      ['menu:dish:m-302', JSON.stringify({ id: 'm-302', name: 'Dal Makhani Bukhara', price: 230, isVeg: true, rating: 4.4, restaurant: 'Hotel Empire' })],
+      ['menu:dish:m-401', JSON.stringify({ id: 'm-401', name: 'Belgian Milk Chocolate Waffle', price: 160, isVeg: true, rating: 4.8, restaurant: 'The Belgian Waffle Co.' })],
+      ['menu:dish:m-402', JSON.stringify({ id: 'm-402', name: 'Death by Chocolate Waffle Cake', price: 340, isVeg: true, rating: 4.9, restaurant: 'The Belgian Waffle Co.' })],
+      ['cart:session_101:m-101', JSON.stringify({ dishId: 'm-101', qty: 2, price: 340, restId: 'rest-1' })],
+      ['cart:session_102:m-201', JSON.stringify({ dishId: 'm-201', qty: 1, price: 199, restId: 'rest-2' })],
+      ['session:user_81:auth', JSON.stringify({ user: 'Akash Ray', phone: '+91 98765 43210', plan: 'Swiggy ONE Gold', area: 'Kothrud, Pune' })],
+      ['session:user_92:auth', JSON.stringify({ user: 'Priya Sharma', phone: '+91 98220 11223', plan: 'Swiggy ONE', area: 'Baner, Pune' })],
+      ['promos:active:coupons', JSON.stringify([{ code: 'SWIGGYIT', discount: 'Flat ₹100 OFF' }, { code: 'PARTY50', discount: '50% OFF up to ₹150' }, { code: 'VALENCEFREE', discount: '100% Free Delivery' }])],
+      ['geo:zone:kothrud', JSON.stringify({ city: 'Pune', area: 'Kothrud', pincode: '411038', hub: 'HUB-WEST-04', deliveryTimeMin: 18 })],
+      ['geo:zone:baner', JSON.stringify({ city: 'Pune', area: 'Baner', pincode: '411045', hub: 'HUB-WEST-09', deliveryTimeMin: 22 })],
+      ['catalog:filter:pure_veg', JSON.stringify({ count: 18, filter: 'isVeg=true' })],
+      ['catalog:filter:fast_delivery', JSON.stringify({ count: 12, maxEta: 25 })],
+      ['catalog:filter:rated_4', JSON.stringify({ count: 24, minRating: 4.0 })],
+      ['support:faq:topics', JSON.stringify(['Where is my live order?', 'Instant Refund Status', 'Payment & Wallet Query', 'Restaurant Partner Support'])],
+      ['membership:swiggy_one', JSON.stringify({ plan: 'Swiggy ONE Gold', active: true, freeDeliveriesLeft: 'Unlimited', savedTotal: '₹1,420' })],
+      ['dish:hyderabadi_biryani', JSON.stringify({ provider: 'cloudinary', public_id: 'valencedb/food/hyderabadi_biryani', url: '/biryani_hd.jpg', orig_bytes: 1842910, optimized_bytes: 74200, savings_pct: 95.9, transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600', dishName: 'Hyderabadi Dum Biryani' })],
+      ['dish:butter_chicken', JSON.stringify({ provider: 'cloudinary', public_id: 'valencedb/food/butter_chicken', url: 'https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=800&auto=format&fit=crop&q=80', orig_bytes: 2097152, optimized_bytes: 82100, savings_pct: 96.1, transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600', dishName: 'Murgh Makhani (Butter Chicken)' })],
+      ['dish:paneer_tikka', JSON.stringify({ provider: 'cloudinary', public_id: 'valencedb/food/paneer_tikka', url: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop&q=80', orig_bytes: 1280000, optimized_bytes: 68400, savings_pct: 94.7, transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600', dishName: 'Tandoori Paneer Tikka' })],
+      ['dish:pizza_margherita', JSON.stringify({ provider: 'cloudinary', public_id: 'valencedb/food/pizza_margherita', url: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80', orig_bytes: 2150000, optimized_bytes: 171000, savings_pct: 92.0, transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600', dishName: 'Artisanal Margherita Pizza' })]
+    ];
+
+    for (const [k, v] of seedData) {
+      await execValenceCmd(['SET', k, v]);
+    }
+    await execValenceCmd(['EXPIRE', 'cart:session_101:m-101', '180']);
+    await execValenceCmd(['EXPIRE', 'cart:session_102:m-201', '240']);
+    await execValenceCmd(['EXPIRE', 'session:user_81:auth', '3600']);
+    await execValenceCmd(['EXPIRE', 'session:user_92:auth', '3600']);
+    cachedKeys = null;
+    console.log('[SEED] Multi-namespace catalog ready (30 keys, 10 namespaces).');
+  } catch (e) {
+    console.error('[SEED ERROR]', e.message);
+  }
+}
+
 // Auto-attach to local Swiggy app on port 3000 on startup
 setTimeout(() => {
+  ensureDatabaseSeeded();
   attachToUpstream('http://127.0.0.1:3000');
-}, 1500);
+}, 1000);
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log('================================================================');

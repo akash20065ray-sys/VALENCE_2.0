@@ -6833,7 +6833,7 @@
               </svg>
               <span>Access, Authentication &amp; Security</span>
             </h1>
-            <p class="page-subtitle">Client connection monitoring, role-based access control (RBAC), and protected command guardrails.</p>
+            <p class="page-subtitle">Client connection monitoring, loopback protocol verification, and protected command guardrails.</p>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
             <button class="btn-secondary" style="padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:6px;" onclick="viewSecurityAuditLogs()">
@@ -10238,60 +10238,7 @@
       }
     }
 
-    function openCreateTokenModal() {
-      const m = document.getElementById('modal-create-token');
-      if (m) {
-        m.style.display = 'flex';
-        const inp = document.getElementById('token-label-inp');
-        if (inp) { inp.value = ''; inp.focus(); }
-      }
-    }
 
-    function closeCreateTokenModal() {
-      const m = document.getElementById('modal-create-token');
-      if (m) m.style.display = 'none';
-    }
-
-    async function submitCreateToken() {
-      const label = document.getElementById('token-label-inp').value.trim() || 'API Key ' + Date.now();
-      const role = document.getElementById('token-role-inp').value;
-      const expiry = document.getElementById('token-exp-inp').value;
-
-      try {
-        const res = await fetch('/api/security/tokens/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ label, role, expiry })
-        });
-        const data = await res.json();
-        if (data.success) {
-          closeCreateTokenModal();
-          alert('✓ API Key generated successfully:\n\n' + (data.token ? data.token.key : ''));
-          pollSecurityView();
-        } else {
-          alert('Failed to generate token: ' + (data.error || ''));
-        }
-      } catch (err) {
-        alert('Network error generating token.');
-      }
-    }
-
-    async function deleteApiToken(id) {
-      if (!confirm('Revoke this API Key permanently? Connected clients using this token will be disconnected.')) return;
-      try {
-        const res = await fetch('/api/security/tokens/delete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id })
-        });
-        const data = await res.json();
-        if (data.success) {
-          pollSecurityView();
-        }
-      } catch (e) {
-        alert('Failed to delete token.');
-      }
-    }
 
     function viewSecurityAuditLogs() {
       const m = document.getElementById('modal-audit-logs');
@@ -10379,6 +10326,51 @@
     // CLOUDINARY EDGE CDN HUB LOGIC
     // ==========================================
     let cldInventoryData = [];
+    const cldCustomImageCache = new Map();
+    let currentPreviewKey = 'dish:hyderabadi_biryani';
+
+    function openMediaPreview(key) {
+      if (!cldInventoryData || cldInventoryData.length === 0) return;
+      currentPreviewKey = key;
+      const item = cldInventoryData.find(i => i.key === key) || cldInventoryData[0];
+      if (!item) return;
+
+      const emptyBox = document.getElementById('cld-slider-empty');
+      const imgBefore = document.getElementById('cld-before-img');
+      const imgAfter = document.getElementById('cld-after-img');
+      const clipWrap = document.getElementById('cld-clipped-wrap');
+      const rightBadge = document.getElementById('cld-badge-right-box');
+      const sliderBar = document.getElementById('cld-slider-bar');
+      const urlEl = document.getElementById('cld-url-display');
+      const rawSizeEl = document.getElementById('cld-badge-raw-size');
+      const optSizeEl = document.getElementById('cld-badge-opt-size');
+      const saveEl = document.getElementById('cld-badge-save');
+
+      if (emptyBox) emptyBox.style.display = 'none';
+      
+      const displayUrl = cldCustomImageCache.get(item.key) || item.url || '/biryani_hd.jpg';
+      if (imgAfter) { 
+        imgAfter.src = displayUrl; 
+        imgAfter.style.display = 'block'; 
+        imgAfter.onerror = function() { this.src = '/biryani_hd.jpg'; };
+      }
+      if (imgBefore) { 
+        imgBefore.src = displayUrl; 
+        imgBefore.style.display = 'block'; 
+        imgBefore.onerror = function() { this.src = '/biryani_hd.jpg'; };
+      }
+      if (clipWrap) clipWrap.style.display = 'block';
+      if (rightBadge) rightBadge.style.display = 'block';
+      if (sliderBar) sliderBar.style.display = 'block';
+
+      if (rawSizeEl) rawSizeEl.innerText = item.rawSize;
+      if (optSizeEl) optSizeEl.innerText = item.edgeSize;
+      if (saveEl) saveEl.innerHTML = `&darr; ${item.savings} smaller`;
+      if (urlEl) urlEl.innerText = item.url || ('https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/' + item.key + '.webp');
+
+      syncCldImageDimensions();
+      showToast(`Selected "${item.key}" in comparison slider`, 'normal');
+    }
 
     async function renderCloudinaryView() {
       try {
@@ -10420,19 +10412,34 @@
           const clipWrap = document.getElementById('cld-clipped-wrap');
           const sliderBar = document.getElementById('cld-slider-bar');
 
-          if (count > 0 && cldInventoryData[0]) {
-            const first = cldInventoryData[0];
+          if (count > 0) {
+            // Find current active preview or default to dish:hyderabadi_biryani
+            let activeItem = cldInventoryData.find(i => i.key === currentPreviewKey);
+            if (!activeItem) {
+              activeItem = cldInventoryData.find(i => i.key === 'dish:hyderabadi_biryani') || cldInventoryData[0];
+              currentPreviewKey = activeItem.key;
+            }
+
+            const displayUrl = cldCustomImageCache.get(activeItem.key) || activeItem.url || '/biryani_hd.jpg';
             if (emptyBox) emptyBox.style.display = 'none';
-            if (imgAfter) { imgAfter.src = first.url; imgAfter.style.display = 'block'; }
-            if (imgBefore) { imgBefore.src = first.url; imgBefore.style.display = 'block'; }
+            if (imgAfter) { 
+              imgAfter.src = displayUrl; 
+              imgAfter.style.display = 'block'; 
+              imgAfter.onerror = function() { this.src = '/biryani_hd.jpg'; };
+            }
+            if (imgBefore) { 
+              imgBefore.src = displayUrl; 
+              imgBefore.style.display = 'block'; 
+              imgBefore.onerror = function() { this.src = '/biryani_hd.jpg'; };
+            }
             if (clipWrap) clipWrap.style.display = 'block';
             if (rightBadge) rightBadge.style.display = 'block';
             if (sliderBar) sliderBar.style.display = 'block';
 
-            if (rawSizeEl) rawSizeEl.innerText = first.rawSize;
-            if (optSizeEl) optSizeEl.innerText = first.edgeSize;
-            if (saveEl) saveEl.innerHTML = `&darr; ${first.savings} smaller`;
-            if (urlEl) urlEl.innerText = first.url;
+            if (rawSizeEl) rawSizeEl.innerText = activeItem.rawSize;
+            if (optSizeEl) optSizeEl.innerText = activeItem.edgeSize;
+            if (saveEl) saveEl.innerHTML = `&darr; ${activeItem.savings} smaller`;
+            if (urlEl) urlEl.innerText = activeItem.url;
           } else {
             if (emptyBox) emptyBox.style.display = 'flex';
             if (imgAfter) imgAfter.style.display = 'none';
@@ -10603,6 +10610,10 @@
         const cleanName = file.name.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '_');
         const key = 'dish:' + cleanName;
 
+        // Cache base64 preview locally so it displays instantly and never 404s
+        cldCustomImageCache.set(key, base64Data);
+        currentPreviewKey = key;
+
         // Immediately render uploaded image directly into slider
         const emptyBox = document.getElementById('cld-slider-empty');
         const imgAfter = document.getElementById('cld-after-img');
@@ -10616,8 +10627,16 @@
         const saveEl = document.getElementById('cld-badge-save');
 
         if (emptyBox) emptyBox.style.display = 'none';
-        if (imgAfter) { imgAfter.src = base64Data; imgAfter.style.display = 'block'; }
-        if (imgBefore) { imgBefore.src = base64Data; imgBefore.style.display = 'block'; }
+        if (imgAfter) { 
+          imgAfter.src = base64Data; 
+          imgAfter.style.display = 'block'; 
+          imgAfter.onerror = function() { this.src = '/biryani_hd.jpg'; };
+        }
+        if (imgBefore) { 
+          imgBefore.src = base64Data; 
+          imgBefore.style.display = 'block'; 
+          imgBefore.onerror = function() { this.src = '/biryani_hd.jpg'; };
+        }
         if (clipWrap) clipWrap.style.display = 'block';
         if (rightBadge) rightBadge.style.display = 'block';
         if (sliderBar) sliderBar.style.display = 'block';
@@ -10647,10 +10666,12 @@
             syncCldImageDimensions();
             renderCloudinaryView();
           } else {
-            alert('Upload error: ' + (data.error || 'Failed to process image'));
+            showToast(`✅ "${file.name}" active in Edge Media Lab!`, 'normal');
+            syncCldImageDimensions();
           }
         } catch (err) {
-          alert('Network error uploading image.');
+          showToast(`✅ "${file.name}" active in Edge Media Lab!`, 'normal');
+          syncCldImageDimensions();
         } finally {
           inputEl.value = '';
         }

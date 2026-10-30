@@ -1405,6 +1405,10 @@ const server = http.createServer(async (req, res) => {
     '.json': 'application/json',
     '.png': 'image/png',
     '.svg': 'image/svg+xml',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.webp': 'image/webp',
+    '.avif': 'image/avif',
   };
 
   fs.readFile(filePath, (err, content) => {
