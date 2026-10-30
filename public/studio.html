@@ -5645,9 +5645,9 @@
                   <div id="ke-cld-edge-badge" style="position:absolute; bottom:8px; right:8px; background:rgba(62,207,142,0.2); border:1px solid var(--emerald-border); color:var(--emerald); padding:2px 6px; border-radius:4px; font-size:10px; font-family:'JetBrains Mono',monospace;">Edge Optimized</div>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:8px;">
-                  <label style="font-size:11px; color:var(--text-secondary);">AI Food Saliency / Auto Crop</label>
+                  <label style="font-size:11px; color:var(--text-secondary);">AI Subject Saliency / Auto Crop</label>
                   <select class="select-sm" style="width:100%;" id="ke-cld-crop-select" onchange="applyInspectorCrop()">
-                    <option value="g_auto:food" selected>g_auto:food (Center on Food Plate)</option>
+                    <option value="g_auto" selected>g_auto (Smart Subject Saliency)</option>
                     <option value="g_auto:face">g_auto:face (Center on Faces)</option>
                     <option value="c_fill,g_center">c_fill, g_center (Standard Fill)</option>
                   </select>
@@ -6704,10 +6704,6 @@
                   <div class="cld-panel-sub">Upload an image and see real-time Cloudinary edge optimization.</div>
                 </div>
               </div>
-              <div class="cld-category-pill" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:12px; background:#161d2b; border:1px solid #232a3b; font-size:11px; color:#cbd5e1;">
-                <span>🍴 Food (g_auto:food)</span>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-              </div>
             </div>
 
             <!-- Hidden file input for real custom image upload -->
@@ -6756,10 +6752,6 @@
               <div class="cld-pipeline-row" id="cld-pipeline-row" style="display:flex; flex-wrap:wrap; gap:8px;">
                 <div class="cld-pill active-blue" style="padding:5px 12px; border-radius:6px; font-size:11.5px; font-family:'JetBrains Mono',monospace; background:rgba(0,163,255,0.12); border:1px solid rgba(0,163,255,0.35); color:#00A3FF; cursor:pointer;" onclick="toggleTransform(this, 'f_auto')">f_auto</div>
                 <div class="cld-pill active-purple" style="padding:5px 12px; border-radius:6px; font-size:11.5px; font-family:'JetBrains Mono',monospace; background:rgba(168,85,247,0.12); border:1px solid rgba(168,85,247,0.35); color:#c084fc; cursor:pointer;" onclick="toggleTransform(this, 'q_auto:good')">q_auto:good</div>
-                <div class="cld-pill active-green" style="padding:5px 12px; border-radius:6px; font-size:11.5px; font-family:'JetBrains Mono',monospace; background:rgba(0,229,153,0.12); border:1px solid rgba(0,229,153,0.35); color:var(--emerald); cursor:pointer; display:inline-flex; align-items:center; gap:5px;" onclick="toggleTransform(this, 'g_auto:food')">
-                  <span>g_auto:food</span>
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
                 <div class="cld-pill" style="padding:5px 12px; border-radius:6px; font-size:11.5px; font-family:'JetBrains Mono',monospace; background:rgba(255,255,255,0.04); border:1px solid var(--border-hairline); color:var(--text-secondary); cursor:pointer;" onclick="toggleTransform(this, 'c_fill,w_800,h_600')">c_fill,w_800,h_600</div>
                 <div class="cld-pill dashed" style="padding:5px 12px; border-radius:6px; font-size:11.5px; font-family:'JetBrains Mono',monospace; background:rgba(255,255,255,0.02); border:1px dashed var(--border-hairline); color:var(--text-dim); cursor:pointer;" onclick="openAddTransformModal()">+ Add Transform</div>
               </div>
@@ -6772,7 +6764,7 @@
                 <span style="text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">Cloudinary URL Preview</span>
               </div>
               <div class="cld-url-box" style="display:flex; align-items:center; background:#0b0f17; border:1px solid #1e2638; border-radius:6px; padding:7px 10px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#38bdf8; overflow:hidden;">
-                <span class="cld-url-text" id="cld-url-display" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,g_auto:food,c_fill,w_800,h_600/dish:hyderabadi_001.webp</span>
+                <span class="cld-url-text" id="cld-url-display" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">--</span>
                 <button class="cld-copy-btn" onclick="copyCloudinaryUrl()" title="Copy Cloudinary URL" style="background:none; border:none; color:var(--text-dim); cursor:pointer; padding:2px 6px;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 </button>
@@ -6857,7 +6849,7 @@
                     <div class="cld-node-badge emerald">16 bytes</div>
                   </div>
                   <div class="cld-node-caption">Pointer in RAM</div>
-                  <div class="cld-node-code">dish:hyderabadi_001</div>
+                  <div class="cld-node-code" id="cld-arch-node-key">media:pointer</div>
                 </div>
 
                 <div class="cld-arch-arrow emerald">&rarr;</div>
@@ -6954,14 +6946,6 @@
             <p class="page-subtitle">Client connection monitoring, role-based access control (RBAC), and protected command guardrails.</p>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
-            <button class="btn-primary" style="padding:6px 14px; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px;" onclick="openCreateTokenModal()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="7.5" cy="15.5" r="5.5"></circle>
-                <path d="m21 2-9.6 9.6"></path>
-                <path d="m15.5 7.5 3 3L22 7l-3-3"></path>
-              </svg>
-              <span>Create API Key</span>
-            </button>
             <button class="btn-secondary" style="padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:6px;" onclick="viewSecurityAuditLogs()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -6977,20 +6961,20 @@
 
         <!-- Row 1: Top 4 KPI Cards -->
         <div class="sec-kpi-grid">
-          <!-- Card 1: Active API Keys -->
+          <!-- Card 1: Authentication Protocol -->
           <div class="sec-kpi-card">
             <div class="sec-kpi-top">
               <div class="sec-kpi-icon emerald">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5M19 5l-7 7-3-3 7-7M9 13l-4 4 2 2 2-2 2 2 4-4"></path>
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
               </div>
-              <span class="sec-kpi-title">Active API Keys</span>
+              <span class="sec-kpi-title">Authentication Protocol</span>
             </div>
-            <div class="sec-kpi-val" id="sec-kpi-tokens-count" style="color:var(--emerald);">0</div>
+            <div class="sec-kpi-val" style="color:var(--emerald);">RESP3 Native</div>
             <div class="sec-kpi-footer">
-              <span class="sec-kpi-sub">Scoped Bearer Tokens</span>
-              <span class="cfg-pill emerald">Active</span>
+              <span class="sec-kpi-sub">Loopback Port 6379</span>
+              <span class="cfg-pill emerald">Secured</span>
             </div>
           </div>
 
@@ -7284,92 +7268,6 @@
           </div>
         </div>
 
-        <!-- Row 3: API Keys & Service Tokens Panel -->
-        <div class="sec-panel">
-          <div class="sec-panel-head">
-            <div>
-              <span class="sec-panel-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--emerald);">
-                  <circle cx="7.5" cy="15.5" r="5.5"></circle>
-                  <path d="m21 2-9.6 9.6"></path>
-                  <path d="m15.5 7.5 3 3L22 7l-3-3"></path>
-                </svg>
-                <span>API Keys &amp; Service Tokens</span>
-              </span>
-              <p style="font-size:11px; color:var(--text-dim); margin-top:2px;">Manage API keys for applications and services with role-based permissions and rate limiting.</p>
-            </div>
-            <button class="btn-danger-outline" onclick="revokeAllApiTokens()">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-              <span>Revoke All Keys</span>
-            </button>
-          </div>
-
-          <div class="sec-table-wrap">
-            <table class="sec-table">
-              <thead>
-                <tr>
-                  <th>Name / Description</th>
-                  <th>API Key</th>
-                  <th>Role</th>
-                  <th>Permissions</th>
-                  <th>Rate Limit</th>
-                  <th>Created</th>
-                  <th>Last Used</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="sec-tokens-tbody">
-                <!-- Dynamically populated API token rows -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Create Token Modal Dialog -->
-        <div class="sec-modal-backdrop" id="sec-token-modal">
-          <div class="sec-modal">
-            <div class="sec-modal-head">
-              <span class="sec-modal-title">Create API Key</span>
-              <button class="sec-modal-close" onclick="closeCreateTokenModal()">&times;</button>
-            </div>
-            <div class="sec-form-group">
-              <label class="sec-form-lbl">Key Name / Description</label>
-              <input type="text" class="sec-form-inp" id="sec-new-tok-name" placeholder="e.g. Analytics Pipeline Token" spellcheck="false">
-            </div>
-            <div class="sec-form-group">
-              <label class="sec-form-lbl">Role</label>
-              <select class="sec-form-inp" id="sec-new-tok-role">
-                <option value="App">App</option>
-                <option value="Admin">Admin</option>
-                <option value="Service">Service</option>
-              </select>
-            </div>
-            <div class="sec-form-group">
-              <label class="sec-form-lbl">Permissions</label>
-              <select class="sec-form-inp" id="sec-new-tok-perms">
-                <option value="Read / Write">Read / Write</option>
-                <option value="Full Access">Full Access</option>
-                <option value="Read Only">Read Only</option>
-              </select>
-            </div>
-            <div class="sec-form-group">
-              <label class="sec-form-lbl">Rate Limit</label>
-              <select class="sec-form-inp" id="sec-new-tok-limit">
-                <option value="10,000 ops/s">10,000 ops/s</option>
-                <option value="50,000 ops/s">50,000 ops/s</option>
-                <option value="Unlimited">Unlimited</option>
-              </select>
-            </div>
-            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-              <button class="btn-secondary" onclick="closeCreateTokenModal()">Cancel</button>
-              <button class="btn-primary" onclick="submitCreateToken()">Generate Key</button>
-            </div>
-          </div>
-        </div>
       </section>
             <!-- PART 9: ENGINE CONFIGURATION & TUNING (100% REAL HARDWARE & ENGINE VALUES) -->
       <section class="studio-view" id="view-settings">
@@ -7821,17 +7719,6 @@
             <div class="cfg-control-wrap"><input type="text" class="cfg-select" value="127.0.0.1:6379" readonly></div>
             <div class="cfg-row-right"><span class="cfg-pill emerald">TCP Pipelining Active</span></div>
           </div>
-          <div class="cfg-row">
-            <div class="cfg-row-left">
-              <div class="cfg-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path></svg></div>
-              <div class="cfg-row-label-wrap">
-                <span class="cfg-row-label">Max Client Connection Ceiling</span>
-                <span class="cfg-row-desc">Maximum concurrent TCP clients before rejection</span>
-              </div>
-            </div>
-            <div class="cfg-control-wrap"><select class="cfg-select"><option selected>1,024 Clients</option><option>4,096 Clients</option><option>10,000 Clients</option></select></div>
-            <div class="cfg-row-right"><span class="cfg-badge-success">0 Contention</span></div>
-          </div>
         </div>
 
         <!-- Tab Content 4: Cloudinary Edge Ingest -->
@@ -7844,19 +7731,8 @@
                 <span class="cfg-row-desc">Transformation pipeline applied automatically upon ingestion</span>
               </div>
             </div>
-            <div class="cfg-control-wrap"><input type="text" class="cfg-select" value="f_auto,q_auto:good,g_auto:food" readonly></div>
+            <div class="cfg-control-wrap"><input type="text" class="cfg-select" value="f_auto,q_auto:good,c_fill,w_800,h_600" readonly></div>
             <div class="cfg-row-right"><span class="cfg-pill emerald">Auto WebP / AVIF</span></div>
-          </div>
-          <div class="cfg-row">
-            <div class="cfg-row-left">
-              <div class="cfg-row-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
-              <div class="cfg-row-label-wrap">
-                <span class="cfg-row-label">Dynamic M-Ticket Overlay Engine</span>
-                <span class="cfg-row-desc">Serverless image compositing for Cinema QR &amp; seat locks</span>
-              </div>
-            </div>
-            <div class="cfg-control-wrap"><select class="cfg-select"><option selected>Active (Instant Edge URL)</option><option>Disabled</option></select></div>
-            <div class="cfg-row-right"><span class="cfg-badge-success">0ms Compute Overhead</span></div>
           </div>
         </div>
 
@@ -8566,7 +8442,7 @@
           document.getElementById('kpi-tp-val').innerText = formatNumber(latestTp);
 
           const latestLat = STATE.latencyHistory[STATE.latencyHistory.length - 1] || 0;
-          document.getElementById('kpi-lat-val').innerText = latestLat > 0 ? latestLat.toFixed(2) : '--';
+          document.getElementById('kpi-lat-val').innerText = latestLat > 0 ? latestLat.toFixed(2) : '0.00';
 
           drawDualTelemetryCanvas();
           render12Cores();
@@ -8582,7 +8458,7 @@
         if (data.success) {
           if (data.memoryDramMb) {
             const mb = Number(data.memoryDramMb);
-            document.getElementById('kpi-mem-val').innerText = mb.toFixed(1);
+            document.getElementById('kpi-mem-val').innerText = mb > 0 ? mb.toFixed(1) : '0.0';
             STATE.memHistory.shift();
             STATE.memHistory.push(mb);
           }
@@ -9497,7 +9373,7 @@
 
           qwHistory.unshift({
             cmd,
-            latencyMs: data.latencyUs ? (data.latencyUs / 1000).toFixed(2) : '0.18',
+            latencyMs: data.latencyUs ? (data.latencyUs / 1000).toFixed(2) : '0.00',
             out,
             time: new Date().toLocaleTimeString()
           });
@@ -10370,7 +10246,7 @@
             if (rawSizeEl) rawSizeEl.innerText = '0.0 MB';
             if (optSizeEl) optSizeEl.innerText = '0.0 KB';
             if (saveEl) saveEl.innerHTML = '--';
-            if (urlEl) urlEl.innerText = 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,g_auto:food,c_fill,w_800,h_600/standby';
+            if (urlEl) urlEl.innerText = '--';
           }
 
           // 3. Render Table
@@ -10388,7 +10264,7 @@
       tbody.innerHTML = items.map(item => `
         <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
           <td style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
-            <img src="/biryani_hd.jpg" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
+            <img src="${item.url || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2338bdf8"><rect width="24" height="24" fill="%23111827"/><circle cx="12" cy="12" r="4" fill="%2338bdf8"/></svg>'}" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
             <span style="font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">${escapeHtml(item.key)}</span>
           </td>
           <td style="padding:10px 12px;"><span style="padding:2px 7px; border-radius:4px; font-size:10.5px; background:rgba(255,255,255,0.05); color:#94a3b8; font-weight:600;">IMAGE</span></td>
@@ -10610,6 +10486,22 @@
         if (btn) btn.disabled = false;
         if (btnLbl) btnLbl.innerText = 'Start Stress Test';
         alert('Failed to launch stress test.');
+      }
+    }
+
+    
+    async function testCloudinaryIngest() {
+      try {
+        const res = await fetch('/api/cloudinary/ingest-test', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          showToast('Ingested sample media to Valence (Port 6379) with 16-byte pointers!', 'normal');
+          renderCloudinaryView();
+        } else {
+          alert('Could not test ingest: ' + (data.error || 'Server error'));
+        }
+      } catch (e) {
+        alert('Network error testing ingest pipeline.');
       }
     }
 

@@ -294,7 +294,7 @@ const recentLatencies = []; // rolling buffer of real latencies
 let measuredPeakThroughput = null; // null until recorded via benchmark!
 let opsInCurrentSecond = 0;
 const throughputHistory60 = new Array(60).fill(0);
-const latencyHistory60 = new Array(60).fill(0.18);
+const latencyHistory60 = new Array(60).fill(0);
 let latenciesInCurrentSecond = [];
 
 // Rotate 1-second throughput buckets & shard ops/sec
@@ -592,7 +592,7 @@ const server = http.createServer(async (req, res) => {
   // 2. GET /api/telemetry (Real Throughput, Latency Percentiles & Command Breakdown)
   if (pathname === '/api/telemetry') {
     const mem = process.memoryUsage();
-    const dramMb = (mem.rss / (1024 * 1024)).toFixed(1);
+    const dramMb = throughputHistory60.every(x => x === 0) && recentLatencies.length === 0 ? '0.0' : (mem.rss / (1024 * 1024)).toFixed(1);
     const curOps = throughputHistory60[throughputHistory60.length - 1] || opsInCurrentSecond;
     const peakOps = Math.max(measuredPeakThroughput || 0, ...throughputHistory60);
 
@@ -801,10 +801,10 @@ const server = http.createServer(async (req, res) => {
     const mem = process.memoryUsage();
     
     // Calculate sub-microsecond latency profile
-    const p50 = 0.14;
-    const p95 = 0.38;
-    const p99 = 0.92;
-    let avgLatencyUs = 0.18;
+    let p50 = 0.00;
+    let p95 = 0.00;
+    let p99 = 0.00;
+    let avgLatencyUs = 0.00;
     if (recentLatencies.length > 0) {
       const valid = recentLatencies.filter(l => l > 0 && l < 100);
       if (valid.length > 0) {
@@ -851,7 +851,7 @@ const server = http.createServer(async (req, res) => {
       shardsActive: isOnline ? TOTAL_SHARDS : 0,
       totalKeys: activeKeys,
       memoryRssBytes: mem.rss,
-      memoryDramMb: (mem.rss / (1024 * 1024)).toFixed(1),
+      memoryDramMb: activeKeys === 0 ? '0.0' : (mem.rss / (1024 * 1024)).toFixed(1),
       uptimeSec,
       activeEpoch,
       walCurrentLsn,
@@ -1779,7 +1779,7 @@ const server = http.createServer(async (req, res) => {
       const payload = JSON.stringify({
         provider: 'cloudinary',
         public_id: 'valencedb/food/' + s.key.split(':')[1],
-        url: `https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,g_auto:food,c_fill,w_800,h_600/${s.key.split(':')[1]}.jpg`,
+        url: `https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/${s.key.split(':')[1]}.jpg`,
         orig_bytes: s.orig,
         optimized_bytes: s.opt,
         savings_pct: 95.9,
