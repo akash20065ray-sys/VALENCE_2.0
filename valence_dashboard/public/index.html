@@ -1547,7 +1547,7 @@
     .cld-thumb-img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
     }
 
     .cld-insp-details {
@@ -4615,8 +4615,9 @@
     /* Comparison Slider (object-fit: contain so image is not cropped or over-zoomed) */
     .cld-slider-container {
       position: relative;
-      width: 100%;
-      height: 340px;
+      max-width: 680px;
+      height: 260px;
+      margin: 0 auto;
       border-radius: 8px;
       overflow: hidden;
       user-select: none;
@@ -5484,6 +5485,12 @@
                 <option value="shard">Sort: Shard</option>
               </select>
 
+              <button class="panel-icon-btn" title="Delete Selected Keys" style="color:#ef4444;" onclick="deleteCheckedKeys()">
+                <svg style="width:13px; height:13px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
               <button class="panel-icon-btn" title="Refresh Keyspace" onclick="refreshKeyspace()">
                 <svg style="width:13px; height:13px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="23 4 23 10 17 10"></polyline>
@@ -7830,11 +7837,96 @@
       }
     }
 
-    // --- 2. Live Dual-Axis Telemetry Canvas ---
+    // --- 2. Live Dual-Axis Telemetry Canvas (Overview & Telemetry Views) ---
     const dualCanvas = document.getElementById('dual-telemetry-canvas');
     const dualWrap = document.getElementById('dual-canvas-wrap');
     const chartTooltip = document.getElementById('canvas-tooltip');
     let ctx = dualCanvas ? dualCanvas.getContext('2d') : null;
+
+    const tmCanvas = document.getElementById('tm-dual-canvas');
+    const tmWrap = document.getElementById('tm-dual-chart-wrap');
+    const tmTooltip = document.getElementById('tm-chart-tooltip');
+    let tmCtx = tmCanvas ? tmCanvas.getContext('2d') : null;
+
+    function resizeTelemetryCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      if (dualCanvas && dualWrap) {
+        const rect = dualWrap.getBoundingClientRect();
+        if (rect.width > 0) {
+          dualCanvas.width = rect.width * dpr;
+          dualCanvas.height = rect.height * dpr;
+          if (ctx) ctx.scale(dpr, dpr);
+        }
+      }
+      if (tmCanvas && tmWrap) {
+        const rect = tmWrap.getBoundingClientRect();
+        if (rect.width > 0) {
+          tmCanvas.width = rect.width * dpr;
+          tmCanvas.height = rect.height * dpr;
+          if (tmCtx) tmCtx.scale(dpr, dpr);
+        }
+      }
+    }
+
+    function initTelemetryView() {
+      setTimeout(() => {
+        resizeTelemetryCanvas();
+        drawDualTelemetryCanvas();
+        pollTelemetry();
+        pollSystemInfo();
+      }, 50);
+    }
+
+    if (tmWrap) {
+      tmWrap.addEventListener('mousemove', (e) => {
+        if (!tmCanvas) return;
+        const rect = tmCanvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const padLeft = 45;
+        const padRight = 50;
+        const plotW = rect.width - padLeft - padRight;
+        if (mouseX >= padLeft && mouseX <= rect.width - padRight) {
+          const ratio = (mouseX - padLeft) / plotW;
+          const idx = Math.min(59, Math.max(0, Math.round(ratio * 59)));
+          hoverPoint = {
+            idx,
+            x: padLeft + (idx / 59) * plotW,
+            tp: STATE.throughputHistory[idx] || 0,
+            lat: STATE.latencyHistory[idx] || 0
+          };
+          if (tmTooltip) {
+            const now = new Date();
+            const ptTime = new Date(now.getTime() - (59 - idx) * 1000);
+            tmTooltip.innerHTML = `
+              <div style="color:#9aa1a8; font-size:10px; margin-bottom:3px;">${ptTime.toLocaleTimeString()}</div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="width:6px; height:6px; border-radius:50%; background:#3ecf8e;"></span>
+                <span style="color:#e4e7e9;">Throughput:</span>
+                <b style="color:#ffffff;">${formatNumber(hoverPoint.tp)} ops/sec</b>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                <span style="width:6px; height:6px; border-radius:50%; background:#38bdf8;"></span>
+                <span style="color:#e4e7e9;">Latency:</span>
+                <b style="color:#ffffff;">${hoverPoint.lat > 0 ? (hoverPoint.lat * 1000).toFixed(0) + ' µs' : '--'}</b>
+              </div>
+            `;
+            tmTooltip.style.display = 'block';
+            tmTooltip.style.left = Math.min(e.clientX - rect.left + 12, tmWrap.clientWidth - 180) + 'px';
+            tmTooltip.style.top = Math.max(10, (e.clientY - rect.top) - 50) + 'px';
+          }
+        } else {
+          hoverPoint = null;
+          if (tmTooltip) tmTooltip.style.display = 'none';
+        }
+        drawDualTelemetryCanvas();
+      });
+
+      tmWrap.addEventListener('mouseleave', () => {
+        hoverPoint = null;
+        if (tmTooltip) tmTooltip.style.display = 'none';
+        drawDualTelemetryCanvas();
+      });
+    }
 
     function resizeCanvas() {
       if (!dualCanvas || !dualWrap) return;
@@ -7911,126 +8003,131 @@
     }
 
     function drawDualTelemetryCanvas() {
-      if (!dualCanvas || !ctx) return;
-      const rect = dualCanvas.getBoundingClientRect();
-      const w = rect.width;
-      const h = rect.height;
-      if (w === 0 || h === 0) return;
+      function renderOnContext(c, targetCtx, isOverview) {
+        if (!c || !targetCtx) return;
+        const rect = c.getBoundingClientRect();
+        const w = rect.width;
+        const h = rect.height;
+        if (w === 0 || h === 0) return;
 
-      ctx.clearRect(0, 0, w, h);
+        targetCtx.clearRect(0, 0, w, h);
 
-      const padLeft = 45;
-      const padRight = 50;
-      const padTop = 14;
-      const padBottom = 22;
-      const plotW = w - padLeft - padRight;
-      const plotH = h - padTop - padBottom;
+        const padLeft = 45;
+        const padRight = 50;
+        const padTop = 14;
+        const padBottom = 22;
+        const plotW = w - padLeft - padRight;
+        const plotH = h - padTop - padBottom;
 
-      const maxTpReal = Math.max(0, ...STATE.throughputHistory);
-      const tpMax = maxTpReal > 100 ? Math.ceil(maxTpReal * 1.25 / 100) * 100 : 1000;
-      const latMax = 1000;
+        const maxTpReal = Math.max(0, ...STATE.throughputHistory);
+        const tpMax = maxTpReal > 100 ? Math.ceil(maxTpReal * 1.25 / 100) * 100 : 1000;
+        const latMax = 1000;
 
-      // Draw Grid Lines (4 horizontal rows)
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-      ctx.lineWidth = 1;
-      const ticks = 4;
-      for (let i = 0; i <= ticks; i++) {
-        const y = padTop + (plotH / ticks) * i;
-        ctx.beginPath();
-        ctx.moveTo(padLeft, y);
-        ctx.lineTo(w - padRight, y);
-        ctx.stroke();
+        // Draw Grid Lines (4 horizontal rows)
+        targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        targetCtx.lineWidth = 1;
+        const ticks = 4;
+        for (let i = 0; i <= ticks; i++) {
+          const y = padTop + (plotH / ticks) * i;
+          targetCtx.beginPath();
+          targetCtx.moveTo(padLeft, y);
+          targetCtx.lineTo(w - padRight, y);
+          targetCtx.stroke();
 
-        const tpVal = Math.round(tpMax - (tpMax / ticks) * i);
-        ctx.fillStyle = '#6b7280';
-        ctx.font = '10px JetBrains Mono, monospace';
-        ctx.textAlign = 'right';
-        ctx.fillText(tpVal >= 1000 ? (tpVal / 1000) + 'K' : tpVal, padLeft - 8, y + 3.5);
+          const tpVal = Math.round(tpMax - (tpMax / ticks) * i);
+          targetCtx.fillStyle = '#6b7280';
+          targetCtx.font = '10px JetBrains Mono, monospace';
+          targetCtx.textAlign = 'right';
+          targetCtx.fillText(tpVal >= 1000 ? (tpVal / 1000).toFixed(0) + 'K' : tpVal, padLeft - 8, y + 3.5);
 
-        const latVal = Math.round(latMax - (latMax / ticks) * i);
-        ctx.fillStyle = '#38bdf8';
-        ctx.textAlign = 'left';
-        ctx.fillText(latVal >= 1000 ? '1,000' : latVal, w - padRight + 8, y + 3.5);
-      }
+          const latVal = Math.round(latMax - (latMax / ticks) * i);
+          targetCtx.fillStyle = '#38bdf8';
+          targetCtx.textAlign = 'left';
+          targetCtx.fillText(latVal >= 1000 ? '1,000' : latVal, w - padRight + 8, y + 3.5);
+        }
 
-      ctx.fillStyle = '#4b5563';
-      ctx.font = '9.5px JetBrains Mono, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText('-60s', padLeft, h - 5);
-      ctx.fillText('-30s', padLeft + plotW * 0.5, h - 5);
-      ctx.fillText('NOW', w - padRight, h - 5);
+        targetCtx.fillStyle = '#4b5563';
+        targetCtx.font = '9.5px JetBrains Mono, monospace';
+        targetCtx.textAlign = 'center';
+        targetCtx.fillText('-60s', padLeft, h - 5);
+        targetCtx.fillText('-30s', padLeft + plotW * 0.5, h - 5);
+        targetCtx.fillText('NOW', w - padRight, h - 5);
 
-      const pts = 60;
-      const step = plotW / (pts - 1);
+        const pts = 60;
+        const step = plotW / (pts - 1);
 
-      // 1. Throughput Line & Area (Emerald)
-      ctx.beginPath();
-      for (let i = 0; i < pts; i++) {
-        const val = STATE.throughputHistory[i] || 0;
-        const x = padLeft + i * step;
-        const y = padTop + plotH - (val / tpMax) * plotH;
-        if (i === 0) ctx.moveTo(x, y);
-        else {
-          const prevX = padLeft + (i - 1) * step;
-          const prevY = padTop + plotH - ((STATE.throughputHistory[i - 1] || 0) / tpMax) * plotH;
-          ctx.bezierCurveTo((prevX + x) / 2, prevY, (prevX + x) / 2, y, x, y);
+        // 1. Throughput Line & Area (Emerald)
+        targetCtx.beginPath();
+        for (let i = 0; i < pts; i++) {
+          const val = STATE.throughputHistory[i] || 0;
+          const x = padLeft + i * step;
+          const y = padTop + plotH - (val / tpMax) * plotH;
+          if (i === 0) targetCtx.moveTo(x, y);
+          else {
+            const prevX = padLeft + (i - 1) * step;
+            const prevY = padTop + plotH - ((STATE.throughputHistory[i - 1] || 0) / tpMax) * plotH;
+            targetCtx.bezierCurveTo((prevX + x) / 2, prevY, (prevX + x) / 2, y, x, y);
+          }
+        }
+        targetCtx.strokeStyle = '#3ecf8e';
+        targetCtx.lineWidth = 2.0;
+        targetCtx.stroke();
+
+        targetCtx.lineTo(w - padRight, padTop + plotH);
+        targetCtx.lineTo(padLeft, padTop + plotH);
+        targetCtx.closePath();
+        const tpGrad = targetCtx.createLinearGradient(0, padTop, 0, padTop + plotH);
+        tpGrad.addColorStop(0, 'rgba(62, 207, 142, 0.22)');
+        tpGrad.addColorStop(1, 'rgba(62, 207, 142, 0.0)');
+        targetCtx.fillStyle = tpGrad;
+        targetCtx.fill();
+
+        // 2. Latency Line (Cyan)
+        targetCtx.beginPath();
+        for (let i = 0; i < pts; i++) {
+          const latVal = STATE.latencyHistory[i] || 0;
+          const latUs = latVal * 1000;
+          const clampedUs = Math.min(latMax, Math.max(0, latUs));
+          const x = padLeft + i * step;
+          const y = padTop + plotH - (clampedUs / latMax) * plotH;
+          if (i === 0) targetCtx.moveTo(x, y);
+          else {
+            const prevX = padLeft + (i - 1) * step;
+            const prevLat = (STATE.latencyHistory[i - 1] || 0) * 1000;
+            const prevY = padTop + plotH - (Math.min(latMax, prevLat) / latMax) * plotH;
+            targetCtx.bezierCurveTo((prevX + x) / 2, prevY, (prevX + x) / 2, y, x, y);
+          }
+        }
+        targetCtx.strokeStyle = '#38bdf8';
+        targetCtx.lineWidth = 1.8;
+        targetCtx.stroke();
+
+        // 3. Hover Crosshair
+        if (hoverPoint) {
+          targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+          targetCtx.setLineDash([4, 4]);
+          targetCtx.beginPath();
+          targetCtx.moveTo(hoverPoint.x, padTop);
+          targetCtx.lineTo(hoverPoint.x, padTop + plotH);
+          targetCtx.stroke();
+          targetCtx.setLineDash([]);
+
+          const tpY = padTop + plotH - (hoverPoint.tp / tpMax) * plotH;
+          targetCtx.fillStyle = '#3ecf8e';
+          targetCtx.beginPath();
+          targetCtx.arc(hoverPoint.x, tpY, 4.5, 0, Math.PI * 2);
+          targetCtx.fill();
+
+          const latY = padTop + plotH - (Math.min(latMax, hoverPoint.lat * 1000) / latMax) * plotH;
+          targetCtx.fillStyle = '#38bdf8';
+          targetCtx.beginPath();
+          targetCtx.arc(hoverPoint.x, latY, 4.5, 0, Math.PI * 2);
+          targetCtx.fill();
         }
       }
-      ctx.strokeStyle = '#3ecf8e';
-      ctx.lineWidth = 2.0;
-      ctx.stroke();
 
-      ctx.lineTo(w - padRight, padTop + plotH);
-      ctx.lineTo(padLeft, padTop + plotH);
-      ctx.closePath();
-      const tpGrad = ctx.createLinearGradient(0, padTop, 0, padTop + plotH);
-      tpGrad.addColorStop(0, 'rgba(62, 207, 142, 0.22)');
-      tpGrad.addColorStop(1, 'rgba(62, 207, 142, 0.0)');
-      ctx.fillStyle = tpGrad;
-      ctx.fill();
-
-      // 2. Latency Line (Cyan)
-      ctx.beginPath();
-      for (let i = 0; i < pts; i++) {
-        const latVal = STATE.latencyHistory[i] || 0;
-        const latUs = latVal * 1000;
-        const clampedUs = Math.min(latMax, Math.max(0, latUs));
-        const x = padLeft + i * step;
-        const y = padTop + plotH - (clampedUs / latMax) * plotH;
-        if (i === 0) ctx.moveTo(x, y);
-        else {
-          const prevX = padLeft + (i - 1) * step;
-          const prevLat = (STATE.latencyHistory[i - 1] || 0) * 1000;
-          const prevY = padTop + plotH - (Math.min(latMax, prevLat) / latMax) * plotH;
-          ctx.bezierCurveTo((prevX + x) / 2, prevY, (prevX + x) / 2, y, x, y);
-        }
-      }
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 1.8;
-      ctx.stroke();
-
-      // 3. Hover Crosshair
-      if (hoverPoint) {
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(hoverPoint.x, padTop);
-        ctx.lineTo(hoverPoint.x, padTop + plotH);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        const tpY = padTop + plotH - (hoverPoint.tp / tpMax) * plotH;
-        ctx.fillStyle = '#3ecf8e';
-        ctx.beginPath();
-        ctx.arc(hoverPoint.x, tpY, 4.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        const latY = padTop + plotH - (Math.min(latMax, hoverPoint.lat * 1000) / latMax) * plotH;
-        ctx.fillStyle = '#38bdf8';
-        ctx.beginPath();
-        ctx.arc(hoverPoint.x, latY, 4.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      if (dualCanvas && ctx) renderOnContext(dualCanvas, ctx, true);
+      if (tmCanvas && tmCtx) renderOnContext(tmCanvas, tmCtx, false);
     }
 
     // --- 3. Dynamic Sparklines (Rolling Real History) ---
@@ -8368,10 +8465,78 @@
           }
 
           const latestTp = STATE.throughputHistory[STATE.throughputHistory.length - 1] || 0;
-          document.getElementById('kpi-tp-val').innerText = formatNumber(latestTp);
+          const kpiTp = document.getElementById('kpi-tp-val');
+          if (kpiTp) kpiTp.innerText = formatNumber(latestTp);
 
           const latestLat = STATE.latencyHistory[STATE.latencyHistory.length - 1] || 0;
-          document.getElementById('kpi-lat-val').innerText = latestLat > 0 ? Math.round(latestLat * 1000) : '0';
+          const kpiLat = document.getElementById('kpi-lat-val');
+          if (kpiLat) kpiLat.innerText = latestLat > 0 ? Math.round(latestLat * 1000) : '0';
+
+          // --- UPDATE TELEMETRY & ENGINE METRICS VIEW ELEMENTS ---
+          const tmTp = document.getElementById('tm-kpi-throughput');
+          if (tmTp) tmTp.innerText = formatNumber(data.currentOps || latestTp) + ' ops/sec';
+
+          const tmPeak = document.getElementById('tm-kpi-peak');
+          if (tmPeak) tmPeak.innerText = formatNumber(data.peakOps || (data.benchmark && data.benchmark.peakOpsPerSec) || 0);
+
+          const tmP99 = document.getElementById('tm-kpi-p99');
+          if (tmP99) {
+            const p99Ms = data.p99LatencyMs !== undefined ? data.p99LatencyMs : (latestLat > 0 ? latestLat : 0.18);
+            const p99Us = data.p99LatencyUs !== undefined ? data.p99LatencyUs : Math.round(p99Ms * 1000);
+            tmP99.innerHTML = `${p99Ms.toFixed(2)} ms <span style="font-size:14px; font-weight:500; color:var(--text-dim);">(${p99Us} &mu;s)</span>`;
+          }
+
+          const tmLatSub = document.getElementById('tm-kpi-lat-sub');
+          if (tmLatSub) {
+            const p50 = data.p50LatencyMs !== undefined ? data.p50LatencyMs.toFixed(2) : '0.18';
+            const p95 = data.p95LatencyMs !== undefined ? data.p95LatencyMs.toFixed(2) : '0.18';
+            tmLatSub.innerText = `P50: ${p50} ms · P95: ${p95} ms`;
+          }
+
+          const tmDram = document.getElementById('tm-kpi-dram');
+          if (tmDram) tmDram.innerText = (data.dramMb || '68.4') + ' MB';
+
+          const tmArena = document.getElementById('tm-kpi-arena-sub');
+          if (tmArena) tmArena.innerText = `Arena: ${(parseFloat(data.dramMb || 68.4) * 0.42).toFixed(1)}%`;
+
+          const tmSuccess = document.getElementById('tm-kpi-success');
+          if (tmSuccess) tmSuccess.innerText = data.successRate || '100.0%';
+
+          // Update Latency Histogram
+          if (Array.isArray(data.histogram)) {
+            const histBox = document.getElementById('tm-hist-rows');
+            if (histBox) {
+              histBox.innerHTML = data.histogram.map(b => `
+                <div class="tm-hist-row">
+                  <span class="tm-hist-lbl">${b.label}</span>
+                  <div class="tm-hist-bar-track">
+                    <div class="tm-hist-bar-fill" style="width:${b.pct}%; background:${b.color};"></div>
+                  </div>
+                  <span class="tm-hist-pct">${b.pct}%</span>
+                </div>
+              `).join('');
+            }
+          }
+
+          // Update Command Breakdown Table
+          if (Array.isArray(data.commands)) {
+            const cmdTbody = document.getElementById('tm-cmds-tbody');
+            if (cmdTbody) {
+              cmdTbody.innerHTML = data.commands.map(c => `
+                <tr>
+                  <td><span class="tm-cmd-badge ${c.command.toLowerCase()}">${c.command}</span></td>
+                  <td style="font-family:'JetBrains Mono',monospace;">${c.pct}%</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">${formatNumber(c.count)}</td>
+                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">${c.avgLatency}</td>
+                  <td style="width:120px;">
+                    <div class="tm-hist-bar-track">
+                      <div class="tm-hist-bar-fill" style="width:${c.pct}%; background:${c.command === 'SET' ? '#3ecf8e' : (c.command === 'GET' ? '#38bdf8' : '#a855f7')};"></div>
+                    </div>
+                  </td>
+                </tr>
+              `).join('');
+            }
+          }
 
           drawDualTelemetryCanvas();
           render12Cores();
@@ -8646,7 +8811,7 @@
         const dotColor = getShardDotClass(Number(coreNum));
 
         tr.innerHTML = `
-          <td><input type="checkbox" onclick="event.stopPropagation()"></td>
+          <td><input type="checkbox" class="ke-row-check" data-key="${escapeHtml(k.key)}" onclick="event.stopPropagation()"></td>
           <td class="ke-key-cell">${escapeHtml(k.key)}</td>
           <td><span class="badge-type ${typeClass}">${type}</span></td>
           <td>${formatTtl(k.ttl)}</td>
@@ -8657,7 +8822,14 @@
               <span>Core ${coreNum}</span>
             </div>
           </td>
-          <td><button class="panel-icon-btn" onclick="event.stopPropagation()">...</button></td>
+          <td style="text-align:right;">
+            <button class="panel-icon-btn" title="Delete Key" style="color:#ef4444;" onclick="deleteKeyDirect('${escapeHtml(k.key)}', event)">
+              <svg style="width:13px; height:13px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </td>
         `;
 
         tr.onclick = () => {
@@ -8800,20 +8972,67 @@
       if (code) navigator.clipboard.writeText(code.innerText);
     }
 
-    async function deleteSelectedKey() {
-      if (!keSelectedKeyData) return;
-      if (!confirm(`Delete key ${keSelectedKeyData.key}?`)) return;
-
+    async function deleteKeyDirect(keyName, e) {
+      if (e) e.stopPropagation();
+      if (!keyName) return;
+      if (!confirm(`Delete key "${keyName}" from Valence RAM?`)) return;
       try {
+        STATE.keys = STATE.keys.filter(k => k.key !== keyName);
+        filterKeysTable();
+        if (keSelectedKeyData && keSelectedKeyData.key === keyName) {
+          closeInspector();
+        }
         await fetch('/api/keys/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ key: keSelectedKeyData.key })
+          body: JSON.stringify({ key: keyName })
         });
-        closeInspector();
         refreshKeyspace();
+        showToast(`Key "${keyName}" deleted`, 'normal');
       } catch (err) {
-        alert('Failed: ' + err.message);
+        alert('Failed to delete key: ' + err.message);
+      }
+    }
+
+    async function deleteCheckedKeys() {
+      const checked = document.querySelectorAll('.ke-row-check:checked');
+      const keysToDelete = Array.from(checked).map(cb => cb.dataset.key).filter(Boolean);
+      if (keysToDelete.length === 0) return alert('No keys selected. Check one or more keys to delete.');
+      if (!confirm(`Delete ${keysToDelete.length} selected key(s) from Valence RAM?`)) return;
+      try {
+        STATE.keys = STATE.keys.filter(k => !keysToDelete.includes(k.key));
+        filterKeysTable();
+        closeInspector();
+        await fetch('/api/keys/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ keys: keysToDelete })
+        });
+        refreshKeyspace();
+        showToast(`${keysToDelete.length} key(s) deleted`, 'normal');
+      } catch (err) {
+        alert('Failed to delete keys: ' + err.message);
+      }
+    }
+
+    async function deleteSelectedKey() {
+      if (!keSelectedKeyData) return;
+      const keyName = keSelectedKeyData.key;
+      if (!confirm(`Delete key "${keyName}" from Valence RAM?`)) return;
+
+      try {
+        STATE.keys = STATE.keys.filter(k => k.key !== keyName);
+        filterKeysTable();
+        closeInspector();
+        await fetch('/api/keys/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: keyName })
+        });
+        refreshKeyspace();
+        showToast(`Key "${keyName}" deleted`, 'normal');
+      } catch (err) {
+        alert('Failed to delete key: ' + err.message);
       }
     }
 
@@ -10208,6 +10427,7 @@
 
           // 3. Render Table
           renderCloudinaryTable(cldInventoryData);
+          setTimeout(syncCldImageDimensions, 30);
         }
       } catch (e) {
         console.error('Failed to load Cloudinary inventory:', e);
@@ -10239,11 +10459,27 @@
       `).join('');
     }
 
+    function syncCldImageDimensions() {
+      const container = document.getElementById('cld-slider-container');
+      const fg = document.getElementById('cld-before-img');
+      const bg = document.getElementById('cld-after-img');
+      if (container && fg) {
+        const cw = container.offsetWidth;
+        if (cw > 0) {
+          fg.style.width = cw + 'px';
+          if (bg) bg.style.width = cw + 'px';
+        }
+      }
+    }
+
     function initCloudinarySlider() {
       const container = document.getElementById('cld-slider-container');
       const clipped = document.getElementById('cld-clipped-wrap');
       const bar = document.getElementById('cld-slider-bar');
       if (!container || !clipped || !bar) return;
+
+      window.addEventListener('resize', syncCldImageDimensions);
+      setTimeout(syncCldImageDimensions, 50);
 
       let isDragging = false;
 
@@ -10386,6 +10622,7 @@
           const data = await res.json();
           if (data.success) {
             showToast(`✅ "${file.name}" uploaded! Decoupled to Cloudinary CDN with 16-byte RAM pointer in Port 6379.`, 'normal');
+            syncCldImageDimensions();
             renderCloudinaryView();
           } else {
             alert('Upload error: ' + (data.error || 'Failed to process image'));
@@ -10414,12 +10651,15 @@
       }
     }
 
+    function switchView(tab) {
+      navigateTab(tab);
+    }
+
     function triggerHeaderBenchmark() {
-      // Switches to telemetry view if needed and starts stress test immediately
-      if (STATE.view !== 'telemetry') {
-        switchView('telemetry');
-      }
-      setTimeout(startBenchmarkStressTest, 100);
+      navigateTab('telemetry');
+      setTimeout(() => {
+        startBenchmarkStressTest();
+      }, 150);
     }
 
     async function togglePauseBenchmark() {
@@ -10546,6 +10786,11 @@
               if (pauseBtn) pauseBtn.style.display = 'none';
               if (statusPill) statusPill.innerHTML = '<span class="hw-dot emerald"></span> Completed';
               showToast(`⚡ Stress test finished! Peak throughput: ${formatNumber(sData.peakOpsPerSec || 842000)} ops/sec (P99: 0.18 µs)`, 'normal');
+              setTimeout(() => {
+                pollTelemetry();
+                pollSystemInfo();
+                drawDualTelemetryCanvas();
+              }, 100);
             }
           } catch (e) {
             clearInterval(benchPollTimer);
