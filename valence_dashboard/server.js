@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const VALENCE_HOST = '127.0.0.1';
 const VALENCE_PORT = 6379;
 const TOTAL_SHARDS = (os.cpus() && os.cpus().length) ? os.cpus().length : 12;

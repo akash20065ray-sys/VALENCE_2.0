@@ -14,7 +14,8 @@ FROM node:20-slim
 WORKDIR /app
 
 # Copy compiled Rust engine binary
-COPY --from=builder /app/target/release/valence_server ./valence_server
+COPY --from=builder /app/target/release/valence-server ./valence-server
+RUN chmod +x ./valence-server
 
 # Copy Studio and Consumer application assets
 COPY valence_dashboard ./valence_dashboard
@@ -30,5 +31,5 @@ ENV PORT=8080
 ENV VALENCE_HOST=127.0.0.1
 ENV VALENCE_PORT=6379
 
-# Launch compiled Rust engine on port 6379 and Studio on port 8080
-CMD ./valence_server & node valence_dashboard/server.js
+# Launch compiled Rust engine on port 6379 and Studio on port $PORT
+CMD ./valence-server & node valence_dashboard/server.js
