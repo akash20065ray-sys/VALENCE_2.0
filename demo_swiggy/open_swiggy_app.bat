@@ -1,3 +1,0 @@
-@echo off
-title Opening Swiggy on Valence...
-start http://localhost:3000

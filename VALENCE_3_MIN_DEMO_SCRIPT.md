@@ -108,50 +108,41 @@ BENCH 1 million
 
 ---
 
-### ⏱️ [2:40 – 3:00] Step 6: Cloudinary Dual-Engine Media Pipeline & Wrap-Up
+### ⏱️ [2:40 – 3:00] Step 6: Real-Time Valence Studio & Production Wrap-Up
 
-👉 **Type in Terminal:**
+👉 **Type in Terminal / Valence Console:**
 ```text
-MEDIA.SET dish:burger sample
+CLUSTER.SHARDS
 ```
 
 🗣️ **Say This:**
-> *"Finally, storing high-resolution food photos directly inside database RAM causes severe memory bloat. Valence uses a dual-engine architecture: it writes a tiny 45-byte pointer to RAM in 3 microseconds while offloading the image to Cloudinary."*
+> *"Finally, notice our live Valence Studio control plane. Every single query executed from any application or terminal updates our thread-per-core telemetry, keyspace index, and hierarchical timing wheel in real-time."*
 
-👉 **Type in Terminal:**
+👉 **Type in Terminal / Valence Console:**
 ```text
-MEDIA.TRANSFORM dish:burger thumb
+INFO
 ```
 
 🗣️ **Say This:**
-> *"When mobile devices request thumbnails, Cloudinary dynamically generates optimized WebP assets on the edge, reducing network bandwidth by 85%."*
-
-👉 **Type in Terminal:**
-```text
-CLOUDINARY.STATS
-```
-
-🗣️ **Say This:**
-> *"Running `CLOUDINARY.STATS` audits our database memory—proving over **88% database RAM preserved** across all media keys.
+> *"Valence delivers true hardware-pinned thread isolation, $O(1)$ expiration, lock-free forkless snapshots, and sub-microsecond P99 latencies under extreme load.
 >
-> That is Valence: 12 lock-free cores, O(1) timing wheels, 1 million ops per second, and cloud-edge optimization. Thank you!"*
+> That is Valence: 12 lock-free cores, O(1) timing wheels, and 1.25 million ops per second. Thank you!"*
 
 ---
 
 ## 📋 Quick 1-Page Cheat Sheet (Keep this open next to you)
 
 ```text
-1. Double click 1_START_VALENCE_SERVER.bat
-2. Double click 2_START_VALENCE_TERMINAL.bat
-3. SHARDS
-4. ATTACH https://akash20065ray-sys.github.io/VALENCE_2.0/
-5. MONITOR                     (Tap 2 items on phone, then press Ctrl+C)
-6. SET cart:session_101 "Biryani" EX 15
-7. TTL cart:session_101
-8. WHEEL
-9. GET cart:session_101
-10. BENCH 1 million
-11. MEDIA.SET dish:burger sample
-12. MEDIA.TRANSFORM dish:burger thumb
-13. CLOUDINARY.STATS
+1. Double click 1_START_VALENCE_SERVER.bat     (Port 6379, 12 Shards)
+2. Double click START_VALENCE_DASHBOARD.bat    (Port 8080 Studio)
+3. Open http://localhost:8080 in browser
+4. In Valence Console or CLI:
+   - SHARDS
+   - SET cart:session_101 "Biryani" EX 15
+   - TTL cart:session_101
+   - WHEEL
+   - GET cart:session_101
+   - BENCH 1000000
+   - CLUSTER.SHARDS
+   - INFO
 ```
