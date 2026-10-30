@@ -2,8 +2,8 @@
 # VALENCE 2.0 PRODUCTION CONTAINER (Rust TCP Engine + Node Database Studio)
 # =============================================================================
 
-# Stage 1: Build high-performance Rust TCP engine
-FROM rust:1.80-slim as builder
+# Stage 1: Build high-performance Rust TCP engine (Latest Rust toolchain)
+FROM rust:slim as builder
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
