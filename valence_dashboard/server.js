@@ -204,12 +204,7 @@ const defaultEngineConfig = {
 };
 let currentEngineConfig = { ...defaultEngineConfig };
 
-let apiTokens = [
-  { id: 1, name: 'Swiggy Consumer App', desc: 'Food ordering mobile app', key: 'val_live_89f3d2a7c41b', fullKey: 'val_live_89f3d2a7c41be9a022f187bb9024c311', role: 'App', roleClass: 'app', perms: 'Read / Write', permsClass: 'rw', rateLimit: '10,000 ops/s', rateLimitPct: 20, created: 'Dec 10, 2026 10:24 AM', lastUsed: '2 minutes ago', active: true, icon: 'swiggy' },
-  { id: 2, name: 'Cinema Ticketing Service', desc: 'M-Ticket booking backend', key: 'val_live_c41a9b8e2104', fullKey: 'val_live_c41a9b8e210499ae87bb12ffaa441122', role: 'App', roleClass: 'app', perms: 'Read / Write', permsClass: 'rw', rateLimit: '10,000 ops/s', rateLimitPct: 20, created: 'Dec 10, 2026 09:15 AM', lastUsed: '5 minutes ago', active: true, icon: 'cinema' },
-  { id: 3, name: 'Studio Admin Controller', desc: 'Valence Dashboard Access', key: 'val_admin_001f7e34a991', fullKey: 'val_admin_001f7e34a99144efbba700311224cc99', role: 'Admin', roleClass: 'admin', perms: 'Full Access', permsClass: 'full', rateLimit: 'Unlimited', rateLimitPct: 100, created: 'Dec 09, 2026 11:42 PM', lastUsed: '1 hour ago', active: true, icon: 'studio' },
-  { id: 4, name: 'Load Test Token', desc: 'Benchmark & Performance', key: 'val_test_a8d4c1e90277', fullKey: 'val_test_a8d4c1e90277aa4411bbcc8899220011', role: 'Service', roleClass: 'service', perms: 'Read / Write', permsClass: 'rw', rateLimit: '50,000 ops/s', rateLimitPct: 60, created: 'Dec 09, 2026 03:21 PM', lastUsed: '1 day ago', active: true, icon: 'bench' }
-];
+let apiTokens = [];
 
 async function parseLiveClients() {
   const res = await execValenceCmd(['CLIENT', 'LIST']);
