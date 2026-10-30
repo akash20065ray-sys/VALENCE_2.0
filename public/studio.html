@@ -6483,41 +6483,41 @@
 
             <!-- Concentric Circular Wheels with Live Rotating Hand and Active Timer Nodes -->
             <div class="tw-wheel-container">
-              <!-- Tier 3: Days Tag (Top Left) -->
+              <!-- Tier 3: Days Tag (Outermost Ring - Purple) -->
               <div class="tw-tier-tag tw-tier-tag-top-left">
                 <div class="tw-tier-title" style="color:#a855f7;">
                   <span class="hw-dot" style="background:#a855f7;"></span>
                   <span>Wheel 3 &ndash; Days</span>
                 </div>
-                <div class="tw-tier-desc">24 slots &middot; 1 hour tick<br>Long-term TTLs (e.g. sessions)</div>
+                <div class="tw-tier-desc">Outermost Ring &middot; 30 slots<br>Multi-day tokens &amp; session cache</div>
               </div>
 
-              <!-- Tier 2: Hours Tag (Top Right) -->
+              <!-- Tier 2: Hours Tag (Third Ring - Amber) -->
               <div class="tw-tier-tag tw-tier-tag-top-right">
-                <div class="tw-tier-title" style="color:#38bdf8;">
+                <div class="tw-tier-title" style="color:#fbbf24;">
                   <span>Wheel 2 &ndash; Hours</span>
-                  <span class="hw-dot" style="background:#38bdf8;"></span>
+                  <span class="hw-dot" style="background:#fbbf24;"></span>
                 </div>
-                <div class="tw-tier-desc">60 slots &middot; 1 minute tick<br>Booking locks (e.g. cinema seats)</div>
+                <div class="tw-tier-desc">Third Ring &middot; 24 slots<br>Daily holds &amp; cinema seat locks</div>
               </div>
 
-              <!-- Tier 1: Minutes Tag (Bottom Left) -->
+              <!-- Tier 1: Minutes Tag (Second Ring - Cyan) -->
               <div class="tw-tier-tag tw-tier-tag-bottom-left">
-                <div class="tw-tier-title" style="color:var(--emerald);">
-                  <span class="hw-dot" style="background:var(--emerald);"></span>
+                <div class="tw-tier-title" style="color:#38bdf8;">
+                  <span class="hw-dot" style="background:#38bdf8;"></span>
                   <span>Wheel 1 &ndash; Minutes</span>
-                  <span class="hw-pinned-pill" style="font-size:9px; padding:0 4px;">Active</span>
                 </div>
-                <div class="tw-tier-desc">60 slots &middot; 1 second tick<br>Cart locks &amp; tokens (e.g. 60s locks)</div>
+                <div class="tw-tier-desc">Second Ring &middot; 60 slots<br>Orders &amp; checkout timers</div>
               </div>
 
-              <!-- Tier 0: Seconds Tag (Bottom Right) -->
+              <!-- Tier 0: Seconds Tag (Innermost Ring - Emerald Active) -->
               <div class="tw-tier-tag tw-tier-tag-bottom-right">
-                <div class="tw-tier-title" style="color:#f59e0b;">
+                <div class="tw-tier-title" style="color:#3ecf8e;">
                   <span>Wheel 0 &ndash; Seconds</span>
-                  <span class="hw-dot" style="background:#f59e0b;"></span>
+                  <span class="hw-dot" style="background:#3ecf8e;"></span>
+                  <span class="hw-pinned-pill" style="font-size:9px; padding:0 4px; background:rgba(62,207,142,0.15); color:#3ecf8e; border:1px solid rgba(62,207,142,0.3);">Active Sweep</span>
                 </div>
-                <div class="tw-tier-desc">1,000 slots &middot; 1 ms tick<br>High precision TTLs (e.g. atomic ops)</div>
+                <div class="tw-tier-desc">Innermost Ring &middot; 60 slots<br>Cart 60s inventory reservation holds</div>
               </div>
 
               <!-- Concentric Wheel SVG Canvas -->
@@ -6588,60 +6588,6 @@
           </div>
         </div>
 
-        <!-- Row 3: Bottom 3 Panels (Throughput, Wheel Stats, Recent Events) -->
-        <div class="tw-bottom-grid">
-          <!-- 1. Eviction Throughput Chart -->
-          <div class="tw-bottom-card">
-            <div class="tw-panel-head" style="margin-bottom:8px;">
-              <div>
-                <span class="tw-panel-title">TTL Eviction Throughput</span>
-                <div style="display:flex; align-items:center; gap:12px; margin-top:4px;">
-                  <span style="font-size:10.5px; color:var(--text-secondary); display:flex; align-items:center; gap:4px;">
-                    <span class="hw-dot emerald"></span> Evictions/sec
-                  </span>
-                  <span style="font-size:10.5px; color:var(--text-secondary); display:flex; align-items:center; gap:4px;">
-                    <span class="hw-dot cyan"></span> Cascade Events
-                  </span>
-                </div>
-              </div>
-              <select class="select-sm" style="background:var(--bg-panel); font-size:10.5px;">
-                <option selected>Last 15 minutes</option>
-                <option>Last 1 hour</option>
-              </select>
-            </div>
-            <div class="tw-spark-canvas-wrap">
-              <canvas id="tw-throughput-canvas" class="tw-spark-canvas"></canvas>
-            </div>
-          </div>
-
-          <!-- 2. Wheel Statistics Table -->
-          <div class="tw-bottom-card">
-            <div class="tw-panel-head" style="margin-bottom:8px;">
-              <span class="tw-panel-title">Wheel Statistics</span>
-            </div>
-            <div style="display:flex; align-items:center; padding:4px 0 6px 0; font-size:10px; color:var(--text-dim); border-bottom:1px solid var(--border-hairline);">
-              <span style="min-width:95px;">Wheel</span>
-              <span style="min-width:50px; text-align:center;">Slots</span>
-              <span style="min-width:50px; text-align:center;">Interval</span>
-              <span style="min-width:45px; text-align:center;">Keys</span>
-              <span style="flex:1; text-align:right;">Utilization</span>
-            </div>
-            <div id="tw-stats-rows">
-              <!-- Dynamically populated 4 wheel rows -->
-            </div>
-          </div>
-
-          <!-- 3. Recent Expiration Events -->
-          <div class="tw-bottom-card">
-            <div class="tw-panel-head" style="margin-bottom:8px;">
-              <span class="tw-panel-title">Recent Expiration Events</span>
-              <button class="btn-secondary" style="padding:2px 7px; font-size:10.5px;">View All</button>
-            </div>
-            <div class="tw-events-list" id="tw-events-list">
-              <!-- Dynamically populated events -->
-            </div>
-          </div>
-        </div>
       </section>
             <!-- PART 6: CLOUDINARY EDGE CDN HUB (EXACT LAYOUT FROM SPECIFICATION) -->
             <!-- ========================================================================= -->
@@ -10940,15 +10886,16 @@
       const cx = 160, cy = 160;
       const now = Date.now();
 
-      const a0 = ((now % 1000) / 1000) * 360;
-      const a1 = ((now % 60000) / 60000) * 360;
-      const a2 = ((now % 3600000) / 3600000) * 360;
-      const a3 = ((now % 86400000) / 86400000) * 360;
+      // Physical clock tiers: Seconds -> Minutes -> Hours -> Days
+      const aSec = ((now % 60000) / 60000) * 360;           // Seconds hand (0 - 60s)
+      const aMin = ((now % 3600000) / 3600000) * 360;       // Minutes hand (0 - 60m)
+      const aHour = ((now % 86400000) / 86400000) * 360;    // Hours hand (0 - 24h)
+      const aDays = ((now % (86400000 * 30)) / (86400000 * 30)) * 360; // Days track
 
-      const p0 = getAnglePoint(cx, cy, 54, a0);
-      const p1 = getAnglePoint(cx, cy, 84, a1);
-      const p2 = getAnglePoint(cx, cy, 114, a2);
-      const p3 = getAnglePoint(cx, cy, 144, a3);
+      const pSec = getAnglePoint(cx, cy, 54, aSec);
+      const pMin = getAnglePoint(cx, cy, 84, aMin);
+      const pHour = getAnglePoint(cx, cy, 114, aHour);
+      const pDays = getAnglePoint(cx, cy, 144, aDays);
 
       svg.innerHTML = `
         <defs>
@@ -10961,30 +10908,30 @@
           </filter>
         </defs>
 
-        <!-- Concentric Circular Slotted Tracks -->
-        <!-- Wheel 3: 4.6h - 49.7d (Purple) -->
-        <circle cx="${cx}" cy="${cy}" r="144" fill="none" stroke="rgba(168, 85, 247, 0.2)" stroke-width="4" stroke-dasharray="4 8" />
+        <!-- Outermost Ring: Wheel 3 - Days Track (Purple) -->
+        <circle cx="${cx}" cy="${cy}" r="144" fill="none" stroke="rgba(168, 85, 247, 0.18)" stroke-width="4" stroke-dasharray="4 8" />
         <circle cx="${cx}" cy="${cy}" r="144" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="2 12" />
-        <circle cx="${p3.x}" cy="${p3.y}" r="4.5" fill="#a855f7" filter="url(#tw-glow)" />
+        <circle cx="${pDays.x}" cy="${pDays.y}" r="4.5" fill="#a855f7" filter="url(#tw-glow)" />
 
-        <!-- Wheel 2: 65s - 4.6h (Amber) -->
-        <circle cx="${cx}" cy="${cy}" r="114" fill="none" stroke="rgba(251, 191, 36, 0.2)" stroke-width="4" stroke-dasharray="4 6" />
+        <!-- Third Ring: Wheel 2 - Hours Track (Amber) -->
+        <circle cx="${cx}" cy="${cy}" r="114" fill="none" stroke="rgba(251, 191, 36, 0.18)" stroke-width="4" stroke-dasharray="4 6" />
         <circle cx="${cx}" cy="${cy}" r="114" fill="none" stroke="#fbbf24" stroke-width="2.2" stroke-dasharray="2 10" />
-        <circle cx="${p2.x}" cy="${p2.y}" r="4.5" fill="#fbbf24" filter="url(#tw-glow)" />
+        <circle cx="${pHour.x}" cy="${pHour.y}" r="4.5" fill="#fbbf24" filter="url(#tw-glow)" />
 
-        <!-- Wheel 1: 256ms - 65s (Cyan) -->
-        <circle cx="${cx}" cy="${cy}" r="84" fill="none" stroke="rgba(56, 189, 248, 0.25)" stroke-width="4.5" stroke-dasharray="3 5" />
+        <!-- Second Ring: Wheel 1 - Minutes Track (Cyan) -->
+        <circle cx="${cx}" cy="${cy}" r="84" fill="none" stroke="rgba(56, 189, 248, 0.22)" stroke-width="4.5" stroke-dasharray="3 5" />
         <circle cx="${cx}" cy="${cy}" r="84" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="2 8" />
-        <circle cx="${p1.x}" cy="${p1.y}" r="5" fill="#38bdf8" filter="url(#tw-glow)" />
+        <circle cx="${pMin.x}" cy="${pMin.y}" r="5" fill="#38bdf8" filter="url(#tw-glow)" />
 
-        <!-- Wheel 0: 1ms - 256ms (Emerald - Active Primary) -->
-        <circle cx="${cx}" cy="${cy}" r="54" fill="none" stroke="rgba(62, 207, 142, 0.35)" stroke-width="5" stroke-dasharray="3 4" />
+        <!-- Innermost Ring: Wheel 0 - Seconds Track (Emerald Active Sweep) -->
+        <circle cx="${cx}" cy="${cy}" r="54" fill="none" stroke="rgba(62, 207, 142, 0.3)" stroke-width="5" stroke-dasharray="3 4" />
         <circle cx="${cx}" cy="${cy}" r="54" fill="none" stroke="#3ecf8e" stroke-width="3" stroke-dasharray="2 6" />
-        <circle cx="${p0.x}" cy="${p0.y}" r="5.5" fill="#3ecf8e" filter="url(#tw-glow)" />
+        <circle cx="${pSec.x}" cy="${pSec.y}" r="5.5" fill="#3ecf8e" filter="url(#tw-glow)" />
 
-        <!-- Rotating Hands -->
-        <line x1="${cx}" y1="${cy}" x2="${p0.x}" y2="${p0.y}" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" />
-        <line x1="${cx}" y1="${cy}" x2="${p1.x}" y2="${p1.y}" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2 2" />
+        <!-- Rotating Hands (Seconds, Minutes & Hours) -->
+        <line x1="${cx}" y1="${cy}" x2="${pSec.x}" y2="${pSec.y}" stroke="#3ecf8e" stroke-width="2.2" stroke-linecap="round" />
+        <line x1="${cx}" y1="${cy}" x2="${pMin.x}" y2="${pMin.y}" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="2 2" />
+        <line x1="${cx}" y1="${cy}" x2="${pHour.x}" y2="${pHour.y}" stroke="#fbbf24" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1 3" />
 
         <!-- Center Hub Outer Ring -->
         <circle cx="${cx}" cy="${cy}" r="34" fill="#0b0f17" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
