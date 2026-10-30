@@ -7,7 +7,8 @@ FROM rust:1.80-slim as builder
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
-RUN cargo build --release
+COPY benches ./benches
+RUN cargo build --release --bin valence-server
 
 # Stage 2: Runtime environment with Node.js Studio
 FROM node:20-slim
