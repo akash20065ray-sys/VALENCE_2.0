@@ -1,100 +1,110 @@
-# 🎙️ VALENCE 2.0: 3-4 MINUTE OFFICIAL DEMO VIDEO SCRIPT
+# 🎙️ VALENCE 2.0: OFFICIAL 3–4 MINUTE DEMO VIDEO SCRIPT
+## (Dashboard Walkthrough First ➔ Swiggy in Query Workbench)
 
 > **Setup Before Recording:**
-> - **Screen Setup:** Split your monitor into two windows:
->   - **Left Window:** Swiggy App (`http://localhost:3000` or `https://openings-tennessee-conf-gate.trycloudflare.com`)
->   - **Right Window:** Valence Studio (`http://localhost:8080`)
-> - **Running Servers:** All 3 servers are already running live!
+> - Have **Valence Studio** open at: [http://localhost:8080](http://localhost:8080)
+> - Have **Swiggy App** open in another tab: [https://openings-tennessee-conf-gate.trycloudflare.com](https://openings-tennessee-conf-gate.trycloudflare.com) (or `http://localhost:3000`)
+> - The left sidebar is already pinned open by default.
 
 ---
 
-### ⏱️ [0:00 – 0:45] BEAT 1: The Cold Cockpit & Zero-Hardcoding Architecture
+### ⏱️ [0:00 – 0:50] STEP 1: Overview & Cockpit (Cold Start Architecture)
 
 👉 **What to show on screen:**  
-Full screen on **Valence Studio** (`http://localhost:8080`), on the **Overview & Cockpit** tab.
+Full screen on **Overview & Cockpit** (`#view-overview`).
 
-🗣️ **What to say:**
-> *"Hello everyone. Today I'm presenting **Valence 2.0**—a next-generation, lock-free in-memory state engine engineered from the ground up in pure Rust.
+🗣️ **What to speak:**
+> *"Hello everyone. Today I'm presenting **Valence 2.0**—a next-generation, lock-free in-memory state engine engineered from scratch in pure Rust, designed as a modern, multi-core replacement for Redis.
 >
-> On my screen is the Valence Studio control plane running locally on port 8080. Notice that our database engine on port 6379 currently has **0 keys in RAM**. Nothing is pre-loaded or hardcoded—every metric, shard status, and microsecond telemetry stream you see is bound live to hardware counters.
+> On my screen is the Valence Studio control plane running locally on port 8080. 
 >
-> Redis is single-threaded and chokes on modern multi-core servers due to global locks. Valence eliminates this with a **Thread-Per-Core architecture**, partitioning state across hardware cores with Murmur3 consistent hashing and zero lock contention."*
+> Look at our live telemetry: the database engine on port 6379 currently starts at **0 keys in RAM**. There are no hardcoded mocks or static tables—every counter, shard status bar, and microsecond telemetry readout is bound live to hardware counters.
+>
+> Redis is fundamentally single-threaded and bottlenecks on modern multi-core CPUs due to global lock contention. Valence eliminates this with a **Thread-Per-Core architecture**, partitioning state across hardware cores with Murmur3 consistent hashing."*
 
 ---
 
-### ⏱️ [0:45 – 1:30] BEAT 2: Live Application Peering (Attaching Swiggy)
+### ⏱️ [0:50 – 1:30] STEP 2: Key Explorer, Hardware Matrix & Timing Wheel Engine
 
 👉 **What to show on screen:**  
-Split screen: Swiggy on Left (`http://localhost:3000`), Valence Studio on Right (`http://localhost:8080`).
+1. Click **Key Explorer** in the left sidebar.
+2. Click **Hardware Matrix** in the left sidebar.
+3. Click **Timing Wheel Engine** in the left sidebar.
 
-👉 **What to click:**
-1. In Valence Studio's left sidebar, click **Access & Security**.
-2. Scroll to the **Application Peering & Ingress Control** section at the top.
-3. Show the prefilled URL `http://localhost:3000` (or the public tunnel `https://openings-tennessee-conf-gate.trycloudflare.com`).
-4. Click the green button: **`[⚡ ATTACH APPLICATION]`**.
-5. An alert appears: *`Attached successfully to http://localhost:3000 (Swiggy Food Delivery)!`*. Click **OK**.
-6. Point your mouse at the top header badge: it turns green: **`● Attached: Swiggy Food Delivery (Port 3000)`**.
-
-🗣️ **What to say:**
-> *"Now, let's attach our consumer production app. On the left is our Swiggy food ordering service running on port 3000. 
+🗣️ **What to speak:**
+> *"Let's explore the engine internals:
 >
-> Inside Valence Studio under **Access & Security**, we enter our service endpoint and click **Attach Application**.
+> First, in **Key Explorer**, every key stored in Valence is tracked with its physical memory footprint, active TTL, and exact hardware core affinity.
 >
-> Instantly, Valence establishes a high-throughput RESP3 bidirectional peering session. The top status pill confirms: **Attached: Swiggy Food Delivery**. Our database is now directly synchronizing with our live food delivery microservices."*
+> Switching to the **Hardware Matrix**, you see our Thread-Per-Core design. Each CPU core owns an isolated memory shard with its own circular ring buffer. Requests never fight over global mutex locks—achieving true linear scaling.
+>
+> Next is our **Timing Wheel Engine**. For flash sales, cart reservation timeouts, and OTPs, traditional databases poll keys using slow $O(N)$ background scans. Valence replaces this with a hierarchical hardware timing wheel that fires expirations in true **O(1) constant time** with zero CPU spikes."*
 
 ---
 
-### ⏱️ [1:30 – 2:20] BEAT 3: Real-Time State Mutations & Sub-Microsecond Execution
+### ⏱️ [1:30 – 2:25] STEP 3: Cloudinary Edge CDN Media Hub (The Image Decoupling Solution)
 
 👉 **What to show on screen:**  
-1. On the **Swiggy App (Left)**: Click on **`Add to Cart`** on 2 or 3 dishes (e.g. Biryani, Butter Chicken).
-2. On **Valence Studio (Right)**: Click **Key Explorer** in the sidebar.
-3. Show the table populated dynamically with real keys: `dish:hyderabadi_biryani`, `swiggy:cart:user_...`, `swiggy:inventory:...`.
-4. Click **Overview & Cockpit**: Show the Live QPS throughput meter and the **0.18 µs** sub-microsecond latency.
-
-🗣️ **What to say:**
-> *"Watch what happens the moment a user interacts with Swiggy. As I add Hyderabadi Biryani and Butter Chicken to the cart, look at the right screen:
->
-> Valence immediately ingests the state mutations. In the **Key Explorer**, live keys appear in real-time with their exact hardware shard placement and active TTLs.
->
-> Look at our Telemetry cockpit: operations are processed at **0.18 microseconds**—sub-microsecond execution that is 5 to 10 times faster than Redis, because requests route directly to the designated CPU core without mutex locks."*
-
----
-
-### ⏱️ [2:20 – 3:15] BEAT 4: Cloudinary Edge CDN Media Hub (The Image Decoupling Solution)
-
-👉 **What to show on screen:**  
-1. In Valence Studio's left sidebar, click **Cloudinary CDN Hub** (under `EDGE MEDIA`).
-2. Point out the top banner: **`● Attached: Swiggy Food Delivery (Port 3000)`**.
-3. Point out the top 4 KPIs:
+1. In the left sidebar under `EDGE MEDIA`, click **Cloudinary CDN Hub**.
+2. Point out the top 4 KPIs:
    - **`Media Keys in RAM`**
    - **`98.0% DRAM Preserved`**
    - **`97.8% Edge Bandwidth Saved`**
    - **`4.2 ms Global Edge TTFB`**
-4. Click the green button: **`[⚡ Test Ingest Pipeline]`**.
-   - An alert confirms: *`Ingested sample media into Valence Port 6379! 16-byte RAM pointers stored.`*. Click **OK**.
-   - The **Active Media Pointer Inventory** table immediately populates with 3 live food assets (`hyderabadi_biryani`, `butter_chicken`, `paneer_tikka`).
-5. **Drag the interactive split comparison slider** left and right with your mouse.
-   - Show the Left side (Original Unoptimized: 4.2 MB raw JPEG).
+3. Click the green button: **`[⚡ Test Ingest Pipeline]`**.
+   - An alert pops up: `Ingested sample media into Valence Port 6379! 16-byte RAM pointers stored.`. Click **OK**.
+   - Show the **Active Media Pointer Inventory** table immediately populated with `hyderabadi_biryani`, `butter_chicken`, and `paneer_tikka`.
+4. **Drag the interactive split comparison slider** left and right with your mouse.
+   - Show the Left side (Original Uncompressed: 4.2 MB raw JPEG).
    - Show the Right side (Cloudinary Edge Transformed: 84 KB WebP with `f_auto, q_auto:good, g_auto:food`).
 
-🗣️ **What to say:**
-> *"The biggest bottleneck in e-commerce and food apps is media bloat. If you store high-resolution food banners directly in RAM, your database memory explodes and costs thousands of dollars.
+🗣️ **What to speak:**
+> *"The biggest memory killer in food and e-commerce databases is media bloat. If you store high-resolution food banners directly in RAM, your database memory explodes and costs thousands of dollars.
 >
-> Valence solves this through our native **Cloudinary CDN Hub**. Instead of storing massive 4-megabyte image payloads in RAM, Valence decouples heavy binary pixels to Cloudinary’s global edge CDN, while storing only lightweight **16-byte zero-copy pointers** inside our Rust RAM engine.
+> Valence solves this through our native **Cloudinary CDN Hub**. Instead of holding massive 4-megabyte image payloads in RAM, Valence decouples heavy binary pixels to Cloudinary’s global edge CDN, while storing only lightweight **16-byte zero-copy pointers** inside our Rust RAM engine.
 >
-> As you see on the interactive slider, our automated pipeline applies dynamic format conversion, content-aware smart cropping, and auto-quality. We preserve **98% of server DRAM** while delivering images to mobile users with a **4.2 millisecond TTFB**."*
+> On this interactive slider, you can see our automated edge pipeline applying dynamic format conversion, content-aware smart cropping, and auto-quality. We preserve **98% of server DRAM** while delivering images to mobile users with a **4.2 millisecond TTFB**."*
 
 ---
 
-### ⏱️ [3:15 – 3:45] BEAT 5: Timing Wheel Engine & Closing Wrap-Up
+### ⏱️ [2:25 – 3:20] STEP 4: Query Workbench & Live Swiggy State Execution
 
 👉 **What to show on screen:**  
-Click on **Timing Wheel Engine** in the sidebar, showing the $O(1)$ hardware timer dial and active expiration slots.
+1. Click **Query Workbench** in the left sidebar.
+2. In the code editor area (`type here valence command`), type or paste:
+   ```redis
+   SET swiggy:cart:user_81 '{"dish":"hyderabadi_biryani","qty":2,"price":499}' EX 300
+   GET swiggy:cart:user_81
+   ```
+3. Click the blue/green **`[▶ Run]`** button.
+4. Show the **Execution Results Card** appearing below with:
+   - Core badge (e.g. `C11`)
+   - Latency tag: `0.18 µs`
+   - Output: `{"dish":"hyderabadi_biryani","qty":2,"price":499}`
+5. Switch to your other browser tab showing the **Swiggy App** (`https://openings-tennessee-conf-gate.trycloudflare.com`).
+   - Click **`Add to Cart`** on Hyderabadi Biryani.
+   - Point out that the consumer frontend communicates seamlessly with this exact in-memory state.
 
-🗣️ **What to say:**
-> *"Finally, for flash sales, cart reservation timeouts, and OTPs, Valence uses a hierarchical **O(1) Timing Wheel**. Unlike standard databases that poll keys in $O(N)$ background loops, Valence fires millisecond expirations in true $O(1)$ constant time with zero CPU spikes.
+🗣️ **What to speak:**
+> *"Now let's test our live consumer data directly inside the **Query Workbench**.
 >
-> To summarize: **Valence 2.0** provides full RESP3 compatibility, thread-per-core scalability, zero-lock concurrency, and edge media offloading.
+> Here we can execute raw Redis RESP commands against Valence. I'll write a `SET` command storing user cart state for our Swiggy food delivery app with an active 300-second TTL, followed by a `GET` command.
 >
-> Thank you for watching!"*
+> When I click **Run**, look at the execution result:
+> Valence processes the query in **sub-microseconds**, automatically routing the key to CPU Core 11 via Murmur3 hashing.
+>
+> Switching to our live Swiggy consumer app on this public URL, our food ordering frontend interacts directly with this ultra-fast state engine, powering cart reservations, order tracking, and restaurant menus with zero lag."*
+
+---
+
+### ⏱️ [3:20 – 3:45] STEP 5: Summary & Conclusion
+
+👉 **What to show on screen:**  
+Switch back to **Overview & Cockpit** or **Key Explorer** to show the newly added keys in the live table.
+
+🗣️ **What to speak:**
+> *"To conclude: **Valence 2.0** brings pure Rust safety, Thread-Per-Core lock-free concurrency, an $O(1)$ Timing Wheel, and Cloudinary media decoupling to high-scale backend systems.
+>
+> It gives engineering teams full Redis wire-protocol compatibility with up to 10x lower latency and 98% lower memory costs.
+>
+> Thank you for your time!"*
