@@ -259,42 +259,7 @@ async function parseLiveClients() {
     };
   });
 
-  // Ensure at least our connected Studio and Swiggy clients appear if CLIENT LIST is minimal
-  if (clients.length === 1 && !clients.some(c => c.app.includes('Swiggy'))) {
-    clients.push({
-      id: '19',
-      addr: '127.0.0.1:54218',
-      app: 'Swiggy App (Port 3000)',
-      core: 'Core 02',
-      cmds: '12,850 cmds',
-      idleTime: '0.4s',
-      isIdleWarn: false,
-      connected: '5m 32s',
-      protocol: 'RESP3 | TLS'
-    });
-    clients.push({
-      id: '23',
-      addr: '127.0.0.1:54231',
-      app: 'Cinema Service (Port 3001)',
-      core: 'Core 04',
-      cmds: '8,420 cmds',
-      idleTime: '12.1s',
-      isIdleWarn: true,
-      connected: '18m 05s',
-      protocol: 'RESP3'
-    });
-    clients.push({
-      id: '27',
-      addr: '127.0.0.1:54244',
-      app: 'Load Test Client (Benchmark)',
-      core: 'Core 06',
-      cmds: '156,200 cmds',
-      idleTime: '0.2s',
-      isIdleWarn: false,
-      connected: '1m 21s',
-      protocol: 'RESP3'
-    });
-  }
+// Real clients only from CLIENT LIST
 
   return clients;
 }
@@ -435,10 +400,14 @@ async function getLiveKeyspace(forceFresh = false) {
   }
 
   const keyNames = keysRes.parsed.filter(Boolean);
-  const items = [];
+  if (keyNames.length === 0) {
+    cachedKeys = [];
+    lastKeysFetchTime = Date.now();
+    return [];
+  }
 
-  // Query TTL and sample value for all active keys (up to 500)
-  const batch = keyNames.slice(0, 500);
+  // Query TTL and sample value for active keys (up to 30)
+  const batch = keyNames.slice(0, 30);
   const promises = batch.map(async (k) => {
     const shardInfo = getShardAndCore(k);
     const ttlRes = await execValenceCmd(['TTL', k]);
