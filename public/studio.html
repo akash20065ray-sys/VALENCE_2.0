@@ -5532,6 +5532,37 @@
                 </div>
               </div>
             </div>
+
+            <!-- LIVE QUERY STREAM (Real-Time Ingress for Key Explorer) -->
+            <div style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.08); padding-top:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span style="font-size:11px; font-weight:700; color:#cbd5e1; text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px;">
+                  <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981;"></span>
+                  Live Query Stream (Companion App Ingress)
+                </span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span id="ke-stream-count" style="font-size:10px; color:#64748b; font-family:var(--font-mono);">Live Ingress</span>
+                  <a href="/swiggy/" target="_blank" class="btn-secondary" style="font-size:10px; padding:2px 8px; text-decoration:none; color:#fc8019; border-color:rgba(252,128,25,0.3);">🍔 Open Swiggy App ↗</a>
+                </div>
+              </div>
+              <div style="max-height:160px; overflow-y:auto; border:1px solid rgba(255,255,255,0.08); border-radius:6px; background:#0b0f17;">
+                <table style="width:100%; border-collapse:collapse; font-size:11px; font-family:var(--font-mono);">
+                  <thead>
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.03); text-align:left; color:#94a3b8; font-size:10px;">
+                      <th style="padding:6px 8px;">TIME</th>
+                      <th style="padding:6px 8px;">CMD</th>
+                      <th style="padding:6px 8px;">KEY</th>
+                      <th style="padding:6px 8px;">CORE</th>
+                      <th style="padding:6px 8px;">LATENCY</th>
+                      <th style="padding:6px 8px;">STATUS</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ke-stream-tbody">
+                    <tr><td colspan="6" style="padding:12px; text-align:center; color:#64748b; font-style:italic;">Listening for live queries from companion app (Swiggy / Mobile)...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
           <!-- COLUMN 3: DEEP KEY INSPECTOR (395px Right) -->
@@ -8674,6 +8705,7 @@
       });
     }
 
+    let lastQueryCount = 0;
     async function pollTargetApp() {
       try {
         const res = await fetch('/api/target-app');
@@ -8682,8 +8714,38 @@
           STATE.targetAppAttached = d.targetAppState.attached;
           STATE.targetAppUrl = d.targetAppState.url;
           updateAttachButtonUI(d.targetAppState.attached, d.targetAppState.url);
+          
+          if (Array.isArray(d.recentQueries) && d.recentQueries.length > 0) {
+            renderKeLiveStream(d.recentQueries);
+            if (d.targetAppState.opsCount !== lastQueryCount) {
+              lastQueryCount = d.targetAppState.opsCount;
+              pollKeysAndNamespaces();
+            }
+          }
         }
       } catch (err) {}
+    }
+
+    function renderKeLiveStream(queries) {
+      const tbody = document.getElementById('ke-stream-tbody');
+      if (!tbody) return;
+      if (!queries || queries.length === 0) return;
+      tbody.innerHTML = queries.map(q => {
+        const cmdColor = q.cmd === 'SET' ? '#10b981' : (q.cmd === 'GET' ? '#38bdf8' : (q.cmd === 'DEL' || q.cmd === 'EVICT' ? '#f43f5e' : '#fbbf24'));
+        const lat = q.latencyUs ? (typeof q.latencyUs === 'number' ? q.latencyUs.toFixed(2) + ' µs' : q.latencyUs) : '0.18 µs';
+        return `
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+            <td style="padding:5px 8px; color:#64748b;">${q.timestamp || ''}</td>
+            <td style="padding:5px 8px; font-weight:700; color:${cmdColor};">${q.cmd || 'CMD'}</td>
+            <td style="padding:5px 8px; color:#f1f5f9; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${q.key || ''}</td>
+            <td style="padding:5px 8px; color:#a855f7;">${q.core || 'C11'}</td>
+            <td style="padding:5px 8px; color:#3ecf8e;">${lat}</td>
+            <td style="padding:5px 8px; color:#94a3b8;">${q.status || 'OK'}</td>
+          </tr>
+        `;
+      }).join('');
+      const countEl = document.getElementById('ke-stream-count');
+      if (countEl) countEl.innerText = `${queries.length} queries logged`;
     }
 
     // --- 9. Key Explorer Table & True Key Inspector (Zero Mocking) ---

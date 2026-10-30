@@ -473,6 +473,29 @@ let targetAppState = {
 };
 let upstreamReq = null;
 
+// --- Reverse Proxy to Consumer App (Port 3000) ---
+function proxyToConsumerApp(req, res, targetUrl) {
+  const options = {
+    hostname: '127.0.0.1',
+    port: 3000,
+    path: targetUrl || req.url,
+    method: req.method,
+    headers: {
+      ...req.headers,
+      host: '127.0.0.1:3000'
+    }
+  };
+  const proxyReq = http.request(options, (proxyRes) => {
+    res.writeHead(proxyRes.statusCode, proxyRes.headers);
+    proxyRes.pipe(res);
+  });
+  proxyReq.on('error', (err) => {
+    res.writeHead(502, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Swiggy Consumer app unreachable on port 3000', message: err.message }));
+  });
+  req.pipe(proxyReq);
+}
+
 function attachToUpstream(targetUrl, appSecret) {
   if (upstreamReq) {
     try { upstreamReq.destroy(); } catch {}
@@ -576,6 +599,36 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
     return res.end();
+  }
+
+  // --- Route Swiggy Consumer App & Assets to Port 3000 ---
+  if (
+    pathname === '/swiggy' || pathname === '/swiggy/' ||
+    pathname.startsWith('/swiggy/') ||
+    pathname === '/cinema' || pathname === '/cinema.html' ||
+    pathname.startsWith('/api/cart') ||
+    pathname.startsWith('/api/swiggy') ||
+    pathname.startsWith('/api/restaurant') ||
+    pathname.startsWith('/api/order') ||
+    pathname.startsWith('/api/rider') ||
+    pathname.startsWith('/api/rush') ||
+    pathname.startsWith('/api/cinema') ||
+    pathname.startsWith('/api/action') ||
+    pathname === '/app.js' || pathname === '/style.css' || pathname === '/biryani_hd.jpg'
+  ) {
+    if (pathname === '/swiggy') {
+      res.writeHead(302, { 'Location': '/swiggy/' });
+      return res.end();
+    }
+    let targetPath = req.url;
+    if (pathname === '/swiggy/') {
+      targetPath = '/index.html' + (parsedUrl.search || '');
+    } else if (pathname.startsWith('/swiggy/')) {
+      targetPath = pathname.replace('/swiggy', '') + (parsedUrl.search || '');
+    } else if (pathname === '/cinema') {
+      targetPath = '/cinema.html' + (parsedUrl.search || '');
+    }
+    return proxyToConsumerApp(req, res, targetPath);
   }
 
   // 1. Live SSE Log Stream
@@ -1501,7 +1554,11 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === '/api/target-app') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({ success: true, targetAppState }));
+    return res.end(JSON.stringify({ 
+      success: true, 
+      targetAppState, 
+      recentQueries: (liveQueryStream || []).slice(-15).reverse() 
+    }));
   }
 
   // --- Cloudinary Upload & Valence Commit Ingest Pipeline ---
@@ -1857,6 +1914,11 @@ const server = http.createServer(async (req, res) => {
 server.on('error', err => {
   console.error('[HTTP SERVER ERROR]', err);
 });
+
+// Auto-attach to local Swiggy app on port 3000 on startup
+setTimeout(() => {
+  attachToUpstream('http://127.0.0.1:3000');
+}, 1500);
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log('================================================================');

@@ -32,5 +32,5 @@ ENV PORT=8080
 ENV VALENCE_HOST=127.0.0.1
 ENV VALENCE_PORT=6379
 
-# Launch compiled Rust engine on port 6379 and Studio on port $PORT
-CMD ./valence-server & node valence_dashboard/server.js
+# Launch compiled Rust engine on port 6379, Swiggy on port 3000, and Studio on port $PORT
+CMD ./valence-server & node server.js & node valence_dashboard/server.js
