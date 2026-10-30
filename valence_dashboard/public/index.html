@@ -10356,9 +10356,47 @@
             }
           }
         }
+
+        // 2. Fetch live connected clients (Port 6379)
+        const cRes = await fetch('/api/security/clients');
+        const cData = await cRes.json();
+        if (cData.success) {
+          const clients = cData.clients || [];
+          const countBadge = document.getElementById('sec-active-count-lbl');
+          if (countBadge) countBadge.innerText = `${clients.length} active client${clients.length === 1 ? '' : 's'}`;
+          const cTbody = document.getElementById('sec-clients-tbody');
+          if (cTbody) {
+            cTbody.innerHTML = clients.map((c, i) => `
+              <tr>
+                <td style="font-family:'JetBrains Mono',monospace; color:var(--text-dim);">${i + 1}</td>
+                <td><code style="background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; font-size:11px;">${c.addr || '127.0.0.1:6379'}</code></td>
+                <td><span style="color:#ffffff; font-weight:600;">${c.app || 'Swiggy Consumer App'}</span></td>
+                <td><span class="cfg-pill purple">${c.core || 'Core 00'}</span></td>
+                <td style="font-family:'JetBrains Mono',monospace;">${c.cmds || '1 cmds'}</td>
+                <td style="color:var(--text-dim); font-size:11px;">${c.idleTime || '0.1s'}</td>
+                <td style="color:var(--emerald); font-size:11px;">${c.connected || 'Live'}</td>
+                <td>
+                  <button class="btn-secondary" style="padding:2px 7px; font-size:10px; color:#ef4444;" onclick="terminateClient('${c.id || c.addr}')">Kill</button>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
       } catch (err) {
-        console.error('Error polling security tokens:', err);
+        console.error('Error polling security view:', err);
       }
+    }
+
+    async function terminateClient(clientId) {
+      if (!confirm('Disconnect client ' + clientId + ' from port 6379?')) return;
+      try {
+        await fetch('/api/security/clients/terminate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId })
+        });
+        pollSecurityView();
+      } catch (err) {}
     }
 
     function initSecurityView() {
