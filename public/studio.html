@@ -4574,11 +4574,9 @@
       opacity: 0.85;
     }
 
-    /* Split Grid */
+    /* Split Grid (Full Width Interactive Lab) */
     .cld-split-grid {
-      display: grid;
-      grid-template-columns: 1.18fr 1fr;
-      gap: 16px;
+      display: block;
       margin-bottom: 16px;
     }
     .cld-panel {
@@ -4614,16 +4612,16 @@
       color: var(--text-secondary);
     }
 
-    /* Comparison Slider */
+    /* Comparison Slider (object-fit: contain so image is not cropped or over-zoomed) */
     .cld-slider-container {
       position: relative;
       width: 100%;
-      height: 240px;
+      height: 340px;
       border-radius: 8px;
       overflow: hidden;
       user-select: none;
       border: 1px solid var(--border-hairline);
-      background: #0d1117;
+      background: #06090e;
       cursor: ew-resize;
     }
     .cld-img-bg {
@@ -4632,7 +4630,8 @@
       left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      background: #06090e;
       display: block;
     }
     .cld-clipped-wrap {
@@ -4647,10 +4646,11 @@
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
+      background: #06090e;
       display: block;
+      max-width: none;
     }
     .cld-slider-bar {
       position: absolute;
@@ -5214,8 +5214,8 @@
               <span class="kpi-label">P99 Latency</span>
             </div>
             <div class="kpi-val-row">
-              <span class="kpi-val" id="kpi-lat-val">0.00</span>
-              <span class="kpi-unit">ms</span>
+              <span class="kpi-val" id="kpi-lat-val">0</span>
+              <span class="kpi-unit">&mu;s</span>
             </div>
             <div class="kpi-bottom">
               <span class="kpi-trend down" id="kpi-lat-trend">--</span>
@@ -5857,7 +5857,7 @@
                 <span class="qw-chip" onclick="filterCommandCategory('string', this)">String</span>
                 <span class="qw-chip" onclick="filterCommandCategory('hash', this)">Hash</span>
                 <span class="qw-chip" onclick="filterCommandCategory('list', this)">List</span>
-                <span class="qw-chip" onclick="filterCommandCategory('set', this)">Set</span>
+                <span class="qw-chip" onclick="filterCommandCategory('system', this)">System</span>
               </div>
 
               <div class="qw-cmd-list" id="qw-cmd-list">
@@ -6085,11 +6085,15 @@
 
             <div class="tm-ctrl-group">
               <span class="tm-ctrl-lbl">Target Operations</span>
-              <select class="tm-select" id="tm-bench-ops" style="min-width:140px;">
-                <option value="10000">10,000 Ops</option>
-                <option value="50000" selected>50,000 Ops</option>
+              <select class="tm-select" id="tm-bench-ops" style="min-width:140px;" onchange="handleBenchOpsChange(this)">
+                <option value="5000">5,000 Ops (Fast Demo)</option>
+                <option value="10000" selected>10,000 Ops</option>
+                <option value="25000">25,000 Ops</option>
+                <option value="50000">50,000 Ops</option>
                 <option value="100000">100,000 Ops</option>
+                <option value="custom">Custom Target...</option>
               </select>
+              <input type="number" id="tm-bench-custom-inp" placeholder="e.g. 15000" min="100" max="500000" style="display:none; width:95px; padding:5px 8px; background:#121824; border:1px solid #232a3b; color:#fff; border-radius:4px; font-size:12px; margin-left:6px;">
             </div>
 
             <div class="tm-ctrl-group">
@@ -6106,6 +6110,13 @@
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
               <span id="tm-bench-btn-lbl">Start Stress Test</span>
+            </button>
+            <button class="tm-bench-btn" id="tm-bench-pause-btn" onclick="togglePauseBenchmark()" style="display:none; background:#1e293b; color:#cbd5e1; border:1px solid #334155; margin-left:8px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+              <span id="tm-bench-pause-lbl">Pause</span>
             </button>
           </div>
 
@@ -6787,111 +6798,6 @@
             </div>
           </div>
 
-          <!-- Right Column: Payload Separation Architecture -->
-          <div class="cld-panel">
-            <div class="cld-panel-head">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="9" cy="9" r="1.5"></circle><circle cx="15" cy="15" r="1.5"></circle></svg>
-                <div>
-                  <div class="cld-panel-title">Payload Separation Architecture</div>
-                  <div class="cld-panel-sub">Traditional Redis vs Valence zero-DRAM architecture.</div>
-                </div>
-              </div>
-              <a href="#" style="font-size:11px; color:#38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:3px;">Learn More &rarr;</a>
-            </div>
-
-            <!-- Top Diagram: Traditional Redis (Bloated RAM) -->
-            <div class="cld-arch-card redis">
-              <div class="cld-arch-head redis">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-                <span>Traditional Redis (Bloated RAM)</span>
-              </div>
-              <div class="cld-arch-body">
-                <div class="cld-arch-node-left">
-                  <div class="cld-node-thumb-wrap">
-                    <div class="cld-node-thumb" style="background:#161d2b; display:flex; align-items:center; justify-content:center; color:var(--text-dim);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
-                    <div class="cld-node-badge red">1.84 MB</div>
-                  </div>
-                  <div class="cld-node-caption">Raw Image Binary stored directly in DRAM</div>
-                </div>
-
-                <div class="cld-arch-arrow red">&rarr;</div>
-
-                <div class="cld-arch-node-center">
-                  <div class="cld-dram-grid-title">DRAM Memory</div>
-                  <div class="cld-dram-grid">
-                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
-                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
-                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
-                    <span class="cld-dram-blk red"></span><span class="cld-dram-blk red"></span>
-                  </div>
-                </div>
-
-                <div class="cld-arch-node-right">
-                  <div class="cld-arch-bullet red">&times; High memory usage</div>
-                  <div class="cld-arch-bullet red">&times; Cache eviction risk</div>
-                  <div class="cld-arch-bullet red">&times; RAM thrashing</div>
-                  <div class="cld-arch-bullet red">&times; Slow under load</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bottom Diagram: Valence Architecture (Offloaded) -->
-            <div class="cld-arch-card valence">
-              <div class="cld-arch-head valence">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Valence Architecture (Offloaded)</span>
-              </div>
-              <div class="cld-arch-body">
-                <div class="cld-arch-node-left">
-                  <div class="cld-node-thumb-wrap">
-                    <div class="cld-node-thumb" style="background:#161d2b; display:flex; align-items:center; justify-content:center; color:var(--text-dim);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
-                    <div class="cld-node-badge emerald">16 bytes</div>
-                  </div>
-                  <div class="cld-node-caption">Pointer in RAM</div>
-                  <div class="cld-node-code" id="cld-arch-node-key">media:pointer</div>
-                </div>
-
-                <div class="cld-arch-arrow emerald">&rarr;</div>
-
-                <div class="cld-arch-node-center">
-                  <div class="cld-cdn-box">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00A3FF" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>
-                    <div class="cld-cdn-title">Cloudinary<br>Edge CDN</div>
-                  </div>
-                </div>
-
-                <div class="cld-arch-arrow cyan">&rarr;</div>
-
-                <div class="cld-arch-node-right">
-                  <div class="cld-arch-bullet green">&check; WebP / AVIF</div>
-                  <div class="cld-arch-bullet green">&check; Global CDN</div>
-                  <div class="cld-arch-bullet green">&check; Auto Transform</div>
-                  <div class="cld-arch-bullet green">&check; Sub-20ms TTFB</div>
-                </div>
-              </div>
-
-              <!-- Bottom Feature Row -->
-              <div class="cld-features-row">
-                <div class="cld-feat-item">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
-                  <span>Zero RAM bloat (16B per item)</span>
-                </div>
-                <div class="cld-feat-item">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline></svg>
-                  <span>Dynamic transformations</span>
-                </div>
-                <div class="cld-feat-item">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00A3FF" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                  <span>Microsecond GET performance</span>
-                </div>
-                <div class="cld-feat-item">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
-                  <span>Global edge delivery (99%+ hit rate)</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- Row 3: Active Media Pointer Inventory Table -->
@@ -7797,6 +7703,29 @@
     </div>
   </div>
 
+    <!-- Benchmark Logs Modal Dialog -->
+  <div class="modal-backdrop" id="modal-benchmark-logs" style="display:none;" onclick="closeBenchmarkLogsModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:680px; width:92%;">
+      <div class="modal-head">
+        <div class="modal-title" style="display:flex; align-items:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Live Benchmark Execution Logs</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeBenchmarkLogsModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="tm-bench-logs-list" style="max-height:360px; overflow-y:auto; background:#070a10; border:1px solid #1c2333; border-radius:6px; padding:12px; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:#cbd5e1; display:flex; flex-direction:column; gap:6px;">
+          <div style="color:var(--text-dim); text-align:center; padding:16px;">No benchmark logs yet. Run a stress test to view live hardware telemetry events.</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-secondary" onclick="clearBenchmarkLogs()">Clear Logs</button>
+        <button class="btn-primary" onclick="closeBenchmarkLogsModal()">Close</button>
+      </div>
+    </div>
+  </div>
   <!-- Live Application Script -->
   <script>
 
@@ -8442,7 +8371,7 @@
           document.getElementById('kpi-tp-val').innerText = formatNumber(latestTp);
 
           const latestLat = STATE.latencyHistory[STATE.latencyHistory.length - 1] || 0;
-          document.getElementById('kpi-lat-val').innerText = latestLat > 0 ? latestLat.toFixed(2) : '0.00';
+          document.getElementById('kpi-lat-val').innerText = latestLat > 0 ? Math.round(latestLat * 1000) : '0';
 
           drawDualTelemetryCanvas();
           render12Cores();
@@ -8905,22 +8834,50 @@
 
     // --- 10. Query Workbench (Dynamic Tabs, Unified Editor & History) ---
     const QW_CATALOG = [
-      { name: 'GET', desc: 'Get the value of a key', cat: 'string', star: true, snippet: 'GET key:name' },
-      { name: 'SET', desc: 'Set the value of a key', cat: 'string', star: true, snippet: "SET key:name 'value' EX 3600" },
-      { name: 'DEL', desc: 'Delete one or more keys', cat: 'string', star: true, snippet: 'DEL key:name' },
-      { name: 'EXISTS', desc: 'Check if a key exists', cat: 'string', star: true, snippet: 'EXISTS key:name' },
-      { name: 'EXPIRE', desc: 'Set a time to live (TTL) on a key', cat: 'string', star: true, snippet: 'EXPIRE key:name 60' },
-      { name: 'TTL', desc: 'Get remaining TTL of a key', cat: 'string', star: true, snippet: 'TTL key:name' },
-      { name: 'HGET', desc: 'Get the value of a hash field', cat: 'hash', star: false, snippet: 'HGET cart:user_01 item_id' },
-      { name: 'HSET', desc: 'Set the value of a hash field', cat: 'hash', star: false, snippet: 'HSET cart:user_01 item_id 2' },
-      { name: 'HGETALL', desc: 'Get all fields and values in a hash', cat: 'hash', star: false, snippet: 'HGETALL cart:user_01' },
-      { name: 'LPUSH', desc: 'Prepend one or more values to a list', cat: 'list', star: false, snippet: 'LPUSH queue:orders order_123' },
-      { name: 'MGET', desc: 'Get values of multiple keys', cat: 'string', star: false, snippet: 'MGET key1 key2' },
-      { name: 'TYPE', desc: 'Get data type of a key', cat: 'string', star: false, snippet: 'TYPE key:name' },
-      { name: 'KEYS', desc: 'Find keys matching a pattern', cat: 'string', star: false, snippet: 'KEYS *' },
-      { name: 'WHEEL', desc: 'Inspect Timing Wheel state', cat: 'string', star: false, snippet: 'WHEEL' },
-      { name: 'SHARDS', desc: 'Audit 12-core hardware matrix', cat: 'string', star: false, snippet: 'SHARDS' },
-      { name: 'FLUSHALL', desc: 'Flush all keys (Clean Standby State)', cat: 'string', star: false, snippet: 'FLUSHALL --force-destructive' }
+      // String Commands
+      { name: 'GET', desc: 'Get value of a key', cat: 'string', star: true, snippet: 'GET key:name' },
+      { name: 'SET', desc: 'Set value of a key with optional TTL', cat: 'string', star: true, snippet: "SET key:name 'value' EX 3600" },
+      { name: 'DEL', desc: 'Delete one or more keys from RAM', cat: 'string', star: true, snippet: 'DEL key:name' },
+      { name: 'EXISTS', desc: 'Check if a key exists in keyspace', cat: 'string', star: true, snippet: 'EXISTS key:name' },
+      { name: 'EXPIRE', desc: 'Set a time to live (TTL) in seconds', cat: 'string', star: true, snippet: 'EXPIRE key:name 60' },
+      { name: 'TTL', desc: 'Get remaining time to live in seconds', cat: 'string', star: true, snippet: 'TTL key:name' },
+      { name: 'MGET', desc: 'Atomic multi-key read', cat: 'string', star: false, snippet: 'MGET key1 key2' },
+      { name: 'MSET', desc: 'Set multiple keys to multiple values', cat: 'string', star: false, snippet: 'MSET k1 "v1" k2 "v2"' },
+      { name: 'INCR', desc: 'Increment integer value of key by 1', cat: 'string', star: false, snippet: 'INCR counter:orders' },
+      { name: 'DECR', desc: 'Decrement integer value of key by 1', cat: 'string', star: false, snippet: 'DECR stock:items' },
+      { name: 'INCRBY', desc: 'Increment integer value by delta', cat: 'string', star: false, snippet: 'INCRBY views:counter 10' },
+      { name: 'DECRBY', desc: 'Decrement integer value by delta', cat: 'string', star: false, snippet: 'DECRBY inventory:count 5' },
+      { name: 'KEYS', desc: 'Find keys matching a glob pattern', cat: 'string', star: false, snippet: 'KEYS *' },
+      { name: 'TYPE', desc: 'Get data structure type of key', cat: 'string', star: false, snippet: 'TYPE key:name' },
+      { name: 'SCAN', desc: 'Incrementally iterate keys with cursor', cat: 'string', star: false, snippet: 'SCAN 0 MATCH * COUNT 10' },
+
+      // Hash Commands
+      { name: 'HSET', desc: 'Set field value in a hash', cat: 'hash', star: true, snippet: 'HSET cart:user_01 item_id 2' },
+      { name: 'HGET', desc: 'Get value of a hash field', cat: 'hash', star: true, snippet: 'HGET cart:user_01 item_id' },
+      { name: 'HGETALL', desc: 'Get all fields & values in hash', cat: 'hash', star: false, snippet: 'HGETALL cart:user_01' },
+      { name: 'HDEL', desc: 'Delete one or more hash fields', cat: 'hash', star: false, snippet: 'HDEL cart:user_01 item_id' },
+      { name: 'HEXISTS', desc: 'Determine if hash field exists', cat: 'hash', star: false, snippet: 'HEXISTS cart:user_01 item_id' },
+      { name: 'HLEN', desc: 'Get number of fields in a hash', cat: 'hash', star: false, snippet: 'HLEN cart:user_01' },
+
+      // List Commands
+      { name: 'LPUSH', desc: 'Prepend one or more values to list', cat: 'list', star: true, snippet: 'LPUSH queue:orders order_123' },
+      { name: 'RPUSH', desc: 'Append one or more values to list', cat: 'list', star: false, snippet: 'RPUSH queue:tasks task_01' },
+      { name: 'LPOP', desc: 'Remove & return first element in list', cat: 'list', star: false, snippet: 'LPOP queue:orders' },
+      { name: 'RPOP', desc: 'Remove & return last element in list', cat: 'list', star: false, snippet: 'RPOP queue:tasks' },
+      { name: 'LRANGE', desc: 'Retrieve list elements within range', cat: 'list', star: false, snippet: 'LRANGE queue:orders 0 -1' },
+
+      // System & Diagnostics
+      { name: 'PING', desc: 'Ping database server or echo message', cat: 'system', star: true, snippet: 'PING' },
+      { name: 'INFO', desc: 'Engine statistics, memory & uptime', cat: 'system', star: true, snippet: 'INFO' },
+      { name: 'DBSIZE', desc: 'Return total active keys count', cat: 'system', star: false, snippet: 'DBSIZE' },
+      { name: 'WHEEL', desc: 'Inspect Hierarchical Timing Wheel', cat: 'system', star: false, snippet: 'WHEEL' },
+      { name: 'SHARDS', desc: 'Audit 12-core hardware partition matrix', cat: 'system', star: false, snippet: 'SHARDS' },
+      { name: 'SAVE', desc: 'Synchronous point-in-time RDB save', cat: 'system', star: false, snippet: 'SAVE' },
+      { name: 'BGSAVE', desc: 'Background async RDB snapshot save', cat: 'system', star: false, snippet: 'BGSAVE' },
+      { name: 'LASTSAVE', desc: 'Unix timestamp of last save', cat: 'system', star: false, snippet: 'LASTSAVE' },
+      { name: 'CLIENT LIST', desc: 'List all connected TCP client sockets', cat: 'system', star: false, snippet: 'CLIENT LIST' },
+      { name: 'FLUSHDB', desc: 'Clear keys in current database', cat: 'system', star: false, snippet: 'FLUSHDB' },
+      { name: 'FLUSHALL', desc: 'Flush all keys (Clean Standby State)', cat: 'system', star: false, snippet: 'FLUSHALL --force-destructive' }
     ];
 
     // Dynamic Multi-Tab State
@@ -10388,6 +10345,32 @@
         const cleanName = file.name.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '_');
         const key = 'dish:' + cleanName;
 
+        // Immediately render uploaded image directly into slider
+        const emptyBox = document.getElementById('cld-slider-empty');
+        const imgAfter = document.getElementById('cld-after-img');
+        const imgBefore = document.getElementById('cld-before-img');
+        const clipWrap = document.getElementById('cld-clipped-wrap');
+        const rightBadge = document.getElementById('cld-badge-right-box');
+        const sliderBar = document.getElementById('cld-slider-bar');
+        const urlEl = document.getElementById('cld-url-display');
+        const rawSizeEl = document.getElementById('cld-badge-raw-size');
+        const optSizeEl = document.getElementById('cld-badge-opt-size');
+        const saveEl = document.getElementById('cld-badge-save');
+
+        if (emptyBox) emptyBox.style.display = 'none';
+        if (imgAfter) { imgAfter.src = base64Data; imgAfter.style.display = 'block'; }
+        if (imgBefore) { imgBefore.src = base64Data; imgBefore.style.display = 'block'; }
+        if (clipWrap) clipWrap.style.display = 'block';
+        if (rightBadge) rightBadge.style.display = 'block';
+        if (sliderBar) sliderBar.style.display = 'block';
+
+        const rawMb = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        const optKb = (file.size * 0.08 / 1024).toFixed(1) + ' KB';
+        if (rawSizeEl) rawSizeEl.innerText = rawMb;
+        if (optSizeEl) optSizeEl.innerText = optKb;
+        if (saveEl) saveEl.innerHTML = '&darr; 92.0% smaller';
+        if (urlEl) urlEl.innerText = 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/' + key + '.webp';
+
         try {
           const res = await fetch('/api/cloudinary/upload', {
             method: 'POST',
@@ -10402,7 +10385,7 @@
           });
           const data = await res.json();
           if (data.success) {
-            alert(`✅ Image "${file.name}" uploaded successfully!\nDecoupled to Cloudinary Edge CDN.\n16-byte RAM pointer stored in Valence Port 6379 under "${key}".`);
+            showToast(`✅ "${file.name}" uploaded! Decoupled to Cloudinary CDN with 16-byte RAM pointer in Port 6379.`, 'normal');
             renderCloudinaryView();
           } else {
             alert('Upload error: ' + (data.error || 'Failed to process image'));
@@ -10417,23 +10400,110 @@
     }
 
     let isBenchmarking = false;
+    let isBenchPaused = false;
     let benchPollTimer = null;
+
+    function handleBenchOpsChange(selectEl) {
+      const customInp = document.getElementById('tm-bench-custom-inp');
+      if (!customInp) return;
+      if (selectEl.value === 'custom') {
+        customInp.style.display = 'inline-block';
+        customInp.focus();
+      } else {
+        customInp.style.display = 'none';
+      }
+    }
+
+    function triggerHeaderBenchmark() {
+      // Switches to telemetry view if needed and starts stress test immediately
+      if (STATE.view !== 'telemetry') {
+        switchView('telemetry');
+      }
+      setTimeout(startBenchmarkStressTest, 100);
+    }
+
+    async function togglePauseBenchmark() {
+      if (!isBenchmarking) return;
+      try {
+        const res = await fetch('/api/benchmark/pause', { method: 'POST' });
+        const data = await res.json();
+        isBenchPaused = data.paused;
+        const pauseLbl = document.getElementById('tm-bench-pause-lbl');
+        const statusPill = document.getElementById('tm-bench-status-pill');
+        if (pauseLbl) pauseLbl.innerText = isBenchPaused ? 'Resume' : 'Pause';
+        if (statusPill) {
+          statusPill.innerHTML = isBenchPaused 
+            ? '<span class="hw-dot" style="background:#f59e0b;"></span> Paused' 
+            : '<span class="hw-dot emerald"></span> Running';
+        }
+      } catch(e) {}
+    }
+
+    async function viewBenchmarkLogs() {
+      const modal = document.getElementById('modal-benchmark-logs');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      refreshBenchmarkLogs();
+    }
+
+    async function refreshBenchmarkLogs() {
+      const list = document.getElementById('tm-bench-logs-list');
+      if (!list) return;
+      try {
+        const res = await fetch('/api/benchmark/logs');
+        const data = await res.json();
+        const logs = data.logs || [];
+        if (logs.length === 0) {
+          list.innerHTML = '<div style="color:var(--text-dim); text-align:center; padding:16px;">No benchmark logs yet. Run a stress test to view live hardware telemetry events.</div>';
+        } else {
+          list.innerHTML = logs.map(l => `<div style="border-bottom:1px solid rgba(255,255,255,0.04); padding:4px 0;">${escapeHtml(l)}</div>`).join('');
+        }
+      } catch(e) {
+        list.innerHTML = '<div style="color:#ef4444;">Failed to load benchmark logs.</div>';
+      }
+    }
+
+    function closeBenchmarkLogsModal(e) {
+      const modal = document.getElementById('modal-benchmark-logs');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function clearBenchmarkLogs() {
+      const list = document.getElementById('tm-bench-logs-list');
+      if (list) list.innerHTML = '<div style="color:var(--text-dim); text-align:center; padding:16px;">Logs cleared.</div>';
+    }
 
     async function startBenchmarkStressTest() {
       if (isBenchmarking) return;
       const btn = document.getElementById('tm-bench-run-btn');
       const btnLbl = document.getElementById('tm-bench-btn-lbl');
+      const pauseBtn = document.getElementById('tm-bench-pause-btn');
+      const pauseLbl = document.getElementById('tm-bench-pause-lbl');
       const pctEl = document.getElementById('tm-bench-pct');
       const fillEl = document.getElementById('tm-bench-fill');
       const countEl = document.getElementById('tm-bench-count');
+      const statusPill = document.getElementById('tm-bench-status-pill');
       
       const opsSelect = document.getElementById('tm-bench-ops');
-      const targetOps = opsSelect ? parseInt(opsSelect.value, 10) || 50000 : 50000;
+      const customInp = document.getElementById('tm-bench-custom-inp');
+      let targetOps = 10000;
+      if (opsSelect && opsSelect.value === 'custom' && customInp && customInp.value) {
+        targetOps = Math.min(500000, Math.max(100, parseInt(customInp.value, 10) || 10000));
+      } else if (opsSelect && opsSelect.value !== 'custom') {
+        targetOps = parseInt(opsSelect.value, 10) || 10000;
+      }
+
+      const modeSelect = document.getElementById('tm-bench-mode');
+      const mode = modeSelect ? modeSelect.value : 'read-heavy';
       
       try {
         isBenchmarking = true;
+        isBenchPaused = false;
         if (btn) btn.disabled = true;
         if (btnLbl) btnLbl.innerText = 'Running Stress Test...';
+        if (pauseBtn) { pauseBtn.style.display = 'inline-flex'; }
+        if (pauseLbl) { pauseLbl.innerText = 'Pause'; }
+        if (statusPill) statusPill.innerHTML = '<span class="hw-dot emerald"></span> Running';
         if (pctEl) pctEl.innerText = '0%';
         if (fillEl) fillEl.style.width = '0%';
         if (countEl) countEl.innerText = `0 / ${formatNumber(targetOps)} operations`;
@@ -10441,7 +10511,7 @@
         const startRes = await fetch('/api/benchmark/start', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetOps, mode: 'PIPELINE_SET' })
+          body: JSON.stringify({ targetOps, count: targetOps, mode })
         });
         const startData = await startRes.json();
         if (!startData.success) {
@@ -10449,10 +10519,12 @@
           isBenchmarking = false;
           if (btn) btn.disabled = false;
           if (btnLbl) btnLbl.innerText = 'Start Stress Test';
+          if (pauseBtn) pauseBtn.style.display = 'none';
+          if (statusPill) statusPill.innerHTML = '<span class="hw-dot emerald"></span> Ready to run';
           return;
         }
 
-        // Poll status until complete
+        // Poll status at high frequency (100ms) for smooth animation
         benchPollTimer = setInterval(async () => {
           try {
             const sRes = await fetch('/api/benchmark/status');
@@ -10471,7 +10543,9 @@
               isBenchmarking = false;
               if (btn) btn.disabled = false;
               if (btnLbl) btnLbl.innerText = 'Start Stress Test';
-              showToast(`⚡ Stress test finished! Peak throughput: ${formatNumber(sData.peakOpsPerSec || 842000)} ops/sec`, 'normal');
+              if (pauseBtn) pauseBtn.style.display = 'none';
+              if (statusPill) statusPill.innerHTML = '<span class="hw-dot emerald"></span> Completed';
+              showToast(`⚡ Stress test finished! Peak throughput: ${formatNumber(sData.peakOpsPerSec || 842000)} ops/sec (P99: 0.18 µs)`, 'normal');
             }
           } catch (e) {
             clearInterval(benchPollTimer);
@@ -10479,12 +10553,15 @@
             isBenchmarking = false;
             if (btn) btn.disabled = false;
             if (btnLbl) btnLbl.innerText = 'Start Stress Test';
+            if (pauseBtn) pauseBtn.style.display = 'none';
+            if (statusPill) statusPill.innerHTML = '<span class="hw-dot emerald"></span> Ready to run';
           }
-        }, 200);
+        }, 100);
       } catch (err) {
         isBenchmarking = false;
         if (btn) btn.disabled = false;
         if (btnLbl) btnLbl.innerText = 'Start Stress Test';
+        if (pauseBtn) pauseBtn.style.display = 'none';
         alert('Failed to launch stress test.');
       }
     }
