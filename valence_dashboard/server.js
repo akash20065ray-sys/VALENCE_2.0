@@ -509,7 +509,11 @@ function attachToUpstream(targetUrl, appSecret) {
   targetAppState.opsCount = 0;
 
   try {
-    const streamUrl = new URL('/api/stream', targetUrl);
+    let connectUrl = targetUrl;
+    if (connectUrl.includes('valence-b8tm.onrender.com') || connectUrl.includes('localhost') || connectUrl.includes('127.0.0.1')) {
+      connectUrl = 'http://127.0.0.1:3000';
+    }
+    const streamUrl = new URL('/api/stream', connectUrl);
     if (appSecret) streamUrl.searchParams.set('auth', appSecret);
     
     const client = streamUrl.protocol === 'https:' ? https : http;
@@ -613,7 +617,7 @@ const server = http.createServer(async (req, res) => {
     pathname.startsWith('/api/rider') ||
     pathname.startsWith('/api/rush') ||
     pathname.startsWith('/api/cinema') ||
-    pathname.startsWith('/api/action') ||
+    pathname.startsWith('/api/action') || pathname === '/api/stream' ||
     pathname === '/app.js' || pathname === '/style.css' || pathname === '/biryani_hd.jpg'
   ) {
     if (pathname === '/swiggy') {

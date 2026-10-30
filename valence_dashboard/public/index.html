@@ -10680,8 +10680,8 @@
             body: JSON.stringify({
               key,
               dishName: cleanName,
-              imageUrl: base64Data,
-              imageBase64: base64Data,
+              rawBytes: file.size,
+              imageUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/' + key + '.webp',
               format: file.type.split('/')[1] || 'jpg'
             })
           });
