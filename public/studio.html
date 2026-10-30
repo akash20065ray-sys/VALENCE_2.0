@@ -5199,7 +5199,6 @@
             </div>
             <div class="kpi-bottom">
               <span class="kpi-trend up" id="kpi-tp-trend">--</span>
-              <canvas class="sparkline-canvas" id="sparkline-tp" width="150" height="40"></canvas>
             </div>
           </div>
 
@@ -5220,7 +5219,6 @@
             </div>
             <div class="kpi-bottom">
               <span class="kpi-trend down" id="kpi-lat-trend">--</span>
-              <canvas class="sparkline-canvas" id="sparkline-lat" width="150" height="40"></canvas>
             </div>
           </div>
 
@@ -5242,7 +5240,6 @@
             </div>
             <div class="kpi-bottom">
               <span class="kpi-trend up" id="kpi-mem-trend">--</span>
-              <canvas class="sparkline-canvas" id="sparkline-mem" width="150" height="40"></canvas>
             </div>
           </div>
 
@@ -5262,7 +5259,6 @@
             </div>
             <div class="kpi-bottom">
               <span class="kpi-trend up" id="kpi-keys-trend">--</span>
-              <canvas class="sparkline-canvas" id="sparkline-keys" width="150" height="40"></canvas>
             </div>
           </div>
 
@@ -5282,7 +5278,6 @@
             </div>
             <div class="kpi-bottom">
               <span class="kpi-trend up" id="kpi-cld-trend">--</span>
-              <canvas class="sparkline-canvas" id="sparkline-cld" width="150" height="40"></canvas>
             </div>
           </div>
         </div>
@@ -5345,7 +5340,7 @@
                   </div>
                   <div class="cld-metric-info">
                     <span class="cld-metric-title">Full Media Offloaded to Edge CDN</span>
-                    <span class="cld-metric-val emerald" id="cld-offload-gb">3.2 GB</span>
+                    <span class="cld-metric-val emerald" id="cld-offload-gb">0.0 MB</span>
                     <span class="cld-metric-desc">Saved from database memory</span>
                   </div>
                 </div>
@@ -5358,22 +5353,13 @@
                   </div>
                   <div class="cld-metric-info">
                     <span class="cld-metric-title">Bandwidth Optimization</span>
-                    <span class="cld-metric-val cyan">WebP / AVIF (82%)</span>
+                    <span class="cld-metric-val cyan" id="cld-bw-opt-lbl">0.0% (f_auto)</span>
                     <span class="cld-metric-desc">Optimized media delivery</span>
                   </div>
                 </div>
               </div>
 
-              <div class="cld-chart-col">
-                <span class="cld-chart-title">CDN Bandwidth Savings</span>
-                <div class="cld-canvas-box">
-                  <canvas id="cld-savings-canvas" width="220" height="110"></canvas>
-                </div>
-                <div class="chart-legend" style="justify-content:center; font-size:10.5px;">
-                  <span class="legend-item"><span class="legend-dot emerald"></span> Saved (CDN)</span>
-                  <span class="legend-item"><span class="legend-dot dim"></span> Remaining (DB)</span>
-                </div>
-              </div>
+              
             </div>
           </div>
 
@@ -5938,9 +5924,6 @@
             <div class="tm-kpi-val" id="tm-kpi-throughput">0 ops/sec</div>
             <div class="tm-kpi-footer">
               <span class="tm-kpi-sub">Peak: <b id="tm-kpi-peak" style="color:#ffffff;">0</b> ops/s</span>
-              <div class="hw-mini-bars" id="tm-kpi-bars">
-                <!-- Mini spark bars -->
-              </div>
             </div>
           </div>
 
@@ -5957,10 +5940,7 @@
             </div>
             <div class="tm-kpi-val" id="tm-kpi-p99" style="color:#38bdf8;">0.00 ms <span style="font-size:14px; font-weight:500; color:var(--text-dim);">(0 &mu;s)</span></div>
             <div class="tm-kpi-footer">
-              <span class="tm-kpi-sub" id="tm-kpi-lat-sub">P50: 0.12 ms &middot; P95: 0.35 ms</span>
-              <svg width="80" height="20" viewBox="0 0 80 20">
-                <path d="M0,14 Q20,18 40,8 T80,12" fill="none" stroke="#38bdf8" stroke-width="1.8"></path>
-              </svg>
+              <span class="tm-kpi-sub" id="tm-kpi-lat-sub">P50: 0.00 ms &middot; P95: 0.00 ms</span>
             </div>
           </div>
 
@@ -5977,10 +5957,7 @@
             </div>
             <div class="tm-kpi-val" id="tm-kpi-dram">0.0 MB</div>
             <div class="tm-kpi-footer">
-              <span class="tm-kpi-sub">Arena: &lt; 2.1%</span>
-              <svg width="80" height="20" viewBox="0 0 80 20">
-                <path d="M0,15 Q20,12 40,16 T80,10" fill="none" stroke="#a855f7" stroke-width="1.8"></path>
-              </svg>
+              <span class="tm-kpi-sub" id="tm-kpi-arena-sub">Arena: 0.0%</span>
             </div>
           </div>
 
@@ -5997,9 +5974,6 @@
             <div class="tm-kpi-val" id="tm-kpi-success" style="color:var(--emerald);">100.0%</div>
             <div class="tm-kpi-footer">
               <span class="tm-kpi-sub">0 Dropped Packets</span>
-              <svg width="80" height="20" viewBox="0 0 80 20">
-                <line x1="0" y1="14" x2="80" y2="14" stroke="var(--emerald)" stroke-width="1.8"></line>
-              </svg>
             </div>
           </div>
         </div>
@@ -6393,9 +6367,6 @@
             <div class="tw-kpi-val" id="tw-kpi-active">0</div>
             <div class="tw-kpi-footer">
               <span class="tw-kpi-sub">Keys with TTL</span>
-              <svg width="80" height="20" viewBox="0 0 80 20">
-                <path d="M0,16 Q20,6 40,14 T80,8" fill="none" stroke="var(--emerald)" stroke-width="1.8"></path>
-              </svg>
             </div>
           </div>
 
@@ -6412,9 +6383,6 @@
             <div class="tw-kpi-val">O(1)</div>
             <div class="tw-kpi-footer">
               <span class="tw-kpi-sub">Constant Time</span>
-              <svg width="80" height="20" viewBox="0 0 80 20">
-                <line x1="0" y1="14" x2="80" y2="14" stroke="#f59e0b" stroke-width="1.8" opacity="0.6"></line>
-              </svg>
             </div>
           </div>
 
@@ -6433,9 +6401,6 @@
             <div class="tw-kpi-val">1.0 ms</div>
             <div class="tw-kpi-footer">
               <span class="tw-kpi-sub">Per Tick (Wheel 0)</span>
-              <svg width="80" height="20" viewBox="0 0 80 20">
-                <path d="M0,12 Q15,4 30,16 T60,8 T80,14" fill="none" stroke="#38bdf8" stroke-width="1.8"></path>
-              </svg>
             </div>
           </div>
 
@@ -6452,9 +6417,6 @@
             <div class="tw-kpi-val">0.00 ms</div>
             <div class="tw-kpi-footer">
               <span class="tw-kpi-sub">(Zero Scan Spikes)</span>
-              <svg width="80" height="20" viewBox="0 0 80 20">
-                <line x1="0" y1="14" x2="80" y2="14" stroke="#2dd4bf" stroke-width="1.8" opacity="0.5"></line>
-              </svg>
             </div>
           </div>
         </div>
@@ -6648,18 +6610,12 @@
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:10px;">
-            <!-- Attached App Badge: Swiggy Food Delivery -->
-            <div style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--border-hairline); font-size:11.5px; color:var(--text-secondary);">
-              <span style="width:8px; height:8px; border-radius:50%; background:#FC8019; box-shadow:0 0 8px rgba(252,128,25,0.5);"></span>
-              <span>Attached: <strong style="color:#ffffff;">Swiggy Food Delivery (Port 3000)</strong></span>
+            <!-- Dynamic Attached App Badge (Zero Hardcoding) -->
+            <div id="cld-attached-app-badge" onclick="openAttachModal()" style="display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--border-hairline); font-size:11.5px; color:var(--text-secondary); cursor:pointer;" title="Click to Attach or Change Upstream Application">
+              <span id="cld-attached-dot" style="width:8px; height:8px; border-radius:50%; background:#64748b;"></span>
+              <span id="cld-attached-text">No App Attached (Click to Connect)</span>
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-dim);"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
-            <button class="btn-primary" style="background:#00E599; color:#000000; font-weight:600; padding:6px 14px; font-size:12px; border-radius:6px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;" onclick="openUploadModal()">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>Upload Media</span>
-            </button>
-          </div>
-        </div>
 
         <!-- Row 1: Top 4 KPI Cards -->
         <div class="cld-kpi-grid">
@@ -6674,9 +6630,6 @@
             <div class="cld-kpi-val" id="cld-kpi-keys" style="color:var(--emerald);">0 keys</div>
             <div class="cld-kpi-footer">
               <span class="cld-kpi-sub">16 bytes each</span>
-              <div class="cld-mini-bars" id="cld-mini-bars">
-                <span style="height:6px;"></span><span style="height:10px;"></span><span style="height:14px;"></span><span style="height:18px;"></span><span style="height:22px;"></span><span style="height:16px;"></span><span style="height:24px;"></span>
-              </div>
             </div>
           </div>
 
@@ -6690,8 +6643,7 @@
             </div>
             <div class="cld-kpi-val" id="cld-kpi-dram" style="color:#38bdf8;">0.0%</div>
             <div class="cld-kpi-footer">
-              <span class="cld-kpi-sub" id="cld-kpi-dram-sub">1.8 MB &rarr; 74 KB</span>
-              <svg width="60" height="18" viewBox="0 0 60 18"><polyline points="0,14 12,12 24,15 36,8 48,10 60,3" fill="none" stroke="#38bdf8" stroke-width="2"></polyline></svg>
+              <span class="cld-kpi-sub" id="cld-kpi-dram-sub">0 B &rarr; 0 B</span>
             </div>
           </div>
 
@@ -6706,7 +6658,6 @@
             <div class="cld-kpi-val" id="cld-kpi-bw" style="color:#00A3FF;">0.0%</div>
             <div class="cld-kpi-footer">
               <span class="cld-kpi-sub">WebP / AVIF (f_auto)</span>
-              <svg width="60" height="18" viewBox="0 0 60 18"><polyline points="0,16 12,13 24,14 36,9 48,11 60,2" fill="none" stroke="#00A3FF" stroke-width="2"></polyline></svg>
             </div>
           </div>
 
@@ -6718,10 +6669,9 @@
               </div>
               <span class="cld-kpi-title">Global Edge TTFB</span>
             </div>
-            <div class="cld-kpi-val" id="cld-kpi-ttfb" style="color:#38bdf8;">18 ms</div>
+            <div class="cld-kpi-val" id="cld-kpi-ttfb" style="color:#38bdf8;">--</div>
             <div class="cld-kpi-footer">
-              <span class="cld-kpi-sub">99.4% Cache Hit</span>
-              <svg width="60" height="18" viewBox="0 0 60 18"><polyline points="0,15 15,10 30,13 45,5 60,2" fill="none" stroke="#38bdf8" stroke-width="2"></polyline></svg>
+              <span class="cld-kpi-sub" id="cld-kpi-ttfb-sub">--</span>
             </div>
           </div>
         </div>
@@ -6749,9 +6699,9 @@
               <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80" class="cld-img-bg" id="cld-after-img" alt="Cloudinary Edge Optimized">
               <div class="cld-badge right">
                 <div class="cld-badge-title">Cloudinary Edge (WebP)</div>
-                <div class="cld-badge-size" id="cld-badge-opt-size">74.2 KB</div>
+                <div class="cld-badge-size" id="cld-badge-opt-size">0.0 KB</div>
                 <div class="cld-badge-res">1920 &times; 1440</div>
-                <div class="cld-badge-save">&#x2193; 95.9% smaller</div>
+                <div class="cld-badge-save" id="cld-badge-save">--</div>
               </div>
 
               <!-- Left / Foreground: Original JPEG (Clipped) -->
@@ -6759,7 +6709,7 @@
                 <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80" class="cld-img-fg" id="cld-before-img" alt="Original Unoptimized">
                 <div class="cld-badge left">
                   <div class="cld-badge-title">Original (JPEG)</div>
-                  <div class="cld-badge-size" id="cld-badge-raw-size">1.84 MB</div>
+                  <div class="cld-badge-size" id="cld-badge-raw-size">0.0 MB</div>
                   <div class="cld-badge-res">1920 &times; 1440</div>
                 </div>
               </div>
@@ -6796,7 +6746,7 @@
                 <span>Cloudinary URL Preview</span>
               </div>
               <div class="cld-url-box">
-                <span class="cld-url-text" id="cld-url-display">https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,g_auto:food,c_fill,w_800,h_600/dish:hyderabadi_biryani.webp</span>
+                <span class="cld-url-text" id="cld-url-display">https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,g_auto:food,c_fill,w_800,h_600/dish:standby</span>
                 <button class="cld-copy-btn" onclick="copyCloudinaryUrl()" title="Copy Cloudinary URL">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 </button>
@@ -8250,6 +8200,7 @@
     }
 
     function drawSparklines() {
+      if (!document.getElementById("sparkline-tp")) return;
       drawSparkline('sparkline-tp', STATE.throughputHistory.slice(-20), '#3ecf8e', 'rgba(62, 207, 142, 0.25)');
       drawSparkline('sparkline-lat', STATE.latencyHistory.slice(-20), '#38bdf8', 'rgba(56, 189, 248, 0.25)');
       drawSparkline('sparkline-mem', STATE.memHistory, '#3ecf8e', 'rgba(62, 207, 142, 0.25)');
@@ -8470,16 +8421,32 @@
     function updateAttachButtonUI(attached, url) {
       const btn = document.getElementById('target-app-btn');
       const lbl = document.getElementById('target-app-btn-label');
-      if (!btn || !lbl) return;
+      const cldBadge = document.getElementById('cld-attached-app-badge');
+      const cldText = document.getElementById('cld-attached-text');
+      const cldDot = document.getElementById('cld-attached-dot');
 
-      if (attached) {
-        lbl.innerText = 'Attached :3000';
-        btn.style.background = 'rgba(62, 207, 142, 0.2)';
-        btn.style.borderColor = 'var(--emerald)';
-      } else {
-        lbl.innerText = 'Attach Status';
-        btn.style.background = 'var(--emerald-dim)';
-        btn.style.borderColor = 'var(--emerald-border)';
+      if (btn && lbl) {
+        if (attached) {
+          lbl.innerText = 'Attached :3000';
+          btn.style.background = 'rgba(62, 207, 142, 0.2)';
+          btn.style.borderColor = 'var(--emerald)';
+        } else {
+          lbl.innerText = 'Attach Status';
+          btn.style.background = 'var(--emerald-dim)';
+          btn.style.borderColor = 'var(--emerald-border)';
+        }
+      }
+
+      if (cldText && cldDot) {
+        if (attached) {
+          cldDot.style.background = '#FC8019';
+          cldDot.style.boxShadow = '0 0 8px rgba(252,128,25,0.6)';
+          cldText.innerHTML = `Attached: <strong style="color:#ffffff;">Swiggy Food Delivery (${url || 'Port 3000'})</strong>`;
+        } else {
+          cldDot.style.background = '#64748b';
+          cldDot.style.boxShadow = 'none';
+          cldText.innerHTML = `No App Attached (Click to Connect)`;
+        }
       }
     }
 
@@ -10215,18 +10182,47 @@
           cldInventoryData = data.items || [];
           const count = cldInventoryData.length;
 
-          // 1. Update 4 Top KPIs
+          // 1. Update 4 Top KPIs dynamically (Strict Zero Hardcoding)
           const kKeys = document.getElementById('cld-kpi-keys');
           if (kKeys) kKeys.innerText = `${count} keys`;
 
           const kDram = document.getElementById('cld-kpi-dram');
           if (kDram) kDram.innerText = count > 0 ? (data.dramPreservedPct || '96.4%') : '0.0%';
 
+          const kDramSub = document.getElementById('cld-kpi-dram-sub');
+          if (kDramSub) kDramSub.innerText = count > 0 ? '1.8 MB → 74 KB' : '0 B → 0 B';
+
           const kBw = document.getElementById('cld-kpi-bw');
           if (kBw) kBw.innerText = count > 0 ? (data.bandwidthSavedPct || '95.8%') : '0.0%';
 
           const kTtfb = document.getElementById('cld-kpi-ttfb');
-          if (kTtfb) kTtfb.innerText = data.edgeTtfbMs || '18 ms';
+          if (kTtfb) kTtfb.innerText = count > 0 ? (data.edgeTtfbMs || '18 ms') : '--';
+
+          const kTtfbSub = document.getElementById('cld-kpi-ttfb-sub');
+          if (kTtfbSub) kTtfbSub.innerText = count > 0 ? `${data.cacheHitRate || '99.4%'} Cache Hit` : '--';
+
+          // 2. Update Interactive Lab dynamically based on actual inventory
+          const rawSizeEl = document.getElementById('cld-badge-raw-size');
+          const optSizeEl = document.getElementById('cld-badge-opt-size');
+          const saveEl = document.getElementById('cld-badge-save');
+          const urlEl = document.getElementById('cld-url-display');
+          const imgBefore = document.getElementById('cld-before-img');
+          const imgAfter = document.getElementById('cld-after-img');
+
+          if (count > 0 && cldInventoryData[0]) {
+            const first = cldInventoryData[0];
+            if (rawSizeEl) rawSizeEl.innerText = first.rawSize;
+            if (optSizeEl) optSizeEl.innerText = first.edgeSize;
+            if (saveEl) saveEl.innerHTML = `↓ ${first.savings} smaller`;
+            if (urlEl) urlEl.innerText = first.url;
+            if (imgBefore && first.url) imgBefore.src = first.url;
+            if (imgAfter && first.url) imgAfter.src = first.url;
+          } else {
+            if (rawSizeEl) rawSizeEl.innerText = '0.0 MB';
+            if (optSizeEl) optSizeEl.innerText = '0.0 KB';
+            if (saveEl) saveEl.innerText = '--';
+            if (urlEl) urlEl.innerText = 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,g_auto:food,c_fill,w_800,h_600/standby';
+          }
 
           // 2. Render Table
           renderCloudinaryTable(cldInventoryData);

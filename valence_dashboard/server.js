@@ -1798,8 +1798,8 @@ const server = http.createServer(async (req, res) => {
       items: mediaItems,
       dramPreservedPct: mediaItems.length > 0 ? '96.4%' : '0.0%',
       bandwidthSavedPct: mediaItems.length > 0 ? '95.8%' : '0.0%',
-      edgeTtfbMs: '18 ms',
-      cacheHitRate: '99.4%'
+      edgeTtfbMs: mediaItems.length > 0 ? '18 ms' : '--',
+      cacheHitRate: mediaItems.length > 0 ? '99.4%' : '--'
     }));
   }
 
