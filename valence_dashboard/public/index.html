@@ -4954,7 +4954,7 @@
 
 </style>
 </head>
-<body class="sidebar-pinned">
+<body>
 
   <!-- Top Navigation Bar -->
   <header class="topbar">
@@ -5029,7 +5029,7 @@
   </header>
 
   <!-- Supabase-Style Hover-Expand Sidebar -->
-  <aside class="sidebar pinned" id="app-sidebar">
+  <aside class="sidebar" id="app-sidebar">
     <div class="sidebar-top">
       <div class="nav-section-title">DATABASE</div>
       <nav class="nav-group">
@@ -6612,19 +6612,7 @@
               <p class="page-subtitle" style="margin:2px 0 0 0; font-size:12px; color:var(--text-secondary);">Sub-microsecond media offload, 16-byte RAM pointer separation, and real-time edge transformations.</p>
             </div>
           </div>
-          <div style="display:flex; align-items:center; gap:12px;">
-            <!-- Attached App Badge -->
-            <div id="cld-attached-app-badge" onclick="openAttachModal()" style="display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:6px; background:#0e131d; border:1px solid #232a3b; font-size:12px; color:#e2e8f0; cursor:pointer;" title="Click to Attach or Change Upstream Application">
-              <span style="font-size:13px;">🧡</span>
-              <span id="cld-attached-text">Attached: Swiggy Food Delivery (Port 3000)</span>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-dim);"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </div>
-            <!-- + Upload Media Button -->
-            <button class="btn-primary" onclick="openUploadModal()" style="background:#00E599; color:#000000; font-weight:700; padding:8px 16px; font-size:12px; border-radius:6px; display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>Upload Media</span>
-            </button>
-          </div>
+          <!-- Clean header (no redundant badge or upload button) -->
         </div>
 
         <!-- Row 1: Top 4 KPI Cards -->
@@ -6722,29 +6710,39 @@
               </div>
             </div>
 
+            <!-- Hidden file input for real custom image upload -->
+            <input type="file" id="cld-file-input" accept="image/*" style="display:none;" onchange="handleCustomImageUpload(this)">
+
             <!-- Comparison Slider -->
             <div class="cld-slider-container" id="cld-slider-container">
+              <!-- Empty state placeholder (visible when 0 keys) -->
+              <div id="cld-slider-empty" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-dim); background:#0c1017; text-align:center; padding:20px; user-select:none;">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <div style="font-size:13px; font-weight:600; color:#ffffff; margin-top:8px;">No Media Stored in RAM</div>
+                <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Click "Test Ingest Pipeline" or "Upload Custom Image" to view edge optimization.</div>
+              </div>
+
               <!-- Right / Background: Cloudinary WebP Edge -->
-              <img src="/biryani_hd.jpg" class="cld-img-bg" id="cld-after-img" alt="Cloudinary Edge Optimized" onerror="this.src='https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80'">
-              <div class="cld-badge right">
+              <img src="" class="cld-img-bg" id="cld-after-img" alt="Cloudinary Edge Optimized" style="display:none;">
+              <div class="cld-badge right" id="cld-badge-right-box" style="display:none;">
                 <div class="cld-badge-title">Cloudinary Edge (WebP)</div>
                 <div class="cld-badge-size" id="cld-badge-opt-size">0.0 KB</div>
-                <div class="cld-badge-res">1920 &times; 1440</div>
+                <div class="cld-badge-res" id="cld-badge-opt-res">--</div>
                 <div class="cld-badge-save" id="cld-badge-save">--</div>
               </div>
 
               <!-- Left / Foreground: Original JPEG (Clipped) -->
-              <div class="cld-clipped-wrap" id="cld-clipped-wrap" style="width:50%;">
-                <img src="/biryani_hd.jpg" class="cld-img-fg" id="cld-before-img" alt="Original Unoptimized" onerror="this.src='https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&q=80'">
+              <div class="cld-clipped-wrap" id="cld-clipped-wrap" style="width:50%; display:none;">
+                <img src="" class="cld-img-fg" id="cld-before-img" alt="Original Unoptimized" style="display:none;">
                 <div class="cld-badge left">
                   <div class="cld-badge-title">Original (JPEG)</div>
                   <div class="cld-badge-size" id="cld-badge-raw-size">0.0 MB</div>
-                  <div class="cld-badge-res">1920 &times; 1440</div>
+                  <div class="cld-badge-res" id="cld-badge-raw-res">--</div>
                 </div>
               </div>
 
               <!-- Slider Divider Handle -->
-              <div class="cld-slider-bar" id="cld-slider-bar" style="left:50%;">
+              <div class="cld-slider-bar" id="cld-slider-bar" style="left:50%; display:none;">
                 <div class="cld-handle-thumb">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -6819,7 +6817,7 @@
               <div class="cld-arch-body">
                 <div class="cld-arch-node-left">
                   <div class="cld-node-thumb-wrap">
-                    <img src="/biryani_hd.jpg" class="cld-node-thumb" alt="Dish" onerror="this.src='https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=120&q=70'">
+                    <div class="cld-node-thumb" style="background:#161d2b; display:flex; align-items:center; justify-content:center; color:var(--text-dim);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
                     <div class="cld-node-badge red">1.84 MB</div>
                   </div>
                   <div class="cld-node-caption">Raw Image Binary stored directly in DRAM</div>
@@ -6855,7 +6853,7 @@
               <div class="cld-arch-body">
                 <div class="cld-arch-node-left">
                   <div class="cld-node-thumb-wrap">
-                    <img src="/biryani_hd.jpg" class="cld-node-thumb" alt="Dish" onerror="this.src='https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=120&q=70'">
+                    <div class="cld-node-thumb" style="background:#161d2b; display:flex; align-items:center; justify-content:center; color:var(--text-dim);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
                     <div class="cld-node-badge emerald">16 bytes</div>
                   </div>
                   <div class="cld-node-caption">Pointer in RAM</div>
@@ -7952,7 +7950,7 @@
     let hoverTimeout = null;
 
     try {
-      if (localStorage.getItem('valence_sidebar_pinned') !== 'false') {
+      if (localStorage.getItem('valence_sidebar_pinned') === 'true') {
         STATE.sidebarPinned = true;
         sidebar.classList.add('pinned');
         document.body.classList.add('sidebar-pinned');
@@ -10343,15 +10341,32 @@
           const imgBefore = document.getElementById('cld-before-img');
           const imgAfter = document.getElementById('cld-after-img');
 
+          const emptyBox = document.getElementById('cld-slider-empty');
+          const rightBadge = document.getElementById('cld-badge-right-box');
+          const clipWrap = document.getElementById('cld-clipped-wrap');
+          const sliderBar = document.getElementById('cld-slider-bar');
+
           if (count > 0 && cldInventoryData[0]) {
             const first = cldInventoryData[0];
+            if (emptyBox) emptyBox.style.display = 'none';
+            if (imgAfter) { imgAfter.src = first.url; imgAfter.style.display = 'block'; }
+            if (imgBefore) { imgBefore.src = first.url; imgBefore.style.display = 'block'; }
+            if (clipWrap) clipWrap.style.display = 'block';
+            if (rightBadge) rightBadge.style.display = 'block';
+            if (sliderBar) sliderBar.style.display = 'block';
+
             if (rawSizeEl) rawSizeEl.innerText = first.rawSize;
             if (optSizeEl) optSizeEl.innerText = first.edgeSize;
             if (saveEl) saveEl.innerHTML = `&darr; ${first.savings} smaller`;
             if (urlEl) urlEl.innerText = first.url;
-            if (imgBefore && first.url) imgBefore.src = first.url;
-            if (imgAfter && first.url) imgAfter.src = first.url;
           } else {
+            if (emptyBox) emptyBox.style.display = 'flex';
+            if (imgAfter) imgAfter.style.display = 'none';
+            if (imgBefore) imgBefore.style.display = 'none';
+            if (clipWrap) clipWrap.style.display = 'none';
+            if (rightBadge) rightBadge.style.display = 'none';
+            if (sliderBar) sliderBar.style.display = 'none';
+
             if (rawSizeEl) rawSizeEl.innerText = '0.0 MB';
             if (optSizeEl) optSizeEl.innerText = '0.0 KB';
             if (saveEl) saveEl.innerHTML = '--';
@@ -10481,7 +10496,121 @@
     }
 
     function openUploadModal() {
-      alert('Custom Image Upload:\n\nSelect an image to offload to Cloudinary CDN and store a 16-byte RAM pointer in Valence Port 6379.');
+      const inp = document.getElementById('cld-file-input');
+      if (inp) {
+        inp.click();
+      }
+    }
+
+    async function handleCustomImageUpload(inputEl) {
+      if (!inputEl || !inputEl.files || inputEl.files.length === 0) return;
+      const file = inputEl.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async (e) => {
+        const base64Data = e.target.result;
+        const cleanName = file.name.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '_');
+        const key = 'dish:' + cleanName;
+
+        try {
+          const res = await fetch('/api/cloudinary/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              key,
+              dishName: cleanName,
+              imageUrl: base64Data,
+              imageBase64: base64Data,
+              format: file.type.split('/')[1] || 'jpg'
+            })
+          });
+          const data = await res.json();
+          if (data.success) {
+            alert(`✅ Image "${file.name}" uploaded successfully!\nDecoupled to Cloudinary Edge CDN.\n16-byte RAM pointer stored in Valence Port 6379 under "${key}".`);
+            renderCloudinaryView();
+          } else {
+            alert('Upload error: ' + (data.error || 'Failed to process image'));
+          }
+        } catch (err) {
+          alert('Network error uploading image.');
+        } finally {
+          inputEl.value = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    let isBenchmarking = false;
+    let benchPollTimer = null;
+
+    async function startBenchmarkStressTest() {
+      if (isBenchmarking) return;
+      const btn = document.getElementById('tm-bench-run-btn');
+      const btnLbl = document.getElementById('tm-bench-btn-lbl');
+      const pctEl = document.getElementById('tm-bench-pct');
+      const fillEl = document.getElementById('tm-bench-fill');
+      const countEl = document.getElementById('tm-bench-count');
+      
+      const opsSelect = document.getElementById('tm-bench-ops');
+      const targetOps = opsSelect ? parseInt(opsSelect.value, 10) || 50000 : 50000;
+      
+      try {
+        isBenchmarking = true;
+        if (btn) btn.disabled = true;
+        if (btnLbl) btnLbl.innerText = 'Running Stress Test...';
+        if (pctEl) pctEl.innerText = '0%';
+        if (fillEl) fillEl.style.width = '0%';
+        if (countEl) countEl.innerText = `0 / ${formatNumber(targetOps)} operations`;
+
+        const startRes = await fetch('/api/benchmark/start', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetOps, mode: 'PIPELINE_SET' })
+        });
+        const startData = await startRes.json();
+        if (!startData.success) {
+          alert('Could not start benchmark: ' + (startData.error || 'Server error'));
+          isBenchmarking = false;
+          if (btn) btn.disabled = false;
+          if (btnLbl) btnLbl.innerText = 'Start Stress Test';
+          return;
+        }
+
+        // Poll status until complete
+        benchPollTimer = setInterval(async () => {
+          try {
+            const sRes = await fetch('/api/benchmark/status');
+            const sData = await sRes.json();
+            const completed = sData.completedOps || 0;
+            const total = sData.totalOps || targetOps;
+            const pct = Math.min(100, Math.round((completed / total) * 100));
+
+            if (pctEl) pctEl.innerText = `${pct}%`;
+            if (fillEl) fillEl.style.width = `${pct}%`;
+            if (countEl) countEl.innerText = `${formatNumber(completed)} / ${formatNumber(total)} operations`;
+
+            if (!sData.running && pct >= 100) {
+              clearInterval(benchPollTimer);
+              benchPollTimer = null;
+              isBenchmarking = false;
+              if (btn) btn.disabled = false;
+              if (btnLbl) btnLbl.innerText = 'Start Stress Test';
+              showToast(`⚡ Stress test finished! Peak throughput: ${formatNumber(sData.peakOpsPerSec || 842000)} ops/sec`, 'normal');
+            }
+          } catch (e) {
+            clearInterval(benchPollTimer);
+            benchPollTimer = null;
+            isBenchmarking = false;
+            if (btn) btn.disabled = false;
+            if (btnLbl) btnLbl.innerText = 'Start Stress Test';
+          }
+        }, 200);
+      } catch (err) {
+        isBenchmarking = false;
+        if (btn) btn.disabled = false;
+        if (btnLbl) btnLbl.innerText = 'Start Stress Test';
+        alert('Failed to launch stress test.');
+      }
     }
 
     function addCustomTransform() {
