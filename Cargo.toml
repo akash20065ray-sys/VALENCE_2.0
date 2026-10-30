@@ -36,7 +36,7 @@ twox-hash = "1.6"
 memmap2 = "0.9"
 
 # Command-Line Parser for Diagnostic CLI
-clap = { version = "4.4", features = ["derive"] }
+clap = { version = "=4.4.18", features = ["derive"] }
 
 [dev-dependencies]
 criterion = "0.5"
