@@ -1,14 +1,14 @@
 # 🎙️ VALENCE 2.0: OFFICIAL 3–4 MINUTE DEMO VIDEO SCRIPT
-## (Dashboard Walkthrough First ➔ Swiggy in Query Workbench)
+## (Dashboard First ➔ Attach Swiggy in Access & Security ➔ Query Workbench Live Execution)
 
 > **Setup Before Recording:**
 > - Have **Valence Studio** open at: [http://localhost:8080](http://localhost:8080)
 > - Have **Swiggy App** open in another tab: [https://openings-tennessee-conf-gate.trycloudflare.com](https://openings-tennessee-conf-gate.trycloudflare.com) (or `http://localhost:3000`)
-> - The left sidebar is already pinned open by default.
+> - The left sidebar is pinned open by default.
 
 ---
 
-### ⏱️ [0:00 – 0:50] STEP 1: Overview & Cockpit (Cold Start Architecture)
+### ⏱️ [0:00 – 0:45] STEP 1: Overview & Cockpit (Cold Start Architecture)
 
 👉 **What to show on screen:**  
 Full screen on **Overview & Cockpit** (`#view-overview`).
@@ -24,7 +24,7 @@ Full screen on **Overview & Cockpit** (`#view-overview`).
 
 ---
 
-### ⏱️ [0:50 – 1:30] STEP 2: Key Explorer, Hardware Matrix & Timing Wheel Engine
+### ⏱️ [0:45 – 1:20] STEP 2: Key Explorer, Hardware Matrix & Timing Wheel Engine
 
 👉 **What to show on screen:**  
 1. Click **Key Explorer** in the left sidebar.
@@ -42,7 +42,7 @@ Full screen on **Overview & Cockpit** (`#view-overview`).
 
 ---
 
-### ⏱️ [1:30 – 2:25] STEP 3: Cloudinary Edge CDN Media Hub (The Image Decoupling Solution)
+### ⏱️ [1:20 – 2:05] STEP 3: Cloudinary Edge CDN Media Hub
 
 👉 **What to show on screen:**  
 1. In the left sidebar under `EDGE MEDIA`, click **Cloudinary CDN Hub**.
@@ -52,14 +52,12 @@ Full screen on **Overview & Cockpit** (`#view-overview`).
    - **`97.8% Edge Bandwidth Saved`**
    - **`4.2 ms Global Edge TTFB`**
 3. Click the green button: **`[⚡ Test Ingest Pipeline]`**.
-   - An alert pops up: `Ingested sample media into Valence Port 6379! 16-byte RAM pointers stored.`. Click **OK**.
-   - Show the **Active Media Pointer Inventory** table immediately populated with `hyderabadi_biryani`, `butter_chicken`, and `paneer_tikka`.
-4. **Drag the interactive split comparison slider** left and right with your mouse.
-   - Show the Left side (Original Uncompressed: 4.2 MB raw JPEG).
-   - Show the Right side (Cloudinary Edge Transformed: 84 KB WebP with `f_auto, q_auto:good, g_auto:food`).
+   - Alert confirms: `Ingested sample media into Valence Port 6379! 16-byte RAM pointers stored.`. Click **OK**.
+   - Show the table populated with live pointers (`hyderabadi_biryani`, `butter_chicken`, `paneer_tikka`).
+4. **Drag the interactive comparison slider** back and forth (Left: 4.2 MB raw JPEG vs Right: 84 KB WebP with `f_auto, q_auto:good, g_auto:food`).
 
 🗣️ **What to speak:**
-> *"The biggest memory killer in food and e-commerce databases is media bloat. If you store high-resolution food banners directly in RAM, your database memory explodes and costs thousands of dollars.
+> *"The biggest memory killer in food and e-commerce databases is media bloat. Storing high-resolution food banners directly in RAM causes database memory to explode.
 >
 > Valence solves this through our native **Cloudinary CDN Hub**. Instead of holding massive 4-megabyte image payloads in RAM, Valence decouples heavy binary pixels to Cloudinary’s global edge CDN, while storing only lightweight **16-byte zero-copy pointers** inside our Rust RAM engine.
 >
@@ -67,43 +65,62 @@ Full screen on **Overview & Cockpit** (`#view-overview`).
 
 ---
 
-### ⏱️ [2:25 – 3:20] STEP 4: Query Workbench & Live Swiggy State Execution
+### ⏱️ [2:05 – 2:45] STEP 4: Access & Security (Attaching the Swiggy Consumer App)
 
 👉 **What to show on screen:**  
-1. Click **Query Workbench** in the left sidebar.
+1. In the left sidebar under `ADMINISTRATION`, click **Access & Security**.
+2. Point your cursor to the top panel: **Application Peering & Ingress Control**.
+3. In `Target Service URL / Port`, show `http://localhost:3000` (or `https://openings-tennessee-conf-gate.trycloudflare.com`).
+4. Click the green button: **`[⚡ ATTACH APPLICATION]`**.
+5. Alert pops up: `Attached successfully to http://localhost:3000 (Swiggy Food Delivery)!`. Click **OK**.
+6. Point your mouse to the top header status pill: it turns green: **`● Attached: Swiggy Food Delivery (Port 3000)`**.
+
+🗣️ **What to speak:**
+> *"Now let's connect our consumer application. Under **Access & Security**, we have our **Application Peering & Ingress Control**.
+>
+> We enter our Swiggy food delivery service endpoint and click **Attach Application**.
+>
+> Instantly, Valence establishes a high-throughput RESP3 peering session. Notice the top header status pill immediately turns green: **Attached: Swiggy Food Delivery**. Our database is now directly linked with our consumer food ordering backend."*
+
+---
+
+### ⏱️ [2:45 – 3:30] STEP 5: Query Workbench & Live Swiggy State Execution
+
+👉 **What to show on screen:**  
+1. In the left sidebar, click **Query Workbench**.
 2. In the code editor area (`type here valence command`), type or paste:
    ```redis
    SET swiggy:cart:user_81 '{"dish":"hyderabadi_biryani","qty":2,"price":499}' EX 300
    GET swiggy:cart:user_81
    ```
 3. Click the blue/green **`[▶ Run]`** button.
-4. Show the **Execution Results Card** appearing below with:
-   - Core badge (e.g. `C11`)
-   - Latency tag: `0.18 µs`
+4. Show the **Execution Results Card** appearing below:
+   - Core tag: `C11`
+   - Latency readout: **`0.18 µs`** (sub-microsecond execution!)
    - Output: `{"dish":"hyderabadi_biryani","qty":2,"price":499}`
-5. Switch to your other browser tab showing the **Swiggy App** (`https://openings-tennessee-conf-gate.trycloudflare.com`).
+5. Switch to the tab showing the **Swiggy App** (`https://openings-tennessee-conf-gate.trycloudflare.com`).
    - Click **`Add to Cart`** on Hyderabadi Biryani.
-   - Point out that the consumer frontend communicates seamlessly with this exact in-memory state.
+   - Point out that the consumer frontend communicates in real-time with this exact in-memory state.
 
 🗣️ **What to speak:**
 > *"Now let's test our live consumer data directly inside the **Query Workbench**.
 >
-> Here we can execute raw Redis RESP commands against Valence. I'll write a `SET` command storing user cart state for our Swiggy food delivery app with an active 300-second TTL, followed by a `GET` command.
+> Here we can execute raw Redis RESP commands against Valence. I'll write a `SET` command storing user cart state for our attached Swiggy app with an active 300-second TTL, followed by a `GET` command.
 >
 > When I click **Run**, look at the execution result:
-> Valence processes the query in **sub-microseconds**, automatically routing the key to CPU Core 11 via Murmur3 hashing.
+> Valence processes the query in **0.18 microseconds**, automatically routing the key to CPU Core 11 via Murmur3 hashing.
 >
 > Switching to our live Swiggy consumer app on this public URL, our food ordering frontend interacts directly with this ultra-fast state engine, powering cart reservations, order tracking, and restaurant menus with zero lag."*
 
 ---
 
-### ⏱️ [3:20 – 3:45] STEP 5: Summary & Conclusion
+### ⏱️ [3:30 – 3:50] STEP 6: Summary & Conclusion
 
 👉 **What to show on screen:**  
-Switch back to **Overview & Cockpit** or **Key Explorer** to show the newly added keys in the live table.
+Switch back to **Overview & Cockpit** or **Key Explorer** to show the live keys.
 
 🗣️ **What to speak:**
-> *"To conclude: **Valence 2.0** brings pure Rust safety, Thread-Per-Core lock-free concurrency, an $O(1)$ Timing Wheel, and Cloudinary media decoupling to high-scale backend systems.
+> *"To conclude: **Valence 2.0** brings pure Rust safety, Thread-Per-Core lock-free concurrency, an O(1) Timing Wheel, and Cloudinary media decoupling to high-scale backend systems.
 >
 > It gives engineering teams full Redis wire-protocol compatibility with up to 10x lower latency and 98% lower memory costs.
 >
