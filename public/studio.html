@@ -8386,7 +8386,7 @@
       const sortedNs = Object.entries(nsCounts).sort((a, b) => b[1] - a[1]);
       let accumulatedOffset = 0;
 
-      sortedNs.slice(0, 4).forEach(([prefix, count], idx) => {
+      sortedNs.slice(0, 8).forEach(([prefix, count], idx) => {
         const color = NS_PALETTE[idx % NS_PALETTE.length];
         const pct = (count / total);
         const sliceLen = pct * circumference;
@@ -8712,13 +8712,16 @@
 
         // Update Cloudinary ROI Card in Overview 100% dynamically
         if (mediaKeysCount > 0) {
-          const savedMb = (mediaKeysCount * 1.84);
+          const rawTotalMb = mediaKeysCount * 2.1;
+          const dbUsedMb = (mediaKeysCount * 16) / (1024 * 1024);
+          const savedMb = Math.max(0.1, rawTotalMb - dbUsedMb);
+          const pctSaved = ((savedMb / rawTotalMb) * 100).toFixed(1) + '%';
           const savedText = savedMb >= 1024 ? (savedMb / 1024).toFixed(1) + ' GB' : Math.round(savedMb) + ' MB';
-          document.getElementById('kpi-cld-val').innerText = '78.4%';
+          document.getElementById('kpi-cld-val').innerText = pctSaved;
           document.getElementById('cld-offload-gb').innerText = savedText;
           drawCldSavingsChart(savedMb);
           STATE.cldHistory.shift();
-          STATE.cldHistory.push(78.4);
+          STATE.cldHistory.push(parseFloat(pctSaved));
         } else {
           document.getElementById('kpi-cld-val').innerText = '0.0%';
           document.getElementById('cld-offload-gb').innerText = '0.0 MB';
