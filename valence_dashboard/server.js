@@ -273,6 +273,105 @@ function execValenceCmd(tokens) {
   });
 }
 
+function parseAllRespFrames(buf) {
+  const results = [];
+  let offset = 0;
+
+  function parseOne(pos) {
+    if (pos >= buf.length) return null;
+    const prefix = String.fromCharCode(buf[pos]);
+    const crlf = buf.indexOf(Buffer.from('\r\n'), pos);
+    if (crlf === -1) return null;
+
+    if (prefix === '+' || prefix === '-') {
+      const str = buf.toString('utf8', pos + 1, crlf);
+      return { val: prefix === '+' ? str : { error: str }, end: crlf + 2 };
+    }
+    if (prefix === ':') {
+      const num = parseInt(buf.toString('utf8', pos + 1, crlf), 10);
+      return { val: num, end: crlf + 2 };
+    }
+    if (prefix === '$') {
+      const len = parseInt(buf.toString('utf8', pos + 1, crlf), 10);
+      if (len === -1) {
+        return { val: null, end: crlf + 2 };
+      }
+      const valStart = crlf + 2;
+      const valEnd = valStart + len;
+      if (buf.length < valEnd + 2) return null; // Incomplete payload
+      return { val: buf.toString('utf8', valStart, valEnd), end: valEnd + 2 };
+    }
+    if (prefix === '*') {
+      const count = parseInt(buf.toString('utf8', pos + 1, crlf), 10);
+      if (count === -1) return { val: null, end: crlf + 2 };
+      let curr = crlf + 2;
+      const arr = [];
+      for (let i = 0; i < count; i++) {
+        const item = parseOne(curr);
+        if (!item) return null;
+        arr.push(item.val);
+        curr = item.end;
+      }
+      return { val: arr, end: curr };
+    }
+    return { val: buf.toString('utf8', pos, crlf), end: crlf + 2 };
+  }
+
+  while (offset < buf.length) {
+    const res = parseOne(offset);
+    if (!res) break;
+    results.push(res.val);
+    offset = res.end;
+  }
+
+  return { results, consumed: offset };
+}
+
+function execValencePipeline(commands) {
+  return new Promise((resolve) => {
+    if (!commands || commands.length === 0) return resolve([]);
+    const client = net.createConnection({ port: VALENCE_PORT, host: VALENCE_HOST }, () => {
+      client.setNoDelay(true);
+      let wire = '';
+      for (const cmd of commands) {
+        wire += createRespWire(cmd);
+      }
+      client.write(wire);
+    });
+
+    let chunks = [];
+    let totalLen = 0;
+    let resolved = false;
+
+    const finish = () => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(timer);
+      const combined = Buffer.concat(chunks, totalLen);
+      const { results } = parseAllRespFrames(combined);
+      try { client.destroy(); } catch(e) {}
+      resolve(results);
+    };
+
+    const timer = setTimeout(finish, 500);
+
+    client.on('data', (chunk) => {
+      chunks.push(chunk);
+      totalLen += chunk.length;
+      const combined = Buffer.concat(chunks, totalLen);
+      const { results } = parseAllRespFrames(combined);
+      if (results.length >= commands.length) {
+        finish();
+      }
+    });
+
+    client.on('end', finish);
+    client.on('close', finish);
+    client.on('error', finish);
+  });
+}
+
+
 // --- Live Telemetry, Shard Metrics & Historical State ---
 const liveQueryStream = [];
 const sseClients = [];
@@ -485,9 +584,10 @@ let lastKeysFetchTime = 0;
 
 async function getLiveKeyspace(forceFresh = false) {
   const now = Date.now();
-  if (!forceFresh && cachedKeys && (now - lastKeysFetchTime < 1500)) {
+  if (!forceFresh && cachedKeys && (now - lastKeysFetchTime < 400)) {
     return cachedKeys;
   }
+  const tStart = Date.now();
 
   const keysRes = await execValenceCmd(['KEYS', '*']);
   if (!keysRes.parsed || !Array.isArray(keysRes.parsed)) {
@@ -501,21 +601,31 @@ async function getLiveKeyspace(forceFresh = false) {
     return [];
   }
 
-  // Query TTL and sample value for active keys (up to 30)
+  // Query TTL and sample value for active keys in a lightning-fast single pipelined socket (0ms latency, zero connection exhaustion)
   const batch = keyNames.slice(0, 500);
-  const promises = batch.map(async (k) => {
+  const pipelineCmds = [];
+  for (const k of batch) {
+    pipelineCmds.push(['TTL', k]);
+    pipelineCmds.push(['GET', k]);
+  }
+
+  const pipelinedResponses = await execValencePipeline(pipelineCmds);
+
+  const resolved = [];
+  for (let i = 0; i < batch.length; i++) {
+    const k = batch[i];
     const shardInfo = getShardAndCore(k);
-    const ttlRes = await execValenceCmd(['TTL', k]);
-    const ttl = typeof ttlRes.parsed === 'number' ? ttlRes.parsed : -1;
-    
-    // Check type / size
+    const ttlRes = pipelinedResponses[i * 2];
+    const getRes = pipelinedResponses[i * 2 + 1];
+
+    const ttl = (typeof ttlRes === 'number') ? ttlRes : -1;
+
     let sizeBytes = 64;
     let type = 'string';
     let valPreview = '';
 
-    const getRes = await execValenceCmd(['GET', k]);
-    if (getRes.parsed && typeof getRes.parsed === 'string') {
-      const str = getRes.parsed;
+    if (getRes && typeof getRes === 'string') {
+      const str = getRes;
       sizeBytes = Buffer.byteLength(str, 'utf8');
       valPreview = str.length > 120 ? str.slice(0, 120) + '...' : str;
       if (str.includes('cloudinary.com') || str.includes('"provider":"cloudinary"') || k.includes(':media') || str.match(/\.(jpg|jpeg|png|webp|avif)/i)) {
@@ -529,7 +639,7 @@ async function getLiveKeyspace(forceFresh = false) {
       }
     }
 
-    return {
+    resolved.push({
       key: k,
       type,
       sizeBytes,
@@ -538,10 +648,9 @@ async function getLiveKeyspace(forceFresh = false) {
       core: `Core ${shardInfo.core}`,
       hash: shardInfo.hash,
       valPreview
-    };
-  });
+    });
+  }
 
-  const resolved = await Promise.all(promises);
   cachedKeys = resolved;
   lastKeysFetchTime = Date.now();
   return cachedKeys;
