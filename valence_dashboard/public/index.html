@@ -6081,47 +6081,47 @@
               <tbody id="tm-cmds-tbody">
                 <tr>
                   <td><span class="tm-cmd-badge get">GET</span></td>
-                  <td style="font-family:'JetBrains Mono',monospace;">64%</td>
-                  <td style="font-family:'JetBrains Mono',monospace;">128,420</td>
-                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">0.18 µs</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0%</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0</td>
+                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">--</td>
                   <td style="width:120px;">
-                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:64%; background:#38bdf8;"></div></div>
+                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:0%; background:#38bdf8;"></div></div>
                   </td>
                 </tr>
                 <tr>
                   <td><span class="tm-cmd-badge set">SET</span></td>
-                  <td style="font-family:'JetBrains Mono',monospace;">24%</td>
-                  <td style="font-family:'JetBrains Mono',monospace;">48,150</td>
-                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">0.22 µs</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0%</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0</td>
+                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">--</td>
                   <td style="width:120px;">
-                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:24%; background:#3ecf8e;"></div></div>
+                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:0%; background:#3ecf8e;"></div></div>
                   </td>
                 </tr>
                 <tr>
                   <td><span class="tm-cmd-badge expire">EXPIRE</span></td>
-                  <td style="font-family:'JetBrains Mono',monospace;">6%</td>
-                  <td style="font-family:'JetBrains Mono',monospace;">12,040</td>
-                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">0.19 µs</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0%</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0</td>
+                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">--</td>
                   <td style="width:120px;">
-                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:6%; background:#a855f7;"></div></div>
+                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:0%; background:#a855f7;"></div></div>
                   </td>
                 </tr>
                 <tr>
                   <td><span class="tm-cmd-badge del">DEL</span></td>
-                  <td style="font-family:'JetBrains Mono',monospace;">4%</td>
-                  <td style="font-family:'JetBrains Mono',monospace;">8,020</td>
-                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">0.21 µs</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0%</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0</td>
+                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">--</td>
                   <td style="width:120px;">
-                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:4%; background:#f43f5e;"></div></div>
+                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:0%; background:#f43f5e;"></div></div>
                   </td>
                 </tr>
                 <tr>
                   <td><span class="tm-cmd-badge mget">MGET</span></td>
-                  <td style="font-family:'JetBrains Mono',monospace;">2%</td>
-                  <td style="font-family:'JetBrains Mono',monospace;">4,010</td>
-                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">0.34 µs</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0%</td>
+                  <td style="font-family:'JetBrains Mono',monospace;">0</td>
+                  <td style="font-family:'JetBrains Mono',monospace; color:var(--text-secondary);">--</td>
                   <td style="width:120px;">
-                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:2%; background:#f59e0b;"></div></div>
+                    <div class="tm-hist-bar-track"><div class="tm-hist-bar-fill" style="width:0%; background:#f59e0b;"></div></div>
                   </td>
                 </tr>
               </tbody>
@@ -9848,6 +9848,7 @@
       drawCldSavingsChart(0);
       drawSparklines();
       initQueryWorkbench();
+      initCloudinaryView();
 
       pollTelemetry();
       pollSystemInfo();
@@ -11108,6 +11109,9 @@
             if (pctEl) pctEl.innerText = `${pct}%`;
             if (fillEl) fillEl.style.width = `${pct}%`;
             if (countEl) countEl.innerText = `${formatNumber(completed)} / ${formatNumber(total)} operations`;
+
+            // Live update telemetry metrics & command table while running!
+            pollTelemetry();
 
             if (!sData.running && pct >= 100) {
               clearInterval(benchPollTimer);

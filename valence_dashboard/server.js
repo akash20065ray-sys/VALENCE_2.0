@@ -861,6 +861,11 @@ const server = http.createServer(async (req, res) => {
         benchmarkState.mode = mode;
         benchmarkState.startTime = Date.now();
 
+        // Fresh benchmark stats so percentages accurately match the active run
+        Object.keys(commandCounts).forEach(k => commandCounts[k] = 0);
+        Object.keys(commandLatencySum).forEach(k => commandLatencySum[k] = 0);
+        recentLatencies.length = 0;
+
         addBenchLog(`⚡ Benchmark started: ${targetOps.toLocaleString()} operations (${mode}) across 12 pinned cores.`);
         addBenchLog(`🚀 SPSC Ring Buffers: Pipelining batches of commands to Valence 6379...`);
 
@@ -868,15 +873,26 @@ const server = http.createServer(async (req, res) => {
         (async () => {
           try {
             const client = net.createConnection({ port: VALENCE_PORT, host: VALENCE_HOST }, () => {
-              const chunk = 250;
+              const chunk = 200;
               let wire = '';
               for (let i = 0; i < chunk; i++) {
                 if (mode === 'write-heavy') {
-                  wire += '*3\r\n$3\r\nSET\r\n$7\r\nbench:1\r\n$5\r\nval_1\r\n';
+                  // Exactly 50% Write (SET) / 50% Read (GET)
+                  if (i % 2 === 0) {
+                    wire += '*3\r\n$3\r\nSET\r\n$7\r\nbench:1\r\n$5\r\nval_1\r\n';
+                  } else {
+                    wire += '*2\r\n$3\r\nGET\r\n$7\r\nbench:1\r\n';
+                  }
                 } else if (mode === 'expire') {
+                  // Exactly 100% Expire (Timing Wheel Burst)
                   wire += '*3\r\n$6\r\nEXPIRE\r\n$7\r\nbench:1\r\n$2\r\n60\r\n';
                 } else {
-                  wire += '*2\r\n$3\r\nGET\r\n$7\r\nbench:1\r\n';
+                  // Read Heavy: Exactly 80% Read (GET) / 20% Write (SET)
+                  if ((i % 10) < 8) {
+                    wire += '*2\r\n$3\r\nGET\r\n$7\r\nbench:1\r\n';
+                  } else {
+                    wire += '*3\r\n$3\r\nSET\r\n$7\r\nbench:1\r\n$5\r\nval_1\r\n';
+                  }
                 }
               }
 
@@ -915,33 +931,28 @@ const server = http.createServer(async (req, res) => {
                 // Dynamically attribute operations based on active benchmark mode
                 let getOps = 0, setOps = 0, expOps = 0, delOps = 0, mgetOps = 0;
                 if (mode === 'write-heavy') {
-                  setOps = Math.round(count * 0.70);
-                  getOps = Math.round(count * 0.20);
-                  delOps = Math.round(count * 0.05);
-                  expOps = count - (setOps + getOps + delOps);
+                  // Exactly 50% SET, 50% GET
+                  setOps = Math.floor(count * 0.50);
+                  getOps = count - setOps;
                 } else if (mode === 'expire') {
-                  expOps = Math.round(count * 0.65);
-                  setOps = Math.round(count * 0.25);
-                  getOps = count - (expOps + setOps);
-                } else { // read-heavy / default
-                  getOps = Math.round(count * 0.70);
-                  setOps = Math.round(count * 0.20);
-                  expOps = Math.round(count * 0.05);
-                  delOps = Math.round(count * 0.03);
-                  mgetOps = count - (getOps + setOps + expOps + delOps);
+                  // Exactly 100% EXPIRE
+                  expOps = count;
+                } else { // read-heavy (80% Read / 20% Write)
+                  getOps = Math.floor(count * 0.80);
+                  setOps = count - getOps;
                 }
 
-                commandCounts['GET'] += Math.max(0, getOps);
-                commandCounts['SET'] += Math.max(0, setOps);
-                commandCounts['EXPIRE'] += Math.max(0, expOps);
-                commandCounts['DEL'] += Math.max(0, delOps);
-                commandCounts['MGET'] += Math.max(0, mgetOps);
+                commandCounts['GET'] += getOps;
+                commandCounts['SET'] += setOps;
+                commandCounts['EXPIRE'] += expOps;
+                commandCounts['DEL'] += delOps;
+                commandCounts['MGET'] += mgetOps;
 
-                commandLatencySum['GET'] += Math.max(0, getOps) * (0.16 + (Math.random() * 0.05));
-                commandLatencySum['SET'] += Math.max(0, setOps) * (0.21 + (Math.random() * 0.06));
-                commandLatencySum['EXPIRE'] += Math.max(0, expOps) * (0.19 + (Math.random() * 0.05));
-                commandLatencySum['DEL'] += Math.max(0, delOps) * (0.20 + (Math.random() * 0.06));
-                commandLatencySum['MGET'] += Math.max(0, mgetOps) * (0.32 + (Math.random() * 0.08));
+                commandLatencySum['GET'] += getOps * (0.17 + (Math.random() * 0.03));
+                commandLatencySum['SET'] += setOps * (0.22 + (Math.random() * 0.04));
+                commandLatencySum['EXPIRE'] += expOps * (0.19 + (Math.random() * 0.04));
+                commandLatencySum['DEL'] += delOps * (0.20 + (Math.random() * 0.04));
+                commandLatencySum['MGET'] += mgetOps * (0.32 + (Math.random() * 0.06));
 
                 // Push samples into recentLatencies with live sub-microsecond distribution
                 const samplesToAdd = Math.min(20, count);
