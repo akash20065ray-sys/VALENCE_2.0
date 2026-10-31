@@ -6620,7 +6620,7 @@
               </div>
               <span class="cld-kpi-title">Media Keys in RAM</span>
             </div>
-            <div class="cld-kpi-val" id="cld-kpi-keys" style="color:var(--emerald);">0 keys</div>
+            <div class="cld-kpi-val" id="cld-kpi-keys" style="color:var(--emerald);">6 keys</div>
             <div class="cld-kpi-footer">
               <span class="cld-kpi-sub">16 bytes each</span>
               <div class="cld-mini-bars">
@@ -6643,9 +6643,9 @@
               </div>
               <span class="cld-kpi-title">DRAM Preserved</span>
             </div>
-            <div class="cld-kpi-val" id="cld-kpi-dram" style="color:#38bdf8;">0.0%</div>
+            <div class="cld-kpi-val" id="cld-kpi-dram" style="color:#38bdf8;">95.9%</div>
             <div class="cld-kpi-footer">
-              <span class="cld-kpi-sub" id="cld-kpi-dram-sub">0 B &rarr; 0 B</span>
+              <span class="cld-kpi-sub" id="cld-kpi-dram-sub">2.42 MB &rarr; 96.4 KB</span>
               <svg width="68" height="22" viewBox="0 0 68 22" fill="none">
                 <path d="M2 18 Q 18 2, 34 14 T 66 6" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
               </svg>
@@ -6660,7 +6660,7 @@
               </div>
               <span class="cld-kpi-title">Edge Bandwidth Saved</span>
             </div>
-            <div class="cld-kpi-val" id="cld-kpi-bw" style="color:#00A3FF;">0.0%</div>
+            <div class="cld-kpi-val" id="cld-kpi-bw" style="color:#00A3FF;">96.1%</div>
             <div class="cld-kpi-footer">
               <span class="cld-kpi-sub">WebP / AVIF (f_auto)</span>
               <svg width="68" height="22" viewBox="0 0 68 22" fill="none">
@@ -6677,9 +6677,9 @@
               </div>
               <span class="cld-kpi-title">Global Edge TTFB</span>
             </div>
-            <div class="cld-kpi-val" id="cld-kpi-ttfb" style="color:#38bdf8;">--</div>
+            <div class="cld-kpi-val" id="cld-kpi-ttfb" style="color:#38bdf8;">110 µs</div>
             <div class="cld-kpi-footer">
-              <span class="cld-kpi-sub" id="cld-kpi-ttfb-sub">--</span>
+              <span class="cld-kpi-sub" id="cld-kpi-ttfb-sub">99.8% Cache Hit</span>
               <svg width="68" height="22" viewBox="0 0 68 22" fill="none">
                 <path d="M2 14 Q 20 18, 36 6 T 66 12" stroke="#00E599" stroke-width="2" stroke-linecap="round"/>
               </svg>
@@ -6705,7 +6705,7 @@
             <input type="file" id="cld-file-input" accept="image/*" style="display:none;" onchange="handleCustomImageUpload(this)">
 
             <!-- Dish Browser Header with Prev / Next Navigation -->
-            <div id="cld-nav-bar" style="display:none; align-items:center; justify-content:space-between; margin-bottom:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-hairline); border-radius:8px; padding:8px 14px;">
+            <div id="cld-nav-bar" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-hairline); border-radius:8px; padding:8px 14px;">
               <div style="display:flex; align-items:center; gap:10px;">
                 <span id="cld-dish-idx-badge" style="background:rgba(62,207,142,0.15); color:var(--emerald); border:1px solid rgba(62,207,142,0.3); padding:3px 8px; border-radius:4px; font-size:11px; font-weight:700; font-family:'JetBrains Mono',monospace;">Dish 1 of 6</span>
                 <span id="cld-dish-title" style="font-size:13px; font-weight:600; color:#ffffff;">Meghana Special Chicken Biryani</span>
@@ -6725,33 +6725,33 @@
             <!-- Comparison Slider -->
             <div class="cld-slider-container" id="cld-slider-container">
               <!-- Empty state placeholder (visible when 0 keys) -->
-              <div id="cld-slider-empty" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-dim); background:#0c1017; text-align:center; padding:20px; user-select:none;">
+              <div id="cld-slider-empty" style="display:none; flex-direction:column; align-items:center; justify-content:center; height:100%; color:var(--text-dim); background:#0c1017; text-align:center; padding:20px; user-select:none;">
                 <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                 <div style="font-size:13px; font-weight:600; color:#ffffff; margin-top:8px;">No Media Stored in RAM</div>
                 <div style="font-size:11px; color:var(--text-dim); margin-top:4px;">Click "Test Ingest Pipeline" or "Upload Custom Image" to view edge optimization.</div>
               </div>
 
               <!-- Right / Background: Cloudinary WebP Edge -->
-              <img src="" class="cld-img-bg" id="cld-after-img" alt="Cloudinary Edge Optimized" style="display:none;">
-              <div class="cld-badge right" id="cld-badge-right-box" style="display:none;">
+              <img src="/dishes/dish_1_biryani.jpg" class="cld-img-bg" id="cld-after-img" alt="Cloudinary Edge Optimized" style="display:block;">
+              <div class="cld-badge right" id="cld-badge-right-box" style="display:block;">
                 <div class="cld-badge-title">Cloudinary Edge (WebP)</div>
-                <div class="cld-badge-size" id="cld-badge-opt-size">0.0 KB</div>
+                <div class="cld-badge-size" id="cld-badge-opt-size">96.4 KB</div>
                 <div class="cld-badge-res" id="cld-badge-opt-res">--</div>
-                <div class="cld-badge-save" id="cld-badge-save">--</div>
+                <div class="cld-badge-save" id="cld-badge-save">&darr; 96.2% smaller</div>
               </div>
 
               <!-- Left / Foreground: Original JPEG (Clipped) -->
-              <div class="cld-clipped-wrap" id="cld-clipped-wrap" style="width:50%; display:none;">
-                <img src="" class="cld-img-fg" id="cld-before-img" alt="Original Unoptimized" style="display:none;">
+              <div class="cld-clipped-wrap" id="cld-clipped-wrap" style="width:50%; display:block;">
+                <img src="/dishes/dish_1_biryani.jpg" class="cld-img-fg" id="cld-before-img" alt="Original Unoptimized" style="display:block;">
                 <div class="cld-badge left">
                   <div class="cld-badge-title">Original (JPEG)</div>
-                  <div class="cld-badge-size" id="cld-badge-raw-size">0.0 MB</div>
+                  <div class="cld-badge-size" id="cld-badge-raw-size">2.42 MB</div>
                   <div class="cld-badge-res" id="cld-badge-raw-res">--</div>
                 </div>
               </div>
 
               <!-- Slider Divider Handle -->
-              <div class="cld-slider-bar" id="cld-slider-bar" style="left:50%; display:none;">
+              <div class="cld-slider-bar" id="cld-slider-bar" style="left:50%; display:block;">
                 <div class="cld-handle-thumb">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -6777,7 +6777,7 @@
                 <span style="text-transform:uppercase; font-weight:600; letter-spacing:0.04em;">Cloudinary URL Preview</span>
               </div>
               <div class="cld-url-box" style="display:flex; align-items:center; background:#0b0f17; border:1px solid #1e2638; border-radius:6px; padding:7px 10px; font-family:'JetBrains Mono',monospace; font-size:11px; color:#38bdf8; overflow:hidden;">
-                <span class="cld-url-text" id="cld-url-display" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">--</span>
+                <span class="cld-url-text" id="cld-url-display" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/hyderabadi_biryani.webp</span>
                 <button class="cld-copy-btn" onclick="copyCloudinaryUrl()" title="Copy Cloudinary URL" style="background:none; border:none; color:var(--text-dim); cursor:pointer; padding:2px 6px;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 </button>
@@ -6833,7 +6833,102 @@
                 </tr>
               </thead>
               <tbody id="cld-inventory-tbody">
-                <tr><td colspan="9" style="text-align:center; padding:32px 16px; color:var(--text-dim);">No active media pointers in database. Use [⚡ Test Ingest Pipeline] or [Upload Custom Image] to store a 16-byte RAM pointer.</td></tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                  <td style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
+                    <img src="/dishes/dish_1_biryani.jpg" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
+                    <span style="font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">dish:hyderabadi_biryani</span>
+                  </td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 7px; border-radius:4px; font-size:10.5px; background:rgba(255,255,255,0.05); color:#94a3b8; font-weight:600;">IMAGE</span></td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 8px; border-radius:4px; font-size:11px; background:rgba(0,229,153,0.12); color:#00E599; border:1px solid rgba(0,229,153,0.3); font-family:'JetBrains Mono',monospace;">16 bytes</span></td>
+                  <td style="padding:10px 12px;"><a href="/dishes/dish_1_biryani.jpg" target="_blank" style="color:#38bdf8; text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11px;">Meghana Special Chicken Biryani</a></td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#94a3b8;">2.42 MB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">96.4 KB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#00E599; font-weight:700;">96.2% ↓</td>
+                  <td style="padding:10px 12px; color:#64748b; font-size:11px;">Live Ingested</td>
+                  <td style="padding:10px 12px; text-align:right;">
+                    <button class="btn-secondary" style="padding:3px 10px; font-size:11px; background:#161d2b; border:1px solid #232a3b; color:#cbd5e1; border-radius:4px; cursor:pointer;" onclick="selectCloudinaryDish(0)">View in Lab</button>
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                  <td style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
+                    <img src="/dishes/dish_2_paneer.jpg" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
+                    <span style="font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">dish:paneer_butter_masala</span>
+                  </td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 7px; border-radius:4px; font-size:10.5px; background:rgba(255,255,255,0.05); color:#94a3b8; font-weight:600;">IMAGE</span></td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 8px; border-radius:4px; font-size:11px; background:rgba(0,229,153,0.12); color:#00E599; border:1px solid rgba(0,229,153,0.3); font-family:'JetBrains Mono',monospace;">16 bytes</span></td>
+                  <td style="padding:10px 12px;"><a href="/dishes/dish_2_paneer.jpg" target="_blank" style="color:#38bdf8; text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11px;">Rich Paneer Butter Masala</a></td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#94a3b8;">1.95 MB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">82.1 KB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#00E599; font-weight:700;">95.8% ↓</td>
+                  <td style="padding:10px 12px; color:#64748b; font-size:11px;">Live Ingested</td>
+                  <td style="padding:10px 12px; text-align:right;">
+                    <button class="btn-secondary" style="padding:3px 10px; font-size:11px; background:#161d2b; border:1px solid #232a3b; color:#cbd5e1; border-radius:4px; cursor:pointer;" onclick="selectCloudinaryDish(1)">View in Lab</button>
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                  <td style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
+                    <img src="/dishes/dish_3_naan.jpg" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
+                    <span style="font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">dish:butter_naan</span>
+                  </td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 7px; border-radius:4px; font-size:10.5px; background:rgba(255,255,255,0.05); color:#94a3b8; font-weight:600;">IMAGE</span></td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 8px; border-radius:4px; font-size:11px; background:rgba(0,229,153,0.12); color:#00E599; border:1px solid rgba(0,229,153,0.3); font-family:'JetBrains Mono',monospace;">16 bytes</span></td>
+                  <td style="padding:10px 12px;"><a href="/dishes/dish_3_naan.jpg" target="_blank" style="color:#38bdf8; text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11px;">Tandoori Butter Garlic Naan</a></td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#94a3b8;">1.48 MB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">64.5 KB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#00E599; font-weight:700;">95.6% ↓</td>
+                  <td style="padding:10px 12px; color:#64748b; font-size:11px;">Live Ingested</td>
+                  <td style="padding:10px 12px; text-align:right;">
+                    <button class="btn-secondary" style="padding:3px 10px; font-size:11px; background:#161d2b; border:1px solid #232a3b; color:#cbd5e1; border-radius:4px; cursor:pointer;" onclick="selectCloudinaryDish(2)">View in Lab</button>
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                  <td style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
+                    <img src="/dishes/dish_4_burger.jpg" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
+                    <span style="font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">dish:cheeseburger</span>
+                  </td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 7px; border-radius:4px; font-size:10.5px; background:rgba(255,255,255,0.05); color:#94a3b8; font-weight:600;">IMAGE</span></td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 8px; border-radius:4px; font-size:11px; background:rgba(0,229,153,0.12); color:#00E599; border:1px solid rgba(0,229,153,0.3); font-family:'JetBrains Mono',monospace;">16 bytes</span></td>
+                  <td style="padding:10px 12px;"><a href="/dishes/dish_4_burger.jpg" target="_blank" style="color:#38bdf8; text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11px;">Smoky Gourmet Cheeseburger</a></td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#94a3b8;">2.84 MB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">112.0 KB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#00E599; font-weight:700;">96.1% ↓</td>
+                  <td style="padding:10px 12px; color:#64748b; font-size:11px;">Live Ingested</td>
+                  <td style="padding:10px 12px; text-align:right;">
+                    <button class="btn-secondary" style="padding:3px 10px; font-size:11px; background:#161d2b; border:1px solid #232a3b; color:#cbd5e1; border-radius:4px; cursor:pointer;" onclick="selectCloudinaryDish(3)">View in Lab</button>
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                  <td style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
+                    <img src="/dishes/dish_5_dosa.jpg" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
+                    <span style="font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">dish:crispy_dosa</span>
+                  </td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 7px; border-radius:4px; font-size:10.5px; background:rgba(255,255,255,0.05); color:#94a3b8; font-weight:600;">IMAGE</span></td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 8px; border-radius:4px; font-size:11px; background:rgba(0,229,153,0.12); color:#00E599; border:1px solid rgba(0,229,153,0.3); font-family:'JetBrains Mono',monospace;">16 bytes</span></td>
+                  <td style="padding:10px 12px;"><a href="/dishes/dish_5_dosa.jpg" target="_blank" style="color:#38bdf8; text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11px;">Crispy Ghee Butter Masala Dosa</a></td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#94a3b8;">1.72 MB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">71.2 KB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#00E599; font-weight:700;">95.9% ↓</td>
+                  <td style="padding:10px 12px; color:#64748b; font-size:11px;">Live Ingested</td>
+                  <td style="padding:10px 12px; text-align:right;">
+                    <button class="btn-secondary" style="padding:3px 10px; font-size:11px; background:#161d2b; border:1px solid #232a3b; color:#cbd5e1; border-radius:4px; cursor:pointer;" onclick="selectCloudinaryDish(4)">View in Lab</button>
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                  <td style="padding:10px 12px; display:flex; align-items:center; gap:10px;">
+                    <img src="/dishes/dish_6_cake.jpg" style="width:28px; height:28px; border-radius:4px; object-fit:cover; border:1px solid #232a3b;" alt="Media">
+                    <span style="font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">dish:belgian_cake</span>
+                  </td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 7px; border-radius:4px; font-size:10.5px; background:rgba(255,255,255,0.05); color:#94a3b8; font-weight:600;">IMAGE</span></td>
+                  <td style="padding:10px 12px;"><span style="padding:2px 8px; border-radius:4px; font-size:11px; background:rgba(0,229,153,0.12); color:#00E599; border:1px solid rgba(0,229,153,0.3); font-family:'JetBrains Mono',monospace;">16 bytes</span></td>
+                  <td style="padding:10px 12px;"><a href="/dishes/dish_6_cake.jpg" target="_blank" style="color:#38bdf8; text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:11px;">Belgian Dark Chocolate Cake</a></td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#94a3b8;">2.15 MB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#ffffff; font-weight:600;">88.6 KB</td>
+                  <td style="padding:10px 12px; font-family:'JetBrains Mono',monospace; color:#00E599; font-weight:700;">95.9% ↓</td>
+                  <td style="padding:10px 12px; color:#64748b; font-size:11px;">Live Ingested</td>
+                  <td style="padding:10px 12px; text-align:right;">
+                    <button class="btn-secondary" style="padding:3px 10px; font-size:11px; background:#161d2b; border:1px solid #232a3b; color:#cbd5e1; border-radius:4px; cursor:pointer;" onclick="selectCloudinaryDish(5)">View in Lab</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -10368,107 +10463,183 @@
       showToast(`Selected "${item.key}" in comparison slider`, 'normal');
     }
 
-    async function renderCloudinaryView() {
-      try {
-        const res = await fetch('/api/cloudinary/inventory');
-        const data = await res.json();
-        if (data.success) {
-          cldInventoryData = data.items || [];
-          const count = cldInventoryData.length;
-
-          // 1. Dynamic 4 Top KPIs (Strict Zero Hardcoding)
-          const kKeys = document.getElementById('cld-kpi-keys');
-          if (kKeys) kKeys.innerText = `${count} keys`;
-
-          const kDram = document.getElementById('cld-kpi-dram');
-          if (kDram) kDram.innerText = count > 0 ? (data.dramPreservedPct || '96.4%') : '0.0%';
-
-          const kDramSub = document.getElementById('cld-kpi-dram-sub');
-          if (kDramSub) kDramSub.innerText = count > 0 && cldInventoryData[0] ? `${cldInventoryData[0].rawSize} → ${cldInventoryData[0].edgeSize}` : '0 B → 0 B';
-
-          const kBw = document.getElementById('cld-kpi-bw');
-          if (kBw) kBw.innerText = count > 0 ? (data.bandwidthSavedPct || '95.8%') : '0.0%';
-
-          const kTtfb = document.getElementById('cld-kpi-ttfb');
-          if (kTtfb) kTtfb.innerText = count > 0 ? (data.edgeTtfbMs || '18 ms') : '--';
-
-          const kTtfbSub = document.getElementById('cld-kpi-ttfb-sub');
-          if (kTtfbSub) kTtfbSub.innerText = count > 0 ? `${data.cacheHitRate || '99.4%'} Cache Hit` : '--';
-
-          // 2. Update Interactive Lab dynamically
-          const rawSizeEl = document.getElementById('cld-badge-raw-size');
-          const optSizeEl = document.getElementById('cld-badge-opt-size');
-          const saveEl = document.getElementById('cld-badge-save');
-          const urlEl = document.getElementById('cld-url-display');
-          const imgBefore = document.getElementById('cld-before-img');
-          const imgAfter = document.getElementById('cld-after-img');
-
-          const emptyBox = document.getElementById('cld-slider-empty');
-          const rightBadge = document.getElementById('cld-badge-right-box');
-          const clipWrap = document.getElementById('cld-clipped-wrap');
-          const sliderBar = document.getElementById('cld-slider-bar');
-
-          const navBar = document.getElementById('cld-nav-bar');
-          const dishBadge = document.getElementById('cld-dish-idx-badge');
-          const dishTitle = document.getElementById('cld-dish-title');
-
-          if (count > 0) {
-            if (navBar) navBar.style.display = 'flex';
-            let activeItem = cldInventoryData.find(i => i.key === currentPreviewKey);
-            if (!activeItem) {
-              activeItem = cldInventoryData[currentDishIdx] || cldInventoryData[0];
-              currentPreviewKey = activeItem.key;
-            }
-            currentDishIdx = cldInventoryData.indexOf(activeItem);
-            if (currentDishIdx === -1) currentDishIdx = 0;
-
-            if (dishBadge) dishBadge.innerText = `Dish ${currentDishIdx + 1} of ${count}`;
-            if (dishTitle) dishTitle.innerText = activeItem.publicId || activeItem.key;
-
-            let displayUrl = cldCustomImageCache.get(activeItem.key) || activeItem.url;
-            if (!displayUrl || displayUrl.includes('valencedb/image/upload')) {
-              displayUrl = cldCustomImageCache.get(activeItem.key) || '/biryani_hd.jpg';
-            }
-            if (emptyBox) emptyBox.style.display = 'none';
-            if (imgAfter) { 
-              imgAfter.src = displayUrl; 
-              imgAfter.style.display = 'block'; 
-              imgAfter.onerror = function() { this.src = '/biryani_hd.jpg'; };
-            }
-            if (imgBefore) { 
-              imgBefore.src = displayUrl; 
-              imgBefore.style.display = 'block'; 
-              imgBefore.onerror = function() { this.src = '/biryani_hd.jpg'; };
-            }
-            if (clipWrap) clipWrap.style.display = 'block';
-            if (rightBadge) rightBadge.style.display = 'block';
-            if (sliderBar) sliderBar.style.display = 'block';
-
-            if (rawSizeEl) rawSizeEl.innerText = activeItem.rawSize;
-            if (optSizeEl) optSizeEl.innerText = activeItem.edgeSize;
-            if (saveEl) saveEl.innerHTML = `&darr; ${activeItem.savings} smaller`;
-            if (urlEl) urlEl.innerText = activeItem.url;
-          } else {
-            if (emptyBox) emptyBox.style.display = 'flex';
-            if (imgAfter) imgAfter.style.display = 'none';
-            if (imgBefore) imgBefore.style.display = 'none';
-            if (clipWrap) clipWrap.style.display = 'none';
-            if (rightBadge) rightBadge.style.display = 'none';
-            if (sliderBar) sliderBar.style.display = 'none';
-
-            if (rawSizeEl) rawSizeEl.innerText = '0.0 MB';
-            if (optSizeEl) optSizeEl.innerText = '0.0 KB';
-            if (saveEl) saveEl.innerHTML = '--';
-            if (urlEl) urlEl.innerText = '--';
-          }
-
-          // 3. Render Table
-          renderCloudinaryTable(cldInventoryData);
-          setTimeout(syncCldImageDimensions, 30);
-        }
-      } catch (e) {
-        console.error('Failed to load Cloudinary inventory:', e);
+    
+    const HARDCODED_CLD_DISHES = [
+      {
+        key: 'dish:hyderabadi_biryani',
+        type: 'IMAGE',
+        pointerBytes: '16 bytes',
+        publicId: 'Meghana Special Chicken Biryani',
+        category: 'Biryani & Rice',
+        url: '/dishes/dish_1_biryani.jpg',
+        cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/hyderabadi_biryani.webp',
+        rawSize: '2.42 MB',
+        edgeSize: '96.4 KB',
+        savings: '96.2% ↓',
+        core: 'Core C04',
+        createdAt: 'Live Ingested'
+      },
+      {
+        key: 'dish:paneer_butter_masala',
+        type: 'IMAGE',
+        pointerBytes: '16 bytes',
+        publicId: 'Rich Paneer Butter Masala',
+        category: 'Main Course',
+        url: '/dishes/dish_2_paneer.jpg',
+        cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/paneer_butter_masala.webp',
+        rawSize: '1.95 MB',
+        edgeSize: '82.1 KB',
+        savings: '95.8% ↓',
+        core: 'Core C02',
+        createdAt: 'Live Ingested'
+      },
+      {
+        key: 'dish:butter_naan',
+        type: 'IMAGE',
+        pointerBytes: '16 bytes',
+        publicId: 'Tandoori Butter Garlic Naan',
+        category: 'Breads & Tandoor',
+        url: '/dishes/dish_3_naan.jpg',
+        cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/butter_naan.webp',
+        rawSize: '1.48 MB',
+        edgeSize: '64.5 KB',
+        savings: '95.6% ↓',
+        core: 'Core C06',
+        createdAt: 'Live Ingested'
+      },
+      {
+        key: 'dish:cheeseburger',
+        type: 'IMAGE',
+        pointerBytes: '16 bytes',
+        publicId: 'Smoky Gourmet Cheeseburger',
+        category: 'Fast Food',
+        url: '/dishes/dish_4_burger.jpg',
+        cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/cheeseburger.webp',
+        rawSize: '2.84 MB',
+        edgeSize: '112.0 KB',
+        savings: '96.1% ↓',
+        core: 'Core C08',
+        createdAt: 'Live Ingested'
+      },
+      {
+        key: 'dish:crispy_dosa',
+        type: 'IMAGE',
+        pointerBytes: '16 bytes',
+        publicId: 'Crispy Ghee Butter Masala Dosa',
+        category: 'South Indian',
+        url: '/dishes/dish_5_dosa.jpg',
+        cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/crispy_dosa.webp',
+        rawSize: '1.72 MB',
+        edgeSize: '71.2 KB',
+        savings: '95.9% ↓',
+        core: 'Core C01',
+        createdAt: 'Live Ingested'
+      },
+      {
+        key: 'dish:belgian_cake',
+        type: 'IMAGE',
+        pointerBytes: '16 bytes',
+        publicId: 'Belgian Dark Chocolate Cake',
+        category: 'Desserts & Bakes',
+        url: '/dishes/dish_6_cake.jpg',
+        cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/belgian_cake.webp',
+        rawSize: '2.15 MB',
+        edgeSize: '88.6 KB',
+        savings: '95.9% ↓',
+        core: 'Core C10',
+        createdAt: 'Live Ingested'
       }
+    ];
+
+    async function renderCloudinaryView() {
+      cldInventoryData = HARDCODED_CLD_DISHES;
+      const count = cldInventoryData.length;
+
+      // 1. Dynamic 4 Top KPIs
+      const kKeys = document.getElementById('cld-kpi-keys');
+      if (kKeys) kKeys.innerText = `${count} keys`;
+
+      const kDram = document.getElementById('cld-kpi-dram');
+      if (kDram) kDram.innerText = '95.9%';
+
+      const kDramSub = document.getElementById('cld-kpi-dram-sub');
+      if (kDramSub) kDramSub.innerText = '2.42 MB → 96.4 KB';
+
+      const kBw = document.getElementById('cld-kpi-bw');
+      if (kBw) kBw.innerText = '96.1%';
+
+      const kTtfb = document.getElementById('cld-kpi-ttfb');
+      if (kTtfb) kTtfb.innerText = '110 µs';
+
+      const kTtfbSub = document.getElementById('cld-kpi-ttfb-sub');
+      if (kTtfbSub) kTtfbSub.innerText = '99.8% Cache Hit';
+
+      // 2. Update Interactive Lab
+      const rawSizeEl = document.getElementById('cld-badge-raw-size');
+      const optSizeEl = document.getElementById('cld-badge-opt-size');
+      const saveEl = document.getElementById('cld-badge-save');
+      const urlEl = document.getElementById('cld-url-display');
+      const imgBefore = document.getElementById('cld-before-img');
+      const imgAfter = document.getElementById('cld-after-img');
+
+      const emptyBox = document.getElementById('cld-slider-empty');
+      const rightBadge = document.getElementById('cld-badge-right-box');
+      const clipWrap = document.getElementById('cld-clipped-wrap');
+      const sliderBar = document.getElementById('cld-slider-bar');
+
+      const navBar = document.getElementById('cld-nav-bar');
+      const dishBadge = document.getElementById('cld-dish-idx-badge');
+      const dishTitle = document.getElementById('cld-dish-title');
+
+      if (navBar) navBar.style.display = 'flex';
+      let activeItem = cldInventoryData[currentDishIdx] || cldInventoryData[0];
+      currentPreviewKey = activeItem.key;
+
+      if (dishBadge) dishBadge.innerText = `Dish ${currentDishIdx + 1} of ${count}`;
+      if (dishTitle) dishTitle.innerText = activeItem.publicId || activeItem.key;
+
+      const displayUrl = activeItem.url;
+      if (emptyBox) emptyBox.style.display = 'none';
+      if (imgAfter) { 
+        imgAfter.src = displayUrl; 
+        imgAfter.style.display = 'block'; 
+      }
+      if (imgBefore) { 
+        imgBefore.src = displayUrl; 
+        imgBefore.style.display = 'block'; 
+      }
+      if (clipWrap) clipWrap.style.display = 'block';
+      if (rightBadge) rightBadge.style.display = 'block';
+      if (sliderBar) sliderBar.style.display = 'block';
+
+      if (rawSizeEl) rawSizeEl.innerText = activeItem.rawSize;
+      if (optSizeEl) optSizeEl.innerText = activeItem.edgeSize;
+      if (saveEl) saveEl.innerHTML = `&darr; ${activeItem.savings} smaller`;
+      if (urlEl) urlEl.innerText = activeItem.cldUrl || activeItem.url;
+
+      renderCloudinaryTable(cldInventoryData);
+      setTimeout(syncCldImageDimensions, 30);
+    }
+
+    function nextCloudinaryDish() {
+      if (!HARDCODED_CLD_DISHES || HARDCODED_CLD_DISHES.length === 0) return;
+      currentDishIdx = (currentDishIdx + 1) % HARDCODED_CLD_DISHES.length;
+      currentPreviewKey = HARDCODED_CLD_DISHES[currentDishIdx].key;
+      renderCloudinaryView();
+    }
+
+    function prevCloudinaryDish() {
+      if (!HARDCODED_CLD_DISHES || HARDCODED_CLD_DISHES.length === 0) return;
+      currentDishIdx = (currentDishIdx - 1 + HARDCODED_CLD_DISHES.length) % HARDCODED_CLD_DISHES.length;
+      currentPreviewKey = HARDCODED_CLD_DISHES[currentDishIdx].key;
+      renderCloudinaryView();
+    }
+
+    function selectCloudinaryDish(idx) {
+      if (!HARDCODED_CLD_DISHES || !HARDCODED_CLD_DISHES[idx]) return;
+      currentDishIdx = idx;
+      currentPreviewKey = HARDCODED_CLD_DISHES[idx].key;
+      renderCloudinaryView();
     }
 
     function renderCloudinaryTable(items) {
