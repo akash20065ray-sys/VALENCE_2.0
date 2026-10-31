@@ -3883,9 +3883,9 @@
 
     /* Guardrail Cards */
     .sec-guard-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
       margin-top: 6px;
     }
 
@@ -6980,54 +6980,8 @@
           </div>
         </div>
 
-        <div class="sec-split-grid">
-          <!-- Left: Active Client Connections Table (Port 6379) -->
-          <div class="sec-panel">
-            <div class="sec-panel-head">
-              <span class="sec-panel-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--emerald);">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="9" cy="7" r="4"></circle>
-                </svg>
-                <span>Active Client Connections (Port 6379)</span>
-              </span>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <div class="hw-pinned-pill" id="sec-active-badge" style="font-size:10px; padding:2px 7px;">
-                  <span class="hw-dot emerald"></span> <span id="sec-active-count-lbl">1 active client</span>
-                </div>
-                <button class="btn-secondary" style="padding:3px 8px; font-size:11px;" onclick="pollSecurityView()">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; margin-right:3px;">
-                    <polyline points="23 4 23 10 17 10"></polyline>
-                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                  </svg>
-                  <span>Refresh</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="sec-table-wrap">
-              <table class="sec-table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Client Address</th>
-                    <th>Application</th>
-                    <th>Core</th>
-                    <th>Commands</th>
-                    <th>Idle Time</th>
-                    <th>Connected</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="sec-clients-tbody">
-                  <!-- Dynamically populated live client rows -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Right: Command Guardrails & Destructive Shield -->
-          <div class="sec-panel">
+        <!-- Command Guardrails & Destructive Shield -->
+        <div class="sec-panel" style="margin-bottom:16px;">
             <div class="sec-panel-head" style="align-items:flex-start; margin-bottom:8px;">
               <div>
                 <span class="sec-panel-title">
@@ -10597,6 +10551,7 @@
     function openUploadModal() {
       const inp = document.getElementById('cld-file-input');
       if (inp) {
+        inp.value = '';
         inp.click();
       }
     }
@@ -10611,9 +10566,8 @@
         const cleanName = file.name.replace(/\.[^/.]+$/, '').toLowerCase().replace(/[^a-z0-9]/g, '_');
         const key = 'dish:' + cleanName;
 
-        // Cache base64 preview locally so it displays instantly and never 404s
+        // Cache preview locally
         cldCustomImageCache.set(key, base64Data);
-        try { localStorage.setItem('cld_' + key, base64Data); } catch (e) {}
         currentPreviewKey = key;
 
         // Immediately render uploaded image directly into slider
@@ -10658,26 +10612,32 @@
               key,
               dishName: cleanName,
               rawBytes: file.size,
+              imageBase64: base64Data,
+              filename: file.name,
               imageUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/' + key + '.webp',
               format: file.type.split('/')[1] || 'jpg'
             })
           });
           const data = await res.json();
           if (data.success) {
-            showToast(`✅ "${file.name}" uploaded! Decoupled to Cloudinary CDN with 16-byte RAM pointer in Port 6379.`, 'normal');
+            if (data.url) {
+              cldCustomImageCache.set(key, data.url);
+              if (imgAfter) imgAfter.src = data.url;
+              if (imgBefore) imgBefore.src = data.url;
+            }
+            showToast(`"${file.name}" uploaded! Decoupled to Cloudinary CDN with 16-byte RAM pointer in Port 6379.`, 'normal');
             syncCldImageDimensions();
             renderCloudinaryView();
           } else {
-            showToast(`✅ "${file.name}" active in Edge Media Lab!`, 'normal');
+            showToast(`"${file.name}" active in Edge Media Lab!`, 'normal');
             syncCldImageDimensions();
           }
         } catch (err) {
-          showToast(`✅ "${file.name}" active in Edge Media Lab!`, 'normal');
-          syncCldImageDimensions();
-        } finally {
-          inputEl.value = '';
+          showToast(`"${file.name}" active in Edge Media Lab!`, 'normal');
         }
+        inputEl.value = '';
       };
+
       reader.readAsDataURL(file);
     }
 

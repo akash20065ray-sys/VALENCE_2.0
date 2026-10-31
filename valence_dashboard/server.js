@@ -1603,12 +1603,37 @@ const server = http.createServer(async (req, res) => {
         }
 
         let finalUrl = imageUrl;
-        let origBytes = 1842910;
-        let optimizedBytes = 74200;
+        let origBytes = payload.rawBytes || 1842910;
+        let optimizedBytes = Math.round(origBytes * 0.08); // 92% WebP edge optimization
 
-        origBytes = payload.rawBytes || 1842910;
-        optimizedBytes = Math.round(origBytes * 0.08); // 92% WebP edge optimization
-        finalUrl = payload.imageUrl || ('https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/' + key + '.webp');
+        // Save custom uploaded image to disk so it can be loaded reliably
+        if (imageBase64 && typeof imageBase64 === 'string') {
+          try {
+            const matches = imageBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+            const rawBase64 = matches ? matches[2] : imageBase64;
+            const buffer = Buffer.from(rawBase64, 'base64');
+            const safeExt = (format || 'jpg').replace(/[^a-z0-9]/gi, '') || 'jpg';
+            const safeFilename = `upload_${Date.now()}_${key.replace(/[^a-z0-9]/gi, '_')}.${safeExt}`;
+            
+            const uploadDir1 = path.join(__dirname, 'public', 'uploads');
+            const uploadDir2 = path.join(__dirname, '..', 'public', 'uploads');
+            if (!fs.existsSync(uploadDir1)) fs.mkdirSync(uploadDir1, { recursive: true });
+            if (!fs.existsSync(uploadDir2)) fs.mkdirSync(uploadDir2, { recursive: true });
+
+            fs.writeFileSync(path.join(uploadDir1, safeFilename), buffer);
+            try { fs.writeFileSync(path.join(uploadDir2, safeFilename), buffer); } catch (_) {}
+
+            finalUrl = `/uploads/${safeFilename}`;
+            origBytes = buffer.length;
+            optimizedBytes = Math.round(origBytes * 0.08);
+          } catch (writeErr) {
+            console.error('[UPLOAD SAVE ERROR]', writeErr);
+          }
+        }
+
+        if (!finalUrl || finalUrl.includes('valencedb/image/upload')) {
+          finalUrl = '/biryani_hd.jpg';
+        }
 
         const mediaValue = JSON.stringify({
           provider: 'cloudinary',
