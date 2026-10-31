@@ -1,17 +1,18 @@
 
 // --- Cloudinary Dynamic Edge Media Helper ---
 function getCloudinaryMediaUrl(rawUrl, name = 'dish') {
-  if (!rawUrl) {
-    const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-    return `https://res.cloudinary.com/demo/image/upload/f_auto,q_auto:good,w_400,c_fill,g_auto:food/dishes/${slug}.jpg`;
+  if (rawUrl && typeof rawUrl === 'string') {
+    if (rawUrl.startsWith('/')) return rawUrl;
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) return rawUrl;
   }
-  if (rawUrl.includes('cloudinary.com')) {
-    if (rawUrl.includes('/image/upload/') && !rawUrl.includes('f_auto')) {
-      return rawUrl.replace('/image/upload/', '/image/upload/f_auto,q_auto:good,w_400,c_fill,g_auto:food/');
-    }
-    return rawUrl;
-  }
-  return `https://res.cloudinary.com/demo/image/fetch/f_auto,q_auto:good,w_400,c_fill,g_auto:food/${encodeURIComponent(rawUrl)}`;
+  const n = (name || '').toLowerCase();
+  if (n.includes('biryani') || n.includes('rice') || n.includes('chicken') || n.includes('65')) return '/dishes/dish_1_biryani.jpg';
+  if (n.includes('paneer') || n.includes('dal') || n.includes('curry')) return '/dishes/dish_2_paneer.jpg';
+  if (n.includes('naan') || n.includes('roti') || n.includes('bread')) return '/dishes/dish_3_naan.jpg';
+  if (n.includes('burger') || n.includes('whopper') || n.includes('fries')) return '/dishes/dish_4_burger.jpg';
+  if (n.includes('dosa') || n.includes('idli') || n.includes('south')) return '/dishes/dish_5_dosa.jpg';
+  if (n.includes('cake') || n.includes('waffle') || n.includes('dessert') || n.includes('chocolate')) return '/dishes/dish_6_cake.jpg';
+  return '/dishes/dish_1_biryani.jpg';
 }
 
 // ==============================================================================
@@ -163,7 +164,7 @@ async function loadFeed() {
 function renderCategories(cats) {
   categoryScrollRow.innerHTML = cats.map(c => `
     <div class="category-item" onclick="filterCuisine('${c.name}')">
-      <img src="${getCloudinaryMediaUrl(c.image, c.name)}" alt="${c.name}">
+      <img src="${getCloudinaryMediaUrl(c.image, c.name)}" onerror="this.src='/dishes/dish_1_biryani.jpg'" alt="${c.name}">
     </div>
   `).join('');
 }
@@ -172,7 +173,7 @@ function renderRestaurants(rests) {
   restaurantsGrid.innerHTML = rests.map(r => `
     <div class="rest-card" onclick="openRestaurantMenu('${r.id}')">
       <div class="rest-img-wrap">
-        <img src="${getCloudinaryMediaUrl(r.image, r.name)}" alt="${r.name}">
+        <img src="${getCloudinaryMediaUrl(r.image, r.name)}" onerror="this.src='/dishes/dish_1_biryani.jpg'" alt="${r.name}">
         <div class="rest-discount-banner">${r.discount}</div>
       </div>
       <div class="rest-info">
@@ -397,7 +398,7 @@ function renderDishRow(dish) {
         <div class="dish-desc-text">${dish.desc}</div>
       </div>
       <div class="dish-img-col">
-        <img src="${getCloudinaryMediaUrl(dish.image, dish.name)}" alt="${dish.name}">
+        <img src="${getCloudinaryMediaUrl(dish.image, dish.name)}" onerror="this.src='/dishes/dish_1_biryani.jpg'" alt="${dish.name}">
         ${btnHtml}
       </div>
     </div>
