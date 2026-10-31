@@ -7036,7 +7036,7 @@
                   </svg>
                   <span>Command Guardrails &amp; Destructive Shield</span>
                 </span>
-                <p style="font-size:11px; color:var(--text-dim); margin-top:3px; line-height:1.4;">Critical destructive commands are protected with explicit confirmation and role-based access control to prevent accidental data loss.</p>
+                <p style="font-size:11px; color:var(--text-dim); margin-top:3px; line-height:1.4;">Critical destructive commands are protected with explicit confirmation to prevent accidental data loss.</p>
               </div>
             </div>
 
@@ -7151,7 +7151,7 @@
                 </div>
                 <div class="sec-guard-body readonly" id="sec-guard-config">
                   <div style="color:#f59e0b; font-weight:600; margin-bottom:4px;">🛡️ Read-Only Guardrail</div>
-                  <div style="color:var(--text-dim); margin-bottom:8px;">CONFIG SET modifications require explicit Admin RBAC authentication token. Read operations (CONFIG GET) remain unrestricted.</div>
+                  <div style="color:var(--text-dim); margin-bottom:8px;">CONFIG SET modifications require explicit engine administrator confirmation flag. Read operations (CONFIG GET) remain unrestricted.</div>
                 </div>
               </div>
             </div>
@@ -10420,7 +10420,8 @@
               currentPreviewKey = activeItem.key;
             }
 
-            const displayUrl = cldCustomImageCache.get(activeItem.key) || activeItem.url || '/biryani_hd.jpg';
+            let displayUrl = localStorage.getItem('cld_' + activeItem.key) || cldCustomImageCache.get(activeItem.key) || activeItem.url;
+            if (!displayUrl || displayUrl.includes('valencedb/image/upload')) displayUrl = '/biryani_hd.jpg';
             if (emptyBox) emptyBox.style.display = 'none';
             if (imgAfter) { 
               imgAfter.src = displayUrl; 
@@ -10612,6 +10613,7 @@
 
         // Cache base64 preview locally so it displays instantly and never 404s
         cldCustomImageCache.set(key, base64Data);
+        try { localStorage.setItem('cld_' + key, base64Data); } catch (e) {}
         currentPreviewKey = key;
 
         // Immediately render uploaded image directly into slider

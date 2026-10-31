@@ -439,7 +439,8 @@ const CINEMA_MOVIES = {
   }
 };
 
-setTimeout(seedValenceCatalog, 1200);
+// seedValenceCatalog disabled for clean zero-key state
+// setTimeout(seedValenceCatalog, 1200);
 
 
 // --- Cloudinary Dynamic Edge Media Pipeline ---
@@ -467,6 +468,70 @@ function getCloudinaryTicketUrl(seatCode, screen = 'IMAX_70MM', time = '07:30_PM
   return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/w_700,h_340,c_fill,f_auto,q_auto/l_text:Arial_28_bold:BOOKING_CONFIRMED,co_white,g_north_west,x_36,y_36/l_text:Arial_22_bold:SEATS_${safeSeat},co_rgb:f5c518,g_north_west,x_36,y_85/l_text:Arial_18:${safeScreen},co_rgb:38bdf8,g_north_west,x_36,y_130/l_text:Arial_14:VALENCE_LOCK_0.18US,co_rgb:10b981,g_south_west,x_36,y_36/sample.jpg`;
 }
 
+
+function proxyToDashboard(req, res) {
+  const options = {
+    hostname: '127.0.0.1',
+    port: 8080,
+    path: req.url,
+    method: req.method,
+    headers: { ...req.headers, host: '127.0.0.1:8080' }
+  };
+  const proxyReq = http.request(options, (proxyRes) => {
+    res.writeHead(proxyRes.statusCode, proxyRes.headers);
+    proxyRes.pipe(res);
+  });
+  proxyReq.on('error', (err) => {
+    // If dashboard port 8080 is unreachable, return clean zero-state fallbacks
+    if (req.url.startsWith('/api/keys')) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: true, count: 0, total: 0, keys: [] }));
+    }
+    if (req.url.startsWith('/api/telemetry')) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({
+        success: true,
+        currentOps: 0,
+        peakOps: 0,
+        p99LatencyMs: 0,
+        p99LatencyUs: 0,
+        p50LatencyMs: 0,
+        p95LatencyMs: 0,
+        dramMb: "0.0",
+        successRate: "100.0%",
+        throughputHistory: new Array(60).fill(0),
+        latencyHistory: new Array(60).fill(0),
+        histogram: [
+          { label: '< 50 µs', pct: 0, color: '#3ECF8E' },
+          { label: '50 – 100 µs', pct: 0, color: '#38BDF8' },
+          { label: '100 – 200 µs', pct: 0, color: '#FBBF24' },
+          { label: '200 – 500 µs', pct: 0, color: '#F97316' },
+          { label: '> 500 µs (P99)', pct: 0, color: '#EF4444' }
+        ],
+        commands: [
+          { command: 'GET', count: 0, pct: 0, avgLatency: '--' },
+          { command: 'SET', count: 0, pct: 0, avgLatency: '--' },
+          { command: 'EXPIRE', count: 0, pct: 0, avgLatency: '--' },
+          { command: 'DEL', count: 0, pct: 0, avgLatency: '--' },
+          { command: 'MGET', count: 0, pct: 0, avgLatency: '--' }
+        ],
+        benchmark: { running: false, paused: false, mode: 'read-heavy', totalOps: 10000, completedOps: 0, startTime: 0, currentOpsPerSec: 0, peakOpsPerSec: 0 }
+      }));
+    }
+    if (req.url.startsWith('/api/cloudinary/inventory')) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: true, count: 0, items: [], dramPreservedPct: '0.0%', bandwidthSavedPct: '0.0%', edgeTtfbMs: '--', cacheHitRate: '--' }));
+    }
+    if (req.url.startsWith('/api/security/clients')) {
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      return res.end(JSON.stringify({ success: true, activeCount: 1, clients: [{ fd: 12, addr: '127.0.0.1:6379', app: 'Studio Loopback Connector', core: 'Core C00', cmdCount: 0, idleSec: 0, uptimeSec: 100 }] }));
+    }
+    res.writeHead(502, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: false, error: 'Dashboard proxy error: ' + err.message }));
+  });
+  req.pipe(proxyReq);
+}
+
 const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   const pathname = parsedUrl.pathname;
@@ -478,6 +543,35 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
     return res.end();
+  }
+
+  // Proxy Studio & Management API endpoints directly to Valence Dashboard (Port 8080)
+  if (
+    pathname === '/api/telemetry' ||
+    pathname === '/api/keys' ||
+    pathname.startsWith('/api/keys/') ||
+    pathname.startsWith('/api/cloudinary') ||
+    pathname.startsWith('/api/security') ||
+    pathname.startsWith('/api/benchmark') ||
+    pathname.startsWith('/api/cluster') ||
+    pathname.startsWith('/api/system/config') ||
+    pathname === '/api/timing-wheel/slots' ||
+    pathname === '/api/snapshot/create' ||
+    pathname === '/api/attach' ||
+    pathname === '/api/detach' ||
+    pathname === '/api/target-app'
+  ) {
+    return proxyToDashboard(req, res);
+  }
+
+  if (pathname === '/studio') {
+    let filePath = path.join(__dirname, 'public', 'studio.html');
+    fs.readFile(filePath, (err, c) => {
+      if (err) { res.writeHead(404); return res.end('Studio not found'); }
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      return res.end(c);
+    });
+    return;
   }
 
   // SSE Live Query Stream
@@ -1110,28 +1204,7 @@ const server = http.createServer(async (req, res) => {
   
   // Track known keys for keyspace explorer & timing wheel (General-purpose high-performance in-memory database store)
   if (!global.valenceKeyStore) {
-    global.valenceKeyStore = new Map([
-      ['session:token:usr_981a', { type: 'string', size: 340, ttl: 45, val: '{"userId":"usr_981a","role":"admin","ip":"192.168.1.104"}' }],
-      ['cache:api:user_profile:8912', { type: 'hash', size: 1420, ttl: 300, val: '{"name":"Alex Vance","tier":"Enterprise","org":"ScaleTech"}' }],
-      ['lock:mutex:order_payout_771', { type: 'string', size: 64, ttl: 14, val: 'worker_node_03' }],
-      ['rate_limit:ip:10.0.4.12', { type: 'string', size: 48, ttl: 22, val: '{"hits":48,"max":100}' }],
-      ['queue:jobs:transcode_worker', { type: 'list', size: 850, ttl: -1, val: '["job_8812","job_8813","job_8814"]' }],
-      ['leaderboard:high_scores', { type: 'zset', size: 620, ttl: -1, val: '{"player_1":9820,"player_2":9410}' }],
-      ['stream:telemetry:sensor_04', { type: 'stream', size: 1140, ttl: -1, val: '{"temp":42.1,"load":0.88,"voltage":1.2}' }],
-      ['geo:zones:datacenter_us_east', { type: 'hash', size: 310, ttl: -1, val: '{"region":"us-east-1","shards":12,"az":"use1-az2"}' }],
-      ['config:cluster:affinity_ring', { type: 'hash', size: 520, ttl: -1, val: '{"topology":"12-core-pinned","simd":"AVX-512","ring":"zero-copy"}' }],
-      ['cache:feed:trending_restaurants', { type: 'list', size: 480, ttl: 3600, val: '["res_meghana","res_empire","res_truffles"]' }],
-      ['user:session:auth_token_991', { type: 'string', size: 320, ttl: 7200, val: '{"uid":"usr_991","role":"customer","device":"ios"}' }],
-      ['config:system:snapshot_policy', { type: 'hash', size: 640, ttl: -1, val: '{"interval_s":300,"compaction":"zstd","engine":"epoch_cow"}' }],
-      ['cache:schema:db_catalog', { type: 'hash', size: 2400, ttl: -1, val: '{"tables":18,"shards":12,"engine":"Valence Core"}' }],
-      ['cart:session_101', { type: 'string', size: 120, ttl: 14, val: '{"items":["item_481","item_209"],"total":149.00}' }],
-      ['lock:seat:C4', { type: 'string', size: 45, ttl: 28, val: 'guest_user_99' }],
-      ['lock:seat:D8', { type: 'string', size: 45, ttl: 8, val: 'mobile_client_12' }],
-      ['rate_limit:api:checkout', { type: 'string', size: 52, ttl: 18, val: '{"count":32,"window_sec":60}' }],
-      ['cache:microservices:route_table', { type: 'hash', size: 1890, ttl: -1, val: '{"auth":"10.0.1.2","pay":"10.0.1.5","stream":"10.0.1.9"}' }],
-      ['counter:global:total_requests', { type: 'string', size: 32, ttl: -1, val: '124800234' }],
-      ['bloom:filter:visited_urls', { type: 'bloom', size: 4096, ttl: -1, val: '<simd_bitset_4096_bits>' }],
-    ]);
+    global.valenceKeyStore = new Map();
   }
 
   // A. GET /api/system/info
