@@ -2074,6 +2074,15 @@ server.on('error', err => {
 // Standby mode by default - attach only when requested via UI or API
 // targetAppState starts with attached: false
 
+
+// Auto-attach to Swiggy on startup so backend is actively streaming and populated
+setTimeout(() => {
+  try {
+    attachToUpstream('http://127.0.0.1:3000', 'val_sec_swiggy_demo_2026');
+    console.log('[AUTO-ATTACH] Swiggy on port 3000 peered successfully');
+  } catch(e) {}
+}, 1500);
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log('================================================================');
   console.log(`  VALENCE STUDIO (100% REAL DATABASE ENGINE CONTROL PLANE)`);

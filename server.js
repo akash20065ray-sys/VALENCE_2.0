@@ -439,8 +439,7 @@ const CINEMA_MOVIES = {
   }
 };
 
-// seedValenceCatalog disabled for clean zero-key state
-// setTimeout(seedValenceCatalog, 1200);
+setTimeout(seedValenceCatalog, 800);
 
 
 // --- Cloudinary Dynamic Edge Media Pipeline ---
