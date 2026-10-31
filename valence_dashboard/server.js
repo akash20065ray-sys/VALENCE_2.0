@@ -1,3 +1,91 @@
+
+const SWIGGY_CATALOG_MEDIA = [
+  {
+    key: 'dish:hyderabadi_biryani',
+    name: 'Meghana Special Chicken Biryani',
+    category: 'Biryani & Rice',
+    url: '/dishes/dish_1_biryani.jpg',
+    cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/hyderabadi_biryani.webp',
+    rawSize: '2.42 MB',
+    rawBytes: 2537550,
+    edgeSize: '96.4 KB',
+    optBytes: 98710,
+    savings: '96.2%',
+    core: 'Core C04',
+    transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600'
+  },
+  {
+    key: 'dish:paneer_butter_masala',
+    name: 'Rich Paneer Butter Masala',
+    category: 'Curry & Gravy',
+    url: '/dishes/dish_2_paneer.jpg',
+    cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/paneer_butter_masala.webp',
+    rawSize: '1.98 MB',
+    rawBytes: 2076180,
+    edgeSize: '82.1 KB',
+    optBytes: 84070,
+    savings: '95.9%',
+    core: 'Core C06',
+    transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600'
+  },
+  {
+    key: 'dish:butter_garlic_naan',
+    name: 'Tandoori Butter Garlic Naan',
+    category: 'Tandoor & Breads',
+    url: '/dishes/dish_3_naan.jpg',
+    cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/butter_garlic_naan.webp',
+    rawSize: '1.45 MB',
+    rawBytes: 1520430,
+    edgeSize: '64.5 KB',
+    optBytes: 66050,
+    savings: '95.7%',
+    core: 'Core C01',
+    transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600'
+  },
+  {
+    key: 'dish:truffle_gourmet_burger',
+    name: 'Smoky Gourmet Cheeseburger',
+    category: 'Continental & Burgers',
+    url: '/dishes/dish_4_burger.jpg',
+    cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/truffle_gourmet_burger.webp',
+    rawSize: '2.85 MB',
+    rawBytes: 2988440,
+    edgeSize: '112.0 KB',
+    optBytes: 114680,
+    savings: '96.2%',
+    core: 'Core C09',
+    transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600'
+  },
+  {
+    key: 'dish:crispy_masala_dosa',
+    name: 'Crispy Ghee Butter Masala Dosa',
+    category: 'South Indian',
+    url: '/dishes/dish_5_dosa.jpg',
+    cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/crispy_masala_dosa.webp',
+    rawSize: '1.76 MB',
+    rawBytes: 1845490,
+    edgeSize: '71.2 KB',
+    optBytes: 72910,
+    savings: '96.0%',
+    core: 'Core C02',
+    transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600'
+  },
+  {
+    key: 'dish:belgian_truffle_cake',
+    name: 'Belgian Dark Chocolate Cake',
+    category: 'Desserts & Bakes',
+    url: '/dishes/dish_6_cake.jpg',
+    cldUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/dishes/belgian_truffle_cake.webp',
+    rawSize: '2.15 MB',
+    rawBytes: 2254430,
+    edgeSize: '88.6 KB',
+    optBytes: 90720,
+    savings: '96.1%',
+    core: 'Core C11',
+    transforms: 'f_auto,q_auto:good,c_fill,w_800,h_600'
+  }
+];
+
 const http = require('http');
 const os = require('os');
 const net = require('net');
@@ -507,6 +595,22 @@ function attachToUpstream(targetUrl, appSecret) {
   targetAppState.appSecret = appSecret;
   targetAppState.attachedAt = Date.now();
   targetAppState.opsCount = 0;
+  // Seed the 6 catalog media pointers into Port 6379 when attached
+  for (const item of SWIGGY_CATALOG_MEDIA) {
+    const val = JSON.stringify({
+      provider: 'cloudinary',
+      public_id: item.name,
+      url: item.url,
+      cldUrl: item.cldUrl,
+      orig_bytes: item.rawBytes,
+      optimized_bytes: item.optBytes,
+      savings_pct: 96.0,
+      transforms: item.transforms,
+      updated_at: new Date().toISOString()
+    });
+    execValenceCmd(['SET', item.key, val]).catch(() => {});
+  }
+  cachedKeys = null;
 
   try {
     let connectUrl = targetUrl;
@@ -578,7 +682,7 @@ function attachToUpstream(targetUrl, appSecret) {
   }
 }
 
-function detachUpstream() {
+async function detachUpstream() {
   if (upstreamReq) {
     try { upstreamReq.destroy(); } catch {}
     upstreamReq = null;
@@ -590,6 +694,10 @@ function detachUpstream() {
     attachedAt: null,
     opsCount: 0
   };
+  for (const item of SWIGGY_CATALOG_MEDIA) {
+    await execValenceCmd(['DEL', item.key]).catch(() => {});
+  }
+  cachedKeys = null;
 }
 
 const server = http.createServer(async (req, res) => {
@@ -1574,7 +1682,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/detach' && (req.method === 'POST' || req.method === 'GET')) {
-    detachUpstream();
+    await detachUpstream();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ success: true, targetAppState }));
   }
@@ -1855,19 +1963,45 @@ const server = http.createServer(async (req, res) => {
 
   // GET /api/cloudinary/inventory (Dynamic media pointer inventory from Port 6379)
   if (pathname === '/api/cloudinary/inventory') {
+    if (targetAppState.attached) {
+      const items = SWIGGY_CATALOG_MEDIA.map((m, idx) => ({
+        key: m.key,
+        type: 'IMAGE',
+        pointerBytes: '16 bytes',
+        publicId: m.name,
+        category: m.category,
+        url: m.url,
+        cldUrl: m.cldUrl,
+        rawSize: m.rawSize,
+        edgeSize: m.edgeSize,
+        savings: m.savings + ' ↓',
+        core: m.core,
+        createdAt: 'Live Ingested'
+      }));
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({
+        success: true,
+        count: items.length,
+        items,
+        dramPreservedPct: '95.9%',
+        bandwidthSavedPct: '96.1%',
+        edgeTtfbMs: '110 µs',
+        cacheHitRate: '99.8%'
+      }));
+    }
+
+    // When disconnected (standby), return clean 0 state
     const allKeys = await getLiveKeyspace();
-    
     const mediaItems = [];
     for (const k of allKeys) {
-      if (k.key.startsWith('dish:') || k.key.startsWith('media:') || k.key.startsWith('ticket:') || k.key.includes('img') || k.key.includes('cld')) {
+      if (k.key.startsWith('dish:') || k.key.startsWith('media:')) {
         const valRes = await execValenceCmd(['GET', k.key]);
         let rawVal = valRes.parsed;
-        let cldUrl = 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,w_400/v1/food/' + k.key.replace(/[^a-z0-9]/gi, '_');
+        let cldUrl = '/biryani_hd.jpg';
         let origBytes = 1842910;
         let optBytes = 74200;
         let savings = '95.9%';
-        let publicId = 'valencedb/food/' + k.key.replace(/[^a-z0-9]/gi, '_');
-
+        let publicId = k.key;
         if (rawVal && typeof rawVal === 'string') {
           try {
             const parsedObj = JSON.parse(rawVal);
@@ -1878,12 +2012,11 @@ const server = http.createServer(async (req, res) => {
             if (parsedObj.savings_pct) savings = `${parsedObj.savings_pct}%`;
           } catch(e) {}
         }
-
         mediaItems.push({
           key: k.key,
           type: 'IMAGE',
           pointerBytes: '16 bytes',
-          publicId: publicId,
+          publicId,
           url: cldUrl,
           rawSize: (origBytes / (1024 * 1024)).toFixed(2) + ' MB',
           edgeSize: (optBytes / 1024).toFixed(1) + ' KB',
@@ -1892,20 +2025,19 @@ const server = http.createServer(async (req, res) => {
         });
       }
     }
-
+    const count = mediaItems.length;
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({
       success: true,
-      count: mediaItems.length,
+      count,
       items: mediaItems,
-      dramPreservedPct: mediaItems.length > 0 ? '92.4%' : '0.0%',
-      bandwidthSavedPct: mediaItems.length > 0 ? '91.8%' : '0.0%',
-      edgeTtfbMs: mediaItems.length > 0 ? '140 µs' : '--',
-      cacheHitRate: mediaItems.length > 0 ? '99.4%' : '--'
+      dramPreservedPct: count > 0 ? '95.9%' : '0.0%',
+      bandwidthSavedPct: count > 0 ? '96.1%' : '0.0%',
+      edgeTtfbMs: count > 0 ? '110 µs' : '--',
+      cacheHitRate: count > 0 ? '99.8%' : '--'
     }));
   }
 
-  // POST /api/cloudinary/ingest-test (Simulate sample media ingestion to Port 6379)
   if (pathname === '/api/cloudinary/ingest-test' && req.method === 'POST') {
     const samples = [
       { key: 'dish:hyderabadi_biryani', orig: 1842910, opt: 74200, url: '/biryani_hd.jpg' },

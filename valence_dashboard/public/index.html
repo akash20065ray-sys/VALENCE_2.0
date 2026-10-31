@@ -6704,6 +6704,24 @@
             <!-- Hidden file input for real custom image upload -->
             <input type="file" id="cld-file-input" accept="image/*" style="display:none;" onchange="handleCustomImageUpload(this)">
 
+            <!-- Dish Browser Header with Prev / Next Navigation -->
+            <div id="cld-nav-bar" style="display:none; align-items:center; justify-content:space-between; margin-bottom:12px; background:rgba(255,255,255,0.03); border:1px solid var(--border-hairline); border-radius:8px; padding:8px 14px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <span id="cld-dish-idx-badge" style="background:rgba(62,207,142,0.15); color:var(--emerald); border:1px solid rgba(62,207,142,0.3); padding:3px 8px; border-radius:4px; font-size:11px; font-weight:700; font-family:'JetBrains Mono',monospace;">Dish 1 of 6</span>
+                <span id="cld-dish-title" style="font-size:13px; font-weight:600; color:#ffffff;">Meghana Special Chicken Biryani</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button class="btn-secondary" style="padding:5px 12px; font-size:11.5px; display:inline-flex; align-items:center; gap:5px; cursor:pointer;" onclick="prevCloudinaryDish()">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                  <span>Previous</span>
+                </button>
+                <button class="btn-primary" style="background:#00E599; color:#000000; font-weight:700; padding:5px 14px; font-size:11.5px; border-radius:5px; display:inline-flex; align-items:center; gap:5px; cursor:pointer; border:none;" onclick="nextCloudinaryDish()">
+                  <span>Next Dish</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+              </div>
+            </div>
+
             <!-- Comparison Slider -->
             <div class="cld-slider-container" id="cld-slider-container">
               <!-- Empty state placeholder (visible when 0 keys) -->
@@ -10283,6 +10301,30 @@
     const cldCustomImageCache = new Map();
     let currentPreviewKey = 'dish:hyderabadi_biryani';
 
+    let currentDishIdx = 0;
+
+    function nextCloudinaryDish() {
+      if (!cldInventoryData || cldInventoryData.length === 0) return;
+      currentDishIdx = (currentDishIdx + 1) % cldInventoryData.length;
+      currentPreviewKey = cldInventoryData[currentDishIdx].key;
+      renderCloudinaryView();
+    }
+
+    function prevCloudinaryDish() {
+      if (!cldInventoryData || cldInventoryData.length === 0) return;
+      currentDishIdx = (currentDishIdx - 1 + cldInventoryData.length) % cldInventoryData.length;
+      currentPreviewKey = cldInventoryData[currentDishIdx].key;
+      renderCloudinaryView();
+    }
+
+    function selectCloudinaryDish(idx) {
+      if (!cldInventoryData || !cldInventoryData[idx]) return;
+      currentDishIdx = idx;
+      currentPreviewKey = cldInventoryData[idx].key;
+      renderCloudinaryView();
+    }
+
+
     function openMediaPreview(key) {
       if (!cldInventoryData || cldInventoryData.length === 0) return;
       currentPreviewKey = key;
@@ -10366,13 +10408,22 @@
           const clipWrap = document.getElementById('cld-clipped-wrap');
           const sliderBar = document.getElementById('cld-slider-bar');
 
+          const navBar = document.getElementById('cld-nav-bar');
+          const dishBadge = document.getElementById('cld-dish-idx-badge');
+          const dishTitle = document.getElementById('cld-dish-title');
+
           if (count > 0) {
-            // Find current active preview or default to dish:hyderabadi_biryani
+            if (navBar) navBar.style.display = 'flex';
             let activeItem = cldInventoryData.find(i => i.key === currentPreviewKey);
             if (!activeItem) {
-              activeItem = cldInventoryData.find(i => i.key === 'dish:hyderabadi_biryani') || cldInventoryData[0];
+              activeItem = cldInventoryData[currentDishIdx] || cldInventoryData[0];
               currentPreviewKey = activeItem.key;
             }
+            currentDishIdx = cldInventoryData.indexOf(activeItem);
+            if (currentDishIdx === -1) currentDishIdx = 0;
+
+            if (dishBadge) dishBadge.innerText = `Dish ${currentDishIdx + 1} of ${count}`;
+            if (dishTitle) dishTitle.innerText = activeItem.publicId || activeItem.key;
 
             let displayUrl = cldCustomImageCache.get(activeItem.key) || activeItem.url;
             if (!displayUrl || displayUrl.includes('valencedb/image/upload')) {
