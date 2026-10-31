@@ -439,7 +439,7 @@ const CINEMA_MOVIES = {
   }
 };
 
-setTimeout(seedValenceCatalog, 800);
+// setTimeout(seedValenceCatalog, 800);
 
 
 // --- Cloudinary Dynamic Edge Media Pipeline ---
