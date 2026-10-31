@@ -1602,9 +1602,9 @@ const server = http.createServer(async (req, res) => {
           return res.end(JSON.stringify({ success: false, error: 'key is required' }));
         }
 
-        let finalUrl = imageUrl;
+        let finalUrl = imageUrl || '';
         let origBytes = payload.rawBytes || 1842910;
-        let optimizedBytes = Math.round(origBytes * 0.08); // 92% WebP edge optimization
+        let optimizedBytes = Math.round(origBytes * 0.08);
 
         // Save custom uploaded image to disk so it can be loaded reliably
         if (imageBase64 && typeof imageBase64 === 'string') {
@@ -1631,7 +1631,7 @@ const server = http.createServer(async (req, res) => {
           }
         }
 
-        if (!finalUrl || finalUrl.includes('valencedb/image/upload')) {
+        if (!finalUrl) {
           finalUrl = '/biryani_hd.jpg';
         }
 
@@ -1987,10 +1987,8 @@ server.on('error', err => {
 
 
 
-// Auto-attach to local Swiggy app on port 3000 on startup
-setTimeout(() => {
-  attachToUpstream('http://127.0.0.1:3000');
-}, 1000);
+// Standby mode by default - attach only when requested via UI or API
+// targetAppState starts with attached: false
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log('================================================================');

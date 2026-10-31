@@ -6881,7 +6881,7 @@
             </div>
             <div class="sec-kpi-val" id="sec-kpi-attached-app" style="font-size:18px; color:var(--text-dim);">None (Standby)</div>
             <div class="sec-kpi-footer">
-              <span class="sec-kpi-sub" id="sec-kpi-attached-sub">Port 3000 Connector</span>
+              <span class="sec-kpi-sub" id="sec-kpi-attached-sub">Loopback Port 6379</span>
               <span class="cfg-pill cyan" id="sec-kpi-attached-pill">Standby</span>
             </div>
           </div>
@@ -6954,7 +6954,7 @@
           <div style="display:grid; grid-template-columns:1.8fr 1.2fr auto auto; gap:10px; align-items:center; background:var(--bg-panel); padding:12px 16px; border-radius:8px; border:1px solid var(--border-hairline);">
             <div>
               <label style="display:block; font-size:10.5px; color:var(--text-dim); margin-bottom:4px; font-weight:500;">Target Application URL</label>
-              <input type="text" id="sec-peering-url-inp" value="http://localhost:3000" placeholder="e.g. http://localhost:3000" style="width:100%; box-sizing:border-box; background:var(--bg-card); border:1px solid var(--border-hairline); border-radius:5px; padding:7px 10px; font-size:12px; color:#ffffff; font-family:'JetBrains Mono',monospace; outline:none;">
+              <input type="text" id="sec-peering-url-inp" value="" placeholder="e.g. http://localhost:3000" style="width:100%; box-sizing:border-box; background:var(--bg-card); border:1px solid var(--border-hairline); border-radius:5px; padding:7px 10px; font-size:12px; color:#ffffff; font-family:'JetBrains Mono',monospace; outline:none;">
             </div>
             <div>
               <label style="display:block; font-size:10.5px; color:var(--text-dim); margin-bottom:4px; font-weight:500;">App Auth Secret (Optional)</label>
@@ -10374,8 +10374,10 @@
               currentPreviewKey = activeItem.key;
             }
 
-            let displayUrl = localStorage.getItem('cld_' + activeItem.key) || cldCustomImageCache.get(activeItem.key) || activeItem.url;
-            if (!displayUrl || displayUrl.includes('valencedb/image/upload')) displayUrl = '/biryani_hd.jpg';
+            let displayUrl = cldCustomImageCache.get(activeItem.key) || activeItem.url;
+            if (!displayUrl || displayUrl.includes('valencedb/image/upload')) {
+              displayUrl = cldCustomImageCache.get(activeItem.key) || '/biryani_hd.jpg';
+            }
             if (emptyBox) emptyBox.style.display = 'none';
             if (imgAfter) { 
               imgAfter.src = displayUrl; 
@@ -10614,7 +10616,7 @@
               rawBytes: file.size,
               imageBase64: base64Data,
               filename: file.name,
-              imageUrl: 'https://res.cloudinary.com/valencedb/image/upload/f_auto,q_auto:good,c_fill,w_800,h_600/' + key + '.webp',
+              imageUrl: '',
               format: file.type.split('/')[1] || 'jpg'
             })
           });
